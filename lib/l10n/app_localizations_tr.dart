@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get aboutFlauncher => 'Arc Launcher Hakkında';
+  String get aboutFlauncher => 'GoodTV Launcher Hakkında';
 
   @override
   String get addCategory => 'Kategori ekle';
@@ -252,7 +252,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get updateInstallPermissionBody =>
-      'Arc Launcher\'ın bilinmeyen uygulamaları yüklemesine izin verin, ardından güncellemeyi yeniden deneyin.';
+      'GoodTV Launcher\'ın bilinmeyen uygulamaları yüklemesine izin verin, ardından güncellemeyi yeniden deneyin.';
 
   @override
   String get updateOpenPermissionSettingsButton => 'İzin ayarlarını aç';
@@ -263,7 +263,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String textAboutDialog(String repoUrl) {
-    return 'Arc Launcher, FLauncher tabanlı, Android TV için özelleştirilmiş açık kaynaklı bir başlatıcıdır.\n\nGeliştiren: Meddouri Badis.\nKaynak kodu $repoUrl adresinde mevcuttur.';
+    return 'GoodTV Launcher; Android TV, Google TV ve Fire TV için ücretsiz, açık kaynaklı bir başlatıcıdır. Good Tools tarafından Arc Launcher, LTvLauncher ve FLauncher temel alınarak geliştirilmiştir.\n\nÖzgün kaynak kodu: $repoUrl';
   }
 
   @override

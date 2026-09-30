@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -25,8 +25,7 @@ import 'package:provider/provider.dart';
 import '../widgets/settings/back_button_actions.dart';
 import 'apps_service.dart';
 
-class LauncherState extends ChangeNotifier
-{
+class LauncherState extends ChangeNotifier {
   bool _isDefaultLauncher;
   bool _launcherVisible;
   bool _appGridFocused;
@@ -35,7 +34,10 @@ class LauncherState extends ChangeNotifier
   bool get launcherVisible => _launcherVisible;
   bool get appGridFocused => _appGridFocused;
 
-  LauncherState() : _isDefaultLauncher = false, _launcherVisible = true, _appGridFocused = false;
+  LauncherState()
+    : _isDefaultLauncher = false,
+      _launcherVisible = true,
+      _appGridFocused = false;
 
   void toggleLauncherVisibility() {
     _launcherVisible = !_launcherVisible;
@@ -72,8 +74,7 @@ class LauncherState extends ChangeNotifier
           appsService.startAmbientMode();
           break;
       }
-    }
-    else {
+    } else {
       SystemNavigator.pop();
     }
   }

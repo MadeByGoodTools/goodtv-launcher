@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/database.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/widgets/add_to_category_dialog.dart';
-import 'package:flauncher/widgets/application_info_panel.dart';
-import 'package:flauncher/widgets/settings/applications_panel_page.dart';
+import 'package:goodtv_launcher/database.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/widgets/add_to_category_dialog.dart';
+import 'package:goodtv_launcher/widgets/application_info_panel.dart';
+import 'package:goodtv_launcher/widgets/settings/applications_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,7 +47,7 @@ void main() {
         name: "FLauncher",
         sideloaded: false,
         hidden: false,
-      )
+      ),
     ]);
 
     await _pumpWidgetWithProviders(tester, appsService);
@@ -64,7 +64,7 @@ void main() {
         name: "FLauncher",
         sideloaded: true,
         hidden: false,
-      )
+      ),
     ]);
 
     await _pumpWidgetWithProviders(tester, appsService);
@@ -86,7 +86,7 @@ void main() {
         name: "FLauncher",
         sideloaded: false,
         hidden: true,
-      )
+      ),
     ]);
 
     await _pumpWidgetWithProviders(tester, appsService);
@@ -109,7 +109,9 @@ void main() {
       version: "1.0.0",
     );
     when(appsService.applications).thenReturn([application]);
-    when(appsService.categoriesWithApps).thenReturn([CategoryWithApps(fakeCategory(), [])]);
+    when(
+      appsService.categoriesWithApps,
+    ).thenReturn([CategoryWithApps(fakeCategory(), [])]);
 
     await _pumpWidgetWithProviders(tester, appsService);
 
@@ -128,7 +130,9 @@ void main() {
       version: "1.0.0",
     );
     when(appsService.applications).thenReturn([application]);
-    when(appsService.categoriesWithApps).thenReturn([CategoryWithApps(fakeCategory(), [])]);
+    when(
+      appsService.categoriesWithApps,
+    ).thenReturn([CategoryWithApps(fakeCategory(), [])]);
 
     await _pumpWidgetWithProviders(tester, appsService);
 
@@ -141,7 +145,10 @@ void main() {
   });
 }
 
-Future<void> _pumpWidgetWithProviders(WidgetTester tester, AppsService appsService) async {
+Future<void> _pumpWidgetWithProviders(
+  WidgetTester tester,
+  AppsService appsService,
+) async {
   await tester.pumpWidget(
     MultiProvider(
       providers: [

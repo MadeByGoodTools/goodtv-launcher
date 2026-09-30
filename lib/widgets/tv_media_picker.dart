@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flauncher/flauncher_channel.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

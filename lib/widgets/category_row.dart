@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/widgets/app_card.dart';
-import 'package:flauncher/widgets/category_container_common.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/widgets/app_card.dart';
+import 'package:goodtv_launcher/widgets/category_container_common.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,8 +26,7 @@ import '../models/app.dart';
 import '../models/category.dart';
 import '../providers/settings_service.dart';
 
-class CategoryRow extends StatelessWidget
-{
+class CategoryRow extends StatelessWidget {
   final Category category;
   final List<App> applications;
 
@@ -46,14 +45,17 @@ class CategoryRow extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>((s) => s.showAppNamesBelowIcons);
+    final showAppNames = context.select<SettingsService, bool>(
+      (s) => s.showAppNamesBelowIcons,
+    );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
-    }
-    else {
+    } else {
       categoryContent = SizedBox(
-        height: category.rowHeight.toDouble() + (showAppNames ? kAppNameLabelHeight : 0),
+        height:
+            category.rowHeight.toDouble() +
+            (showAppNames ? kAppNameLabelHeight : 0),
         child: ListView.custom(
           padding: const EdgeInsets.all(8),
           scrollDirection: Axis.horizontal,
@@ -61,20 +63,20 @@ class CategoryRow extends StatelessWidget
             childCount: applications.length,
             findChildIndexCallback: _findChildIndex,
             (context, index) => Padding(
-                key: Key(applications[index].packageName),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: AppCard(
-                  category: category,
-                  application: applications[index],
-                  autofocus: index == 0,
-                  handleUpNavigationToSettings: isFirstSection,
-                  onFocused: onAppFocused,
-                  onMove: (direction) => _onMove(context, direction, index),
-                  onMoveEnd: () => _onMoveEnd(context)
-                )
-            )
-          )
-        )
+              key: Key(applications[index].packageName),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: AppCard(
+                category: category,
+                application: applications[index],
+                autofocus: index == 0,
+                handleUpNavigationToSettings: isFirstSection,
+                onFocused: onAppFocused,
+                onMove: (direction) => _onMove(context, direction, index),
+                onMoveEnd: () => _onMoveEnd(context),
+              ),
+            ),
+          ),
+        ),
       );
     }
 
@@ -89,25 +91,32 @@ class CategoryRow extends StatelessWidget
             if (showCategoriesTitle) {
               return Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: Text(category.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(shadows: [const Shadow(color: Colors.black54, offset: Offset(1, 1), blurRadius: 8)])
+                child: Text(
+                  category.name,
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    shadows: [
+                      const Shadow(
+                        color: Colors.black54,
+                        offset: Offset(1, 1),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
 
             return SizedBox.shrink();
-          }
+          },
         ),
-        categoryContent
+        categoryContent,
       ],
     );
   }
 
-  int _findChildIndex(Key key) =>
-      applications.indexWhere((app) => app.packageName == (key as ValueKey<String>).value);
+  int _findChildIndex(Key key) => applications.indexWhere(
+    (app) => app.packageName == (key as ValueKey<String>).value,
+  );
 
   void _onMove(BuildContext context, AxisDirection direction, int index) {
     int newIndex = 0;

@@ -1,7 +1,7 @@
-# Arc Launcher evolution
+# GoodTV Launcher roadmap
 
-This repository starts from Arc Launcher 1.0.8 and keeps Arc's complete
-existing feature set. New work is additive and remains GPL-3.0.
+GoodTV Launcher starts from Arc Launcher 1.0.8 and keeps its complete existing
+feature set. New work is additive and remains GPL-3.0.
 
 ## Baseline retained
 

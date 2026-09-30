@@ -1,5 +1,5 @@
 {
-    "aboutFlauncher": "About Arc Launcher",
+    "aboutFlauncher": "About GoodTV Launcher",
     "addCategory": "Add category",
     "addSection": "Add section",
     "alphabetical": "Alphabetical",
@@ -124,10 +124,10 @@
     },
     "updateInstallButton": "Install",
     "updateInstallPermissionTitle": "Installer permission required",
-    "updateInstallPermissionBody": "Allow Arc Launcher to install unknown apps, then retry the update.",
+    "updateInstallPermissionBody": "Allow GoodTV Launcher to install unknown apps, then retry the update.",
     "updateOpenPermissionSettingsButton": "Open permission settings",
     "updateErrorGeneric": "Update check failed. Please try again.",
-    "textAboutDialog": "Arc Launcher is a customized open-source launcher for Android TV, based on FLauncher.\n\nDeveloped by Meddouri Badis.\nSource code available at {repoUrl}.",
+    "textAboutDialog": "GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools from Arc Launcher, LTvLauncher, and FLauncher.\n\nOriginal upstream source: {repoUrl}",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

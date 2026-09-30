@@ -23,8 +23,8 @@ import 'package:collection/collection.dart' as collection;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:drift/drift.dart';
-import 'package:flauncher/database.dart';
-import 'package:flauncher/flauncher_channel.dart';
+import 'package:goodtv_launcher/database.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/widgets.dart' hide Category;
 
@@ -246,8 +246,8 @@ class AppsService extends ChangeNotifier {
       (application) => !application.hidden,
     );
     final defaultFavoriteLauncherPackageNames = [
-      'com.omeda.arc',
-      'com.omeda.arc.debug',
+      'ca.goodtools.goodtvlauncher',
+      'ca.goodtools.goodtvlauncher.debug',
     ];
 
     return _database.transaction(() async {

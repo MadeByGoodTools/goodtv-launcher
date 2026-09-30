@@ -16,18 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/widgets/app_card.dart';
-import 'package:flauncher/widgets/category_container_common.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/widgets/app_card.dart';
+import 'package:goodtv_launcher/widgets/category_container_common.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/app.dart';
 import '../models/category.dart';
 
-class CategoryCleanRow extends StatelessWidget
-{
+class CategoryCleanRow extends StatelessWidget {
   final Category category;
   final List<App> applications;
 
@@ -46,16 +45,18 @@ class CategoryCleanRow extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>((s) => s.showAppNamesBelowIcons);
+    final showAppNames = context.select<SettingsService, bool>(
+      (s) => s.showAppNamesBelowIcons,
+    );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
-    }
-    else {
+    } else {
       categoryContent = LayoutBuilder(
         builder: (context, constraints) {
-          final rowHeight = appCardRowExtentFromContentWidth(constraints.maxWidth)
-              + (showAppNames ? kAppNameLabelHeight : 0);
+          final rowHeight =
+              appCardRowExtentFromContentWidth(constraints.maxWidth) +
+              (showAppNames ? kAppNameLabelHeight : 0);
           return SizedBox(
             height: rowHeight,
             child: Row(
@@ -76,7 +77,8 @@ class CategoryCleanRow extends StatelessWidget
                         scrollAlignment: scrollAlignment,
                         enforceAspectRatio: false,
                         onFocused: onAppFocused,
-                        onMove: (direction) => _onMove(context, direction, index),
+                        onMove: (direction) =>
+                            _onMove(context, direction, index),
                         onMoveEnd: () => _onMoveEnd(context),
                       ),
                     ),
@@ -93,9 +95,7 @@ class CategoryCleanRow extends StatelessWidget
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        categoryContent
-      ],
+      children: [categoryContent],
     );
   }
 

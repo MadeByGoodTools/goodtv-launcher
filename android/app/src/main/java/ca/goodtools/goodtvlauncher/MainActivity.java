@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.omeda.arc;
+package ca.goodtools.goodtvlauncher;
 
 import android.content.Context;
 import android.content.Intent;

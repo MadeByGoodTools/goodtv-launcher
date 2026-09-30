@@ -30,8 +30,12 @@ class _FocusableSettingsTileState extends State<FocusableSettingsTile> {
       child: RepaintBoundary(
         child: Actions(
           actions: <Type, Action<Intent>>{
-            ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onPressed?.call()),
-            ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => widget.onPressed?.call()),
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (_) => widget.onPressed?.call(),
+            ),
+            ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+              onInvoke: (_) => widget.onPressed?.call(),
+            ),
           },
           child: Focus(
             autofocus: widget.autofocus,
@@ -41,12 +45,20 @@ class _FocusableSettingsTileState extends State<FocusableSettingsTile> {
               borderRadius: BorderRadius.circular(12),
               focusColor: Colors.transparent,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: _focused ? Colors.white.withOpacity(0.05) : Colors.transparent,
+                  color: _focused
+                      ? Colors.white.withOpacity(0.05)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   border: _focused
-                      ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        )
                       : Border.all(color: Colors.transparent, width: 2),
                 ),
                 child: Row(

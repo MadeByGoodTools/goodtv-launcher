@@ -20,25 +20,25 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
-import 'package:flauncher/actions.dart';
-import 'package:flauncher/custom_traversal_policy.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/launcher_state.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
-import 'package:flauncher/providers/watch_next_service.dart';
-import 'package:flauncher/widgets/app_card.dart';
-import 'package:flauncher/widgets/cached_blur_backdrop.dart';
-import 'package:flauncher/widgets/category_clean_row.dart';
-import 'package:flauncher/widgets/category_row.dart';
-import 'package:flauncher/widgets/launcher_alternative_view.dart';
-import 'package:flauncher/widgets/focus_aware_app_bar.dart';
-import 'package:flauncher/widgets/wallpaper_video_background.dart';
-import 'package:flauncher/widgets/watch_next_row.dart';
+import 'package:goodtv_launcher/actions.dart';
+import 'package:goodtv_launcher/custom_traversal_policy.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/launcher_state.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/providers/watch_next_service.dart';
+import 'package:goodtv_launcher/widgets/app_card.dart';
+import 'package:goodtv_launcher/widgets/cached_blur_backdrop.dart';
+import 'package:goodtv_launcher/widgets/category_clean_row.dart';
+import 'package:goodtv_launcher/widgets/category_row.dart';
+import 'package:goodtv_launcher/widgets/launcher_alternative_view.dart';
+import 'package:goodtv_launcher/widgets/focus_aware_app_bar.dart';
+import 'package:goodtv_launcher/widgets/wallpaper_video_background.dart';
+import 'package:goodtv_launcher/widgets/watch_next_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 import 'models/app.dart';
 import 'models/category.dart';
@@ -95,10 +95,16 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         children: [
           RepaintBoundary(
             child: Consumer<WallpaperService>(
-              builder: (_, wallpaperService, __) => _wallpaper(context, wallpaperService),
+              builder: (_, wallpaperService, __) =>
+                  _wallpaper(context, wallpaperService),
             ),
           ),
-          Selector3<LauncherState, SettingsService, WallpaperService, (bool, bool, bool)>(
+          Selector3<
+            LauncherState,
+            SettingsService,
+            WallpaperService,
+            (bool, bool, bool)
+          >(
             selector: (_, launcherState, settings, wallpaperService) => (
               launcherState.appGridFocused,
               settings.backgroundBlurDisabled,
@@ -122,22 +128,28 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
             },
           ),
           Consumer<LauncherState>(
-            builder:
-                (_, state, child) => Visibility(
-                  replacement: const Center(child: AlternativeLauncherView()),
-                  visible: state.launcherVisible,
-                  child: child!,
-                ),
+            builder: (_, state, child) => Visibility(
+              replacement: const Center(child: AlternativeLauncherView()),
+              visible: state.launcherVisible,
+              child: child!,
+            ),
             child: Scaffold(
               backgroundColor: Colors.transparent,
               appBar: FocusAwareAppBar(key: _appBarKey),
               // (initialized (data.$1), layoutVersion (data.$2), showAppNamesBelowIcons (data.$3))
               body: Selector2<AppsService, SettingsService, (bool, int, bool)>(
-                selector: (_, appsService, settingsService) =>
-                    (appsService.initialized, appsService.layoutVersion, settingsService.showAppNamesBelowIcons),
+                selector: (_, appsService, settingsService) => (
+                  appsService.initialized,
+                  appsService.layoutVersion,
+                  settingsService.showAppNamesBelowIcons,
+                ),
                 builder: (context, data, _) {
                   if (data.$1) {
-                    return _tvOSLayout(context, context.read<AppsService>(), showAppNames: data.$3);
+                    return _tvOSLayout(
+                      context,
+                      context.read<AppsService>(),
+                      showAppNames: data.$3,
+                    );
                   } else {
                     return _emptyState(context);
                   }
@@ -163,21 +175,31 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     _setAppGridFocused(false);
   }
 
-  Widget _tvOSLayout(BuildContext context, AppsService appsService, {required bool showAppNames}) {
-    final favoritesCategory = appsService.categories.firstWhereOrNull((c) => c.name == 'Favorites');
+  Widget _tvOSLayout(
+    BuildContext context,
+    AppsService appsService, {
+    required bool showAppNames,
+  }) {
+    final favoritesCategory = appsService.categories.firstWhereOrNull(
+      (c) => c.name == 'Favorites',
+    );
     final favoriteApps = favoritesCategory?.applications ?? const [];
 
-    final otherSections =
-        appsService.launcherSections.where((section) {
-          if (section is Category && section.name == 'Favorites') return false;
-          return true;
-        }).toList();
+    final otherSections = appsService.launcherSections.where((section) {
+      if (section is Category && section.name == 'Favorites') return false;
+      return true;
+    }).toList();
 
-    final showWatchNextSection = context.select<SettingsService, bool>((s) => s.showWatchNextSection);
-    final watchNextVisible = context.select<WatchNextService, bool>((s) => s.hasVisibleSection);
+    final showWatchNextSection = context.select<SettingsService, bool>(
+      (s) => s.showWatchNextSection,
+    );
+    final watchNextVisible = context.select<WatchNextService, bool>(
+      (s) => s.hasVisibleSection,
+    );
     final reserveWatchNextSpace = showWatchNextSection && watchNextVisible;
 
-    if (favoriteApps.isEmpty && otherSections.isEmpty) return _emptyState(context);
+    if (favoriteApps.isEmpty && otherSections.isEmpty)
+      return _emptyState(context);
 
     return CustomScrollView(
       controller: _scrollController,
@@ -221,9 +243,18 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           otherSections,
           firstCategoryAlreadyFound: favoriteApps.isNotEmpty,
           showAppNames: showAppNames,
-          onFirstSectionFocused: favoriteApps.isNotEmpty ? _scrollDockToTop : null,
+          onFirstSectionFocused: favoriteApps.isNotEmpty
+              ? _scrollDockToTop
+              : null,
         ),
-        SliverToBoxAdapter(child: SizedBox(height: _bottomScrollPadding(context, hasDock: favoriteApps.isNotEmpty))),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: _bottomScrollPadding(
+              context,
+              hasDock: favoriteApps.isNotEmpty,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -232,7 +263,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     if (!hasDock) {
       return 64;
     }
-    return MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - kToolbarHeight;
+    return MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        kToolbarHeight;
   }
 
   List<Widget> _buildSectionSlivers(
@@ -249,7 +282,12 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       final Key sectionKey = Key(section.id.toString());
 
       if (section is LauncherSpacer) {
-        slivers.add(SliverToBoxAdapter(key: sectionKey, child: SizedBox(height: section.height.toDouble())));
+        slivers.add(
+          SliverToBoxAdapter(
+            key: sectionKey,
+            child: SizedBox(height: section.height.toDouble()),
+          ),
+        );
         continue;
       }
 
@@ -260,7 +298,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       final bool isFirstSection = !firstCategoryFound;
       if (isFirstSection) firstCategoryFound = true;
       final onAppFocused = !firstBuiltSectionFound
-          ? () => _onAppGridFocused(onFirstSectionFocused: onFirstSectionFocused)
+          ? () =>
+                _onAppGridFocused(onFirstSectionFocused: onFirstSectionFocused)
           : () => _onAppGridFocused();
       firstBuiltSectionFound = true;
 
@@ -275,7 +314,13 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   child: Text(
                     category.name,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      shadows: const [Shadow(color: Colors.black54, offset: Offset(1, 1), blurRadius: 8)],
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black54,
+                          offset: Offset(1, 1),
+                          blurRadius: 8,
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -309,7 +354,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           );
           break;
         case CategoryType.grid:
-          final gridContentWidth = MediaQuery.sizeOf(context).width - 2 * kLauncherSectionHorizontalPadding;
+          final gridContentWidth =
+              MediaQuery.sizeOf(context).width -
+              2 * kLauncherSectionHorizontalPadding;
           final gridAspectRatio = showAppNames
               ? appCardGridAspectRatio(gridContentWidth, category.columnsCount)
               : kAppCardAspectRatio;
@@ -332,7 +379,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   childCount: filteredApps.length,
                   findChildIndexCallback: (Key key) {
                     final valueKey = key as ValueKey<String>;
-                    final index = filteredApps.indexWhere((app) => app.packageName == valueKey.value);
+                    final index = filteredApps.indexWhere(
+                      (app) => app.packageName == valueKey.value,
+                    );
                     return index >= 0 ? index : null;
                   },
                   (context, index) => Padding(
@@ -345,13 +394,26 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                       category: category,
                       application: filteredApps[index],
                       autofocus: index == 0,
-                      handleUpNavigationToSettings: isFirstSection && index < category.columnsCount,
+                      handleUpNavigationToSettings:
+                          isFirstSection && index < category.columnsCount,
                       enforceAspectRatio: false,
-                      onFocused: index < category.columnsCount ? onAppFocused : null,
-                      ensureVisibleOnFocus: onAppFocused == null || index >= category.columnsCount,
+                      onFocused: index < category.columnsCount
+                          ? onAppFocused
+                          : null,
+                      ensureVisibleOnFocus:
+                          onAppFocused == null ||
+                          index >= category.columnsCount,
                       onlyScrollWhenNearBottom: true,
-                      onMove: (direction) => _onGridMove(context, category, index, direction, filteredApps),
-                      onMoveEnd: () => context.read<AppsService>().saveApplicationOrderInCategory(category),
+                      onMove: (direction) => _onGridMove(
+                        context,
+                        category,
+                        index,
+                        direction,
+                        filteredApps,
+                      ),
+                      onMoveEnd: () => context
+                          .read<AppsService>()
+                          .saveApplicationOrderInCategory(category),
                     ),
                   ),
                 ),
@@ -392,7 +454,10 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
 
     final viewport = RenderAbstractViewport.of(renderObject);
     final position = _scrollController.position;
-    return viewport.getOffsetToReveal(renderObject, 0).offset.clamp(position.minScrollExtent, position.maxScrollExtent);
+    return viewport
+        .getOffsetToReveal(renderObject, 0)
+        .offset
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
   }
 
   // TO DO : refractor duplicate _onMove code
@@ -404,7 +469,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     List<App> filteredApps,
   ) {
     final currentRow = (index / category.columnsCount).floor();
-    final totalRows = ((filteredApps.length - 1) / category.columnsCount).floor();
+    final totalRows = ((filteredApps.length - 1) / category.columnsCount)
+        .floor();
 
     int? newIndex;
     switch (direction) {
@@ -415,7 +481,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         if (index < filteredApps.length - 1) newIndex = index + 1;
         break;
       case AxisDirection.down:
-        if (currentRow < totalRows) newIndex = min(index + category.columnsCount, filteredApps.length - 1);
+        if (currentRow < totalRows)
+          newIndex = min(
+            index + category.columnsCount,
+            filteredApps.length - 1,
+          );
         break;
       case AxisDirection.left:
         if (index > 0) newIndex = index - 1;
@@ -426,7 +496,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       final appsService = context.read<AppsService>();
       final movingApp = filteredApps[index];
       final realOldIndex = category.applications.indexOf(movingApp);
-      final realNewIndex = category.applications.indexOf(filteredApps[newIndex]);
+      final realNewIndex = category.applications.indexOf(
+        filteredApps[newIndex],
+      );
       if (realOldIndex >= 0 && realNewIndex >= 0) {
         appsService.reorderApplication(category, realOldIndex, realNewIndex);
         appsService.setPendingReorderFocus(movingApp.packageName, category.id);
@@ -441,9 +513,15 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     AppsService appsService, {
     required bool handleUpNavigationToSettings,
   }) {
-    final backdropDisabled = context.select<SettingsService, bool>((s) => s.dockBackdropFilterDisabled);
-    final darkBackground = context.select<SettingsService, bool>((s) => s.dockDarkBackground);
-    final shadowEnabled = context.select<SettingsService, bool>((s) => s.dockShadowEnabled);
+    final backdropDisabled = context.select<SettingsService, bool>(
+      (s) => s.dockBackdropFilterDisabled,
+    );
+    final darkBackground = context.select<SettingsService, bool>(
+      (s) => s.dockDarkBackground,
+    );
+    final shadowEnabled = context.select<SettingsService, bool>(
+      (s) => s.dockShadowEnabled,
+    );
 
     const dockBorderRadius = 24.0;
     final borderRadius = BorderRadius.circular(dockBorderRadius);
@@ -451,10 +529,14 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     final content = Container(
       padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: darkBackground ? Colors.black.withOpacity(0.3) : Colors.white.withOpacity(0.1),
+        color: darkBackground
+            ? Colors.black.withOpacity(0.3)
+            : Colors.white.withOpacity(0.1),
         borderRadius: borderRadius,
         border: Border.all(
-          color: darkBackground ? Colors.black.withOpacity(0.15) : Colors.white.withOpacity(0.15),
+          color: darkBackground
+              ? Colors.black.withOpacity(0.15)
+              : Colors.white.withOpacity(0.15),
           width: 1.5,
         ),
       ),
@@ -472,13 +554,21 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         decoration: BoxDecoration(
           borderRadius: borderRadius,
           boxShadow: shadowEnabled
-              ? [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 2)]
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ]
               : null,
         ),
         child: ClipRRect(
           borderRadius: borderRadius,
           clipBehavior: Clip.antiAlias,
-          child: backdropDisabled ? content : CachedBlurBackdrop(sigma: 5, child: content),
+          child: backdropDisabled
+              ? content
+              : CachedBlurBackdrop(sigma: 5, child: content),
         ),
       ),
     );
@@ -493,21 +583,29 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         width: screenSize.width,
         height: screenSize.height,
         child: WallpaperVideoBackground(
-          key: ValueKey("background_video_${wallpaperService.wallpaperRevision}"),
+          key: ValueKey(
+            "background_video_${wallpaperService.wallpaperRevision}",
+          ),
           file: videoFile,
         ),
       );
     }
     if (wallpaperService.wallpaper != null) {
       return Image(
-        image: ResizeImage(wallpaperService.wallpaper!, height: (screenSize.height * dpr).round()),
+        image: ResizeImage(
+          wallpaperService.wallpaper!,
+          height: (screenSize.height * dpr).round(),
+        ),
         key: ValueKey("background_${wallpaperService.wallpaperRevision}"),
         fit: BoxFit.cover,
         height: screenSize.height,
         width: screenSize.width,
       );
     } else {
-      return _CachedGradientBackground(key: const Key("background"), gradient: wallpaperService.gradient.gradient);
+      return _CachedGradientBackground(
+        key: const Key("background"),
+        gradient: wallpaperService.gradient.gradient,
+      );
     }
   }
 
@@ -519,7 +617,10 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: 16),
-          Text(localizations.loading, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            localizations.loading,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ],
       ),
     );
@@ -538,7 +639,8 @@ class _CachedGradientBackground extends StatefulWidget {
   const _CachedGradientBackground({super.key, required this.gradient});
 
   @override
-  State<_CachedGradientBackground> createState() => _CachedGradientBackgroundState();
+  State<_CachedGradientBackground> createState() =>
+      _CachedGradientBackgroundState();
 }
 
 class _CachedGradientBackgroundState extends State<_CachedGradientBackground> {
@@ -560,9 +662,14 @@ class _CachedGradientBackgroundState extends State<_CachedGradientBackground> {
     _rendering = true;
     final recorder = ui.PictureRecorder();
     final rect = Offset.zero & size;
-    Canvas(recorder).drawRect(rect, Paint()..shader = widget.gradient.createShader(rect));
+    Canvas(
+      recorder,
+    ).drawRect(rect, Paint()..shader = widget.gradient.createShader(rect));
     final picture = recorder.endRecording();
-    final image = await picture.toImage(size.width.round(), size.height.round());
+    final image = await picture.toImage(
+      size.width.round(),
+      size.height.round(),
+    );
     picture.dispose();
     _rendering = false;
     if (!mounted) {
@@ -582,20 +689,30 @@ class _CachedGradientBackgroundState extends State<_CachedGradientBackground> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
-        final needsRender = size != _renderedSize || widget.gradient != _renderedGradient;
+        final needsRender =
+            size != _renderedSize || widget.gradient != _renderedGradient;
         if (needsRender && size.width > 0 && size.height > 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && (size != _renderedSize || widget.gradient != _renderedGradient)) {
+            if (mounted &&
+                (size != _renderedSize ||
+                    widget.gradient != _renderedGradient)) {
               _render(size);
             }
           });
         }
         final image = _image;
         if (image != null && !needsRender) {
-          return RawImage(image: image, width: size.width, height: size.height, fit: BoxFit.fill);
+          return RawImage(
+            image: image,
+            width: size.width,
+            height: size.height,
+            fit: BoxFit.fill,
+          );
         }
         // First frame (and while re-rendering): paint the gradient live once to avoid a flash.
-        return DecoratedBox(decoration: BoxDecoration(gradient: widget.gradient));
+        return DecoratedBox(
+          decoration: BoxDecoration(gradient: widget.gradient),
+        );
       },
     );
   }

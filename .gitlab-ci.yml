@@ -228,7 +228,7 @@ promote:gitlab-release:
     - echo 'running promote:gitlab-release'
   release:
     name: $CI_COMMIT_TAG
-    description: Arc Launcher v$CI_COMMIT_TAG
+    description: GoodTV Launcher v$CI_COMMIT_TAG
     tag_name: $CI_COMMIT_TAG
     assets:
       links:

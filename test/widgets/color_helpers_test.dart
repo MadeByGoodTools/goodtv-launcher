@@ -1,4 +1,4 @@
-import 'package:flauncher/widgets/color_helpers.dart';
+import 'package:goodtv_launcher/widgets/color_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -38,7 +38,13 @@ void main() {
     Color defaultColor = Colors.red;
 
     // then
-    expect(() => computeBorderColor(badTick1, defaultColor), throwsAssertionError);
-    expect(() => computeBorderColor(badTick2, defaultColor), throwsAssertionError);
+    expect(
+      () => computeBorderColor(badTick1, defaultColor),
+      throwsAssertionError,
+    );
+    expect(
+      () => computeBorderColor(badTick2, defaultColor),
+      throwsAssertionError,
+    );
   });
 }

@@ -88,13 +88,13 @@ jobs:
             --build-number=${{ steps.meta.outputs.build_number }} \
             --build-name=${{ steps.meta.outputs.build_name }}
           mkdir -p release-apks
-          find build/app/outputs -name 'arc-launcher-universal-release.apk' -exec cp -t release-apks/ {} +
-          find build/app/outputs -name 'arc-launcher-arm64-v8a-release.apk' -exec cp -t release-apks/ {} +
-          find build/app/outputs -name 'arc-launcher-armeabi-v7a-release.apk' -exec cp -t release-apks/ {} +
+          find build/app/outputs -name 'goodtv-launcher-universal-release.apk' -exec cp -t release-apks/ {} +
+          find build/app/outputs -name 'goodtv-launcher-arm64-v8a-release.apk' -exec cp -t release-apks/ {} +
+          find build/app/outputs -name 'goodtv-launcher-armeabi-v7a-release.apk' -exec cp -t release-apks/ {} +
           for apk in \
-            release-apks/arc-launcher-universal-release.apk \
-            release-apks/arc-launcher-arm64-v8a-release.apk \
-            release-apks/arc-launcher-armeabi-v7a-release.apk; do
+            release-apks/goodtv-launcher-universal-release.apk \
+            release-apks/goodtv-launcher-arm64-v8a-release.apk \
+            release-apks/goodtv-launcher-armeabi-v7a-release.apk; do
             test -f "$apk" || { echo "Missing $apk"; find build/app/outputs -name '*.apk'; exit 1; }
           done
       - uses: actions/upload-artifact@v4
@@ -190,13 +190,13 @@ jobs:
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
           mkdir -p dist
-          cp release-apks/arc-launcher-universal-release.apk \
+          cp release-apks/goodtv-launcher-universal-release.apk \
             "dist/${RELEASE_APK_FILENAME_PREFIX}-${TAG}.apk"
-          cp release-apks/arc-launcher-arm64-v8a-release.apk \
+          cp release-apks/goodtv-launcher-arm64-v8a-release.apk \
             "dist/${RELEASE_APK_FILENAME_PREFIX}-${TAG}-arm64-v8a.apk"
-          cp release-apks/arc-launcher-armeabi-v7a-release.apk \
+          cp release-apks/goodtv-launcher-armeabi-v7a-release.apk \
             "dist/${RELEASE_APK_FILENAME_PREFIX}-${TAG}-armeabi-v7a.apk"
-          echo "Arc Launcher v${TAG}" > release_notes.md
+          echo "GoodTV Launcher v${TAG}" > release_notes.md
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}

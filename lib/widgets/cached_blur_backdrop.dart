@@ -19,7 +19,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flauncher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +45,8 @@ class CachedBlurLayer extends StatefulWidget {
   State<CachedBlurLayer> createState() => _CachedBlurLayerState();
 }
 
-class _CachedBlurLayerState extends _CachedBlurBackgroundState<CachedBlurLayer> {
+class _CachedBlurLayerState
+    extends _CachedBlurBackgroundState<CachedBlurLayer> {
   @override
   double get sigma => widget.sigma;
 
@@ -63,13 +64,18 @@ class CachedBlurBackdrop extends StatefulWidget {
   final double sigma;
   final Widget child;
 
-  const CachedBlurBackdrop({super.key, required this.sigma, required this.child});
+  const CachedBlurBackdrop({
+    super.key,
+    required this.sigma,
+    required this.child,
+  });
 
   @override
   State<CachedBlurBackdrop> createState() => _CachedBlurBackdropState();
 }
 
-class _CachedBlurBackdropState extends _CachedBlurBackgroundState<CachedBlurBackdrop> {
+class _CachedBlurBackdropState
+    extends _CachedBlurBackgroundState<CachedBlurBackdrop> {
   @override
   double get sigma => widget.sigma;
 
@@ -77,7 +83,10 @@ class _CachedBlurBackdropState extends _CachedBlurBackgroundState<CachedBlurBack
   Widget buildBlurContent(Widget blurBackground) {
     return Stack(
       fit: StackFit.passthrough,
-      children: [Positioned.fill(child: blurBackground), widget.child],
+      children: [
+        Positioned.fill(child: blurBackground),
+        widget.child,
+      ],
     );
   }
 
@@ -88,7 +97,8 @@ class _CachedBlurBackdropState extends _CachedBlurBackgroundState<CachedBlurBack
   );
 }
 
-abstract class _CachedBlurBackgroundState<T extends StatefulWidget> extends State<T> {
+abstract class _CachedBlurBackgroundState<T extends StatefulWidget>
+    extends State<T> {
   ui.Image? _blurred;
   Size _builtSize = Size.zero;
   int _builtRevision = -1;
@@ -124,18 +134,26 @@ abstract class _CachedBlurBackgroundState<T extends StatefulWidget> extends Stat
 
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
-      final blurPaint =
-          Paint()
-            ..imageFilter = ui.ImageFilter.blur(
-              sigmaX: sigma * dpr,
-              sigmaY: sigma * dpr,
-              tileMode: TileMode.clamp,
-            );
+      final blurPaint = Paint()
+        ..imageFilter = ui.ImageFilter.blur(
+          sigmaX: sigma * dpr,
+          sigmaY: sigma * dpr,
+          tileMode: TileMode.clamp,
+        );
       canvas.saveLayer(rect, blurPaint);
       if (source != null) {
-        paintImage(canvas: canvas, rect: rect, image: source, fit: BoxFit.cover, filterQuality: FilterQuality.low);
+        paintImage(
+          canvas: canvas,
+          rect: rect,
+          image: source,
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.low,
+        );
       } else {
-        canvas.drawRect(rect, Paint()..shader = service.gradient.gradient.createShader(rect));
+        canvas.drawRect(
+          rect,
+          Paint()..shader = service.gradient.gradient.createShader(rect),
+        );
       }
       canvas.restore();
 
@@ -189,7 +207,9 @@ abstract class _CachedBlurBackgroundState<T extends StatefulWidget> extends Stat
       builder: (context, constraints) {
         final screen = MediaQuery.sizeOf(context);
         final dpr = MediaQuery.devicePixelRatioOf(context);
-        final gradientId = service.wallpaper == null ? service.gradient.uuid : null;
+        final gradientId = service.wallpaper == null
+            ? service.gradient.uuid
+            : null;
         final stale =
             _blurred == null ||
             _builtSize != screen ||
@@ -222,7 +242,8 @@ class _BlurBlit extends LeafRenderObjectWidget {
   const _BlurBlit({required this.image, required this.screenSize});
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _BlurBlitRender(image, screenSize);
+  RenderObject createRenderObject(BuildContext context) =>
+      _BlurBlitRender(image, screenSize);
 
   @override
   void updateRenderObject(BuildContext context, _BlurBlitRender renderObject) {
@@ -265,8 +286,18 @@ class _BlurBlitRender extends RenderBox {
     // Sample the blurred wallpaper at this box's true on-screen position so the
     // crop stays aligned with the real wallpaper (offset alone is layer-local).
     final screenPos = localToGlobal(Offset.zero);
-    final src = Rect.fromLTWH(screenPos.dx * scaleX, screenPos.dy * scaleY, size.width * scaleX, size.height * scaleY);
+    final src = Rect.fromLTWH(
+      screenPos.dx * scaleX,
+      screenPos.dy * scaleY,
+      size.width * scaleX,
+      size.height * scaleY,
+    );
     final dst = offset & size;
-    context.canvas.drawImageRect(_image, src, dst, Paint()..filterQuality = FilterQuality.low);
+    context.canvas.drawImageRect(
+      _image,
+      src,
+      dst,
+      Paint()..filterQuality = FilterQuality.low,
+    );
   }
 }

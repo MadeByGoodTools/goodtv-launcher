@@ -19,8 +19,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flauncher/flauncher_channel.dart';
-import 'package:flauncher/models/watch_next_item.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
+import 'package:goodtv_launcher/models/watch_next_item.dart';
 import 'package:http/http.dart' as http;
 
 class WatchNextService extends ChangeNotifier {
@@ -40,7 +40,8 @@ class WatchNextService extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasPermission => _hasPermission;
   bool get hasItems => _items.isNotEmpty;
-  bool get hasVisibleSection => !_isLoading && (!_hasPermission || _items.isNotEmpty);
+  bool get hasVisibleSection =>
+      !_isLoading && (!_hasPermission || _items.isNotEmpty);
 
   WatchNextService(this._fLauncherChannel) {
     _init();
@@ -137,15 +138,15 @@ class WatchNextService extends ChangeNotifier {
       }
     }
 
-    final workers = List.generate(
-      _maxParallelPosterLoads,
-      (_) => worker(),
-    );
+    final workers = List.generate(_maxParallelPosterLoads, (_) => worker());
     await Future.wait(workers);
   }
 
   void ensurePosterLoaded(String? uri) {
-    if (uri == null || _posterCache.containsKey(uri) || _failedPosters.contains(uri) || _loadingPosters.contains(uri)) {
+    if (uri == null ||
+        _posterCache.containsKey(uri) ||
+        _failedPosters.contains(uri) ||
+        _loadingPosters.contains(uri)) {
       return;
     }
     unawaited(_loadPosterImage(uri));
@@ -163,7 +164,9 @@ class WatchNextService extends ChangeNotifier {
         imageBytes = await _fLauncherChannel.loadContentUriImage(uri);
       } else {
         final uriObj = Uri.parse(uri);
-        final response = await http.get(uriObj).timeout(const Duration(seconds: 10));
+        final response = await http
+            .get(uriObj)
+            .timeout(const Duration(seconds: 10));
         if (response.statusCode == 200) {
           imageBytes = response.bodyBytes;
         }
@@ -189,7 +192,10 @@ class WatchNextService extends ChangeNotifier {
     if (_posterNotifyDebounce?.isActive ?? false) {
       return;
     }
-    _posterNotifyDebounce = Timer(const Duration(milliseconds: 80), notifyListeners);
+    _posterNotifyDebounce = Timer(
+      const Duration(milliseconds: 80),
+      notifyListeners,
+    );
   }
 
   Uint8List? getCachedPoster(String? uri) {
@@ -204,7 +210,9 @@ class WatchNextService extends ChangeNotifier {
 
   Future<void> launchItem(WatchNextItem item) async {
     debugPrint('WatchNext: Launching item: ${item.title}');
-    debugPrint('WatchNext: packageName=${item.packageName}, contentId=${item.contentId}, intentUri=${item.intentUri}');
+    debugPrint(
+      'WatchNext: packageName=${item.packageName}, contentId=${item.contentId}, intentUri=${item.intentUri}',
+    );
 
     if (item.packageName == null && item.intentUri == null) {
       debugPrint('WatchNext: Cannot launch - no package name or intent URI');

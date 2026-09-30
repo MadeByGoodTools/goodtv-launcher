@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
-import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
-import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/widgets/settings/gradient_panel_page.dart';
+import 'package:goodtv_launcher/widgets/settings/wallpaper_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,7 +62,8 @@ Future<void> _pumpWidgetWithProviders(
       ],
       builder: (_, __) => MaterialApp(
         routes: {
-          GradientPanelPage.routeName: (_) => Container(key: Key("GradientPanelPage")),
+          GradientPanelPage.routeName: (_) =>
+              Container(key: Key("GradientPanelPage")),
         },
         home: Scaffold(body: WallpaperPanelPage()),
       ),

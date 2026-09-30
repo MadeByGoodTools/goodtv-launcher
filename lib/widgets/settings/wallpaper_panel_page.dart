@@ -18,16 +18,16 @@
 
 import 'dart:io';
 
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
-import 'package:flauncher/widgets/settings/focusable_settings_tile.dart';
-import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
-import 'package:flauncher/widgets/tv_media_picker.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/widgets/settings/focusable_settings_tile.dart';
+import 'package:goodtv_launcher/widgets/settings/gradient_panel_page.dart';
+import 'package:goodtv_launcher/widgets/tv_media_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
-import 'package:flauncher/widgets/rounded_switch_list_tile.dart';
+import 'package:goodtv_launcher/widgets/rounded_switch_list_tile.dart';
 
 class WallpaperPanelPage extends StatelessWidget {
   static const String routeName = "wallpaper_panel";

@@ -18,8 +18,8 @@
 
 import 'dart:math';
 
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/widgets/app_card.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/widgets/app_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,8 +28,7 @@ import '../models/category.dart';
 import '../providers/settings_service.dart';
 import 'category_container_common.dart';
 
-class AppsGrid extends StatelessWidget
-{
+class AppsGrid extends StatelessWidget {
   final Category category;
   final List<App> applications;
 
@@ -44,16 +43,20 @@ class AppsGrid extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>((s) => s.showAppNamesBelowIcons);
+    final showAppNames = context.select<SettingsService, bool>(
+      (s) => s.showAppNamesBelowIcons,
+    );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
-    }
-    else {
+    } else {
       categoryContent = LayoutBuilder(
         builder: (context, constraints) {
           final childAspectRatio = showAppNames
-              ? appCardGridAspectRatio(constraints.maxWidth, category.columnsCount)
+              ? appCardGridAspectRatio(
+                  constraints.maxWidth,
+                  category.columnsCount,
+                )
               : kAppCardAspectRatio;
           return GridView.custom(
             primary: false,
@@ -79,14 +82,15 @@ class AppsGrid extends StatelessWidget
                     category: category,
                     application: applications[index],
                     autofocus: index == 0,
-                    handleUpNavigationToSettings: isFirstSection && index < category.columnsCount,
+                    handleUpNavigationToSettings:
+                        isFirstSection && index < category.columnsCount,
                     enforceAspectRatio: false,
                     onMove: (direction) => _onMove(context, direction, index),
                     onMoveEnd: () => _saveOrder(context),
                   ),
                 ),
               ),
-            )
+            ),
           );
         },
       );
@@ -101,34 +105,42 @@ class AppsGrid extends StatelessWidget
             if (showCategoriesTitle) {
               return Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: Text(category.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(shadows: [const Shadow(color: Colors.black54, offset: Offset(1, 1), blurRadius: 8)])
+                child: Text(
+                  category.name,
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    shadows: [
+                      const Shadow(
+                        color: Colors.black54,
+                        offset: Offset(1, 1),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
 
             return SizedBox.shrink();
-          }
+          },
         ),
-        categoryContent
+        categoryContent,
       ],
     );
   }
 
-
   int? _findChildIndex(Key key) {
     final valueKey = key as ValueKey<String>;
-    final index = applications.indexWhere((app) => app.packageName == valueKey.value);
+    final index = applications.indexWhere(
+      (app) => app.packageName == valueKey.value,
+    );
     return index >= 0 ? index : null;
   }
 
   // TO DO : refractor duplicate _onMove code
   void _onMove(BuildContext context, AxisDirection direction, int index) {
     final currentRow = (index / category.columnsCount).floor();
-    final totalRows = ((applications.length - 1) / category.columnsCount).floor();
+    final totalRows = ((applications.length - 1) / category.columnsCount)
+        .floor();
 
     int? newIndex;
     switch (direction) {
@@ -145,7 +157,10 @@ class AppsGrid extends StatelessWidget
         break;
       case AxisDirection.down:
         if (currentRow < totalRows) {
-          newIndex = min(index + category.columnsCount, applications.length - 1);
+          newIndex = min(
+            index + category.columnsCount,
+            applications.length - 1,
+          );
         }
         // At bottom boundary - do nothing
         break;
@@ -159,7 +174,9 @@ class AppsGrid extends StatelessWidget
       final appsService = context.read<AppsService>();
       final movingApp = applications[index];
       final realOldIndex = category.applications.indexOf(movingApp);
-      final realNewIndex = category.applications.indexOf(applications[newIndex]);
+      final realNewIndex = category.applications.indexOf(
+        applications[newIndex],
+      );
       if (realOldIndex >= 0 && realNewIndex >= 0) {
         appsService.reorderApplication(category, realOldIndex, realNewIndex);
         // Set pending focus so the app at the new position will request focus

@@ -1,5 +1,5 @@
-import 'package:flauncher/providers/network_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/network_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,9 +12,9 @@ class DailyWifiUsageWidget extends StatelessWidget {
       builder: (context, networkService, settingsService, _) {
         if (!networkService.hasUsageStatsPermission) {
           return TextButton.icon(
-             icon: const Icon(Icons.data_usage, size: 20),
-             label: const Text("Grant Usage Permission"),
-             onPressed: () => networkService.requestPermission(),
+            icon: const Icon(Icons.data_usage, size: 20),
+            label: const Text("Grant Usage Permission"),
+            onPressed: () => networkService.requestPermission(),
           );
         }
 
@@ -46,7 +46,11 @@ class DailyWifiUsageWidget extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
                   shadows: [
-                    Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 4)
+                    Shadow(
+                      color: Colors.black54,
+                      offset: Offset(0, 2),
+                      blurRadius: 4,
+                    ),
                   ],
                 ),
                 children: [

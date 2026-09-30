@@ -18,7 +18,7 @@
 
 //import 'dart:html';
 
-import 'package:flauncher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
@@ -26,14 +26,14 @@ import 'package:shared_preferences_platform_interface/shared_preferences_platfor
 //import '../mocks.mocks.dart';
 
 void main() async {
-  SharedPreferencesStorePlatform.instance = InMemorySharedPreferencesStore.empty();
+  SharedPreferencesStorePlatform.instance =
+      InMemorySharedPreferencesStore.empty();
   final sharedPreferences = await SharedPreferences.getInstance();
   final settingsService = SettingsService(sharedPreferences);
 
   setUp(() async {
     await sharedPreferences.clear();
   });
-
 
   test("setUse24HourTimeFormat", () async {
     final sharedPreferences = await SharedPreferences.getInstance();
@@ -49,11 +49,15 @@ void main() async {
     final sharedPreferences = await SharedPreferences.getInstance();
     final settingsService = SettingsService(sharedPreferences);
 
-    await settingsService.setGradientUuid("4730aa2d-1a90-49a6-9942-ffe82f470e26");
+    await settingsService.setGradientUuid(
+      "4730aa2d-1a90-49a6-9942-ffe82f470e26",
+    );
 
-    expect(sharedPreferences.getString("gradient_uuid"), "4730aa2d-1a90-49a6-9942-ffe82f470e26");
+    expect(
+      sharedPreferences.getString("gradient_uuid"),
+      "4730aa2d-1a90-49a6-9942-ffe82f470e26",
+    );
   });
-
 
   group("getGradientUuid", () {
     test("without uuid from shared preferences", () async {
@@ -69,7 +73,10 @@ void main() async {
     test("with uuid from shared preferences", () async {
       final sharedPreferences = await SharedPreferences.getInstance();
       await sharedPreferences.clear();
-      sharedPreferences.setString("gradient_uuid", "4730aa2d-1a90-49a6-9942-ffe82f470e26");
+      sharedPreferences.setString(
+        "gradient_uuid",
+        "4730aa2d-1a90-49a6-9942-ffe82f470e26",
+      );
       final settingsService = SettingsService(sharedPreferences);
 
       final gradientUuid = settingsService.gradientUuid;
@@ -78,7 +85,7 @@ void main() async {
     });
   });
 
-  group("getDateFormat", ()  {
+  group("getDateFormat", () {
     test("with default", () async {
       expect(settingsService.dateFormat, SettingsService.defaultDateFormat);
     });

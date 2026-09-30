@@ -18,28 +18,30 @@
 
 import 'dart:math';
 
-import 'package:flauncher/database.dart';
-import 'package:flauncher/flauncher_channel.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/database.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flauncher/models/app.dart';
-import 'package:flauncher/models/category.dart';
+import 'package:goodtv_launcher/models/app.dart';
+import 'package:goodtv_launcher/models/category.dart';
 
-
-@GenerateMocks([
-  FLauncherChannel,
-  WallpaperService,
-  AppsService,
-  SettingsService,
-  ImagePicker,
-], customMocks: [
-  MockSpec<FLauncherDatabase>(unsupportedMembers: {#alias}),
-  MockSpec<ImageProvider>(unsupportedMembers: {#alias}),
-])
+@GenerateMocks(
+  [
+    FLauncherChannel,
+    WallpaperService,
+    AppsService,
+    SettingsService,
+    ImagePicker,
+  ],
+  customMocks: [
+    MockSpec<FLauncherDatabase>(unsupportedMembers: {#alias}),
+    MockSpec<ImageProvider>(unsupportedMembers: {#alias}),
+  ],
+)
 void main() {}
 
 App fakeApp({
@@ -49,14 +51,14 @@ App fakeApp({
   bool hidden = false,
   bool sideloaded = false,
 }) {
-    final app = App(
-      packageName: packageName,
-      name: name,
-      version: version,
-      hidden: hidden,
-    );
-    app.sideloaded = sideloaded;
-    return app;
+  final app = App(
+    packageName: packageName,
+    name: name,
+    version: version,
+    hidden: hidden,
+  );
+  app.sideloaded = sideloaded;
+  return app;
 }
 
 Category fakeCategory({
@@ -66,13 +68,12 @@ Category fakeCategory({
   CategoryType type = CategoryType.grid,
   int rowHeight = 110,
   int columnsCount = 6,
-}) =>
-    Category(
-      id: Random().nextInt(1 << 32),
-      name: name,
-      sort: sort,
-      type: type,
-      rowHeight: rowHeight,
-      columnsCount: columnsCount,
-      order: order,
-    );
+}) => Category(
+  id: Random().nextInt(1 << 32),
+  name: name,
+  sort: sort,
+  type: type,
+  rowHeight: rowHeight,
+  columnsCount: columnsCount,
+  order: order,
+);

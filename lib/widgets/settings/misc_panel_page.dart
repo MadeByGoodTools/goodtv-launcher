@@ -1,10 +1,9 @@
-
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/watch_next_service.dart';
-import 'package:flauncher/widgets/rounded_switch_list_tile.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/watch_next_service.dart';
+import 'package:goodtv_launcher/widgets/rounded_switch_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 class MiscPanelPage extends StatelessWidget {
   static const String routeName = "misc_panel";
@@ -18,7 +17,10 @@ class MiscPanelPage extends StatelessWidget {
 
     return Column(
       children: [
-        Text(localizations.miscellaneous, style: Theme.of(context).textTheme.titleLarge),
+        Text(
+          localizations.miscellaneous,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         const Divider(),
         Expanded(
           child: ListView(
@@ -27,32 +29,52 @@ class MiscPanelPage extends StatelessWidget {
               RoundedSwitchListTile(
                 autofocus: true,
                 value: settingsService.appHighlightAnimationEnabled,
-                onChanged: (value) => settingsService.setAppHighlightAnimationEnabled(value),
-                title: Text(localizations.appCardHighlightAnimation, style: Theme.of(context).textTheme.bodyMedium),
+                onChanged: (value) =>
+                    settingsService.setAppHighlightAnimationEnabled(value),
+                title: Text(
+                  localizations.appCardHighlightAnimation,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.filter_center_focus),
               ),
               RoundedSwitchListTile(
                 value: settingsService.appKeyClickEnabled,
-                onChanged: (value) => settingsService.setAppKeyClickEnabled(value),
-                title: Text(localizations.appKeyClick, style: Theme.of(context).textTheme.bodyMedium),
+                onChanged: (value) =>
+                    settingsService.setAppKeyClickEnabled(value),
+                title: Text(
+                  localizations.appKeyClick,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.notifications_active),
               ),
               RoundedSwitchListTile(
                 value: settingsService.showCategoryTitles,
-                onChanged: (value) => settingsService.setShowCategoryTitles(value),
-                title: Text(localizations.showCategoryTitles, style: Theme.of(context).textTheme.bodyMedium),
+                onChanged: (value) =>
+                    settingsService.setShowCategoryTitles(value),
+                title: Text(
+                  localizations.showCategoryTitles,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.abc),
               ),
               RoundedSwitchListTile(
                 value: settingsService.showAppNamesBelowIcons,
-                onChanged: (value) => settingsService.setShowAppNamesBelowIcons(value),
-                title: Text(localizations.showAppNamesBelowIcons, style: Theme.of(context).textTheme.bodyMedium),
+                onChanged: (value) =>
+                    settingsService.setShowAppNamesBelowIcons(value),
+                title: Text(
+                  localizations.showAppNamesBelowIcons,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.subtitles),
               ),
               RoundedSwitchListTile(
                 value: settingsService.showFocusBorders,
-                onChanged: (value) => settingsService.setShowFocusBorders(value),
-                title: Text(localizations.showFocusBorders, style: Theme.of(context).textTheme.bodyMedium),
+                onChanged: (value) =>
+                    settingsService.setShowFocusBorders(value),
+                title: Text(
+                  localizations.showFocusBorders,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.border_outer),
               ),
               RoundedSwitchListTile(
@@ -66,7 +88,10 @@ class MiscPanelPage extends StatelessWidget {
                     }
                   }
                 },
-                title: Text(localizations.showWatchNextSection, style: Theme.of(context).textTheme.bodyMedium),
+                title: Text(
+                  localizations.showWatchNextSection,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 secondary: Icon(Icons.play_circle_outline),
               ),
               if (settingsService.showWatchNextSection)
@@ -76,7 +101,11 @@ class MiscPanelPage extends StatelessWidget {
                       return const SizedBox.shrink();
                     }
                     return Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 8,
+                      ),
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -94,14 +123,20 @@ class MiscPanelPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               ElevatedButton.icon(
-                                onPressed: () => watchNextService.requestPermission(),
+                                onPressed: () =>
+                                    watchNextService.requestPermission(),
                                 icon: const Icon(Icons.lock_open),
-                                label: Text(localizations.watchNextGrantPermission),
+                                label: Text(
+                                  localizations.watchNextGrantPermission,
+                                ),
                               ),
                               TextButton.icon(
-                                onPressed: () => watchNextService.refreshPermissionAndItems(),
+                                onPressed: () => watchNextService
+                                    .refreshPermissionAndItems(),
                                 icon: const Icon(Icons.refresh),
-                                label: Text(localizations.watchNextCheckPermission),
+                                label: Text(
+                                  localizations.watchNextCheckPermission,
+                                ),
                               ),
                             ],
                           ),

@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/launcher_state.dart';
-import 'package:flauncher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/launcher_state.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:provider/provider.dart';
@@ -57,8 +57,7 @@ class BackAction extends Action<BackIntent> {
 
     if (navigator != null) {
       navigator.maybePop();
-    }
-    else {
+    } else {
       LauncherState state = context.read<LauncherState>();
       state.handleBackNavigation(context);
     }
@@ -73,4 +72,5 @@ class BackIntent extends Intent {
   const BackIntent();
 }
 
-Future<bool> isDefaultLauncher(BuildContext context) async => await context.read<AppsService>().isDefaultLauncher();
+Future<bool> isDefaultLauncher(BuildContext context) async =>
+    await context.read<AppsService>().isDefaultLauncher();

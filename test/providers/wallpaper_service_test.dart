@@ -19,8 +19,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flauncher/gradients.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/gradients.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';

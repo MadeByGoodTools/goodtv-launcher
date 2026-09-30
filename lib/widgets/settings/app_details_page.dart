@@ -1,13 +1,12 @@
-
 import 'dart:typed_data';
 
-import 'package:flauncher/models/app.dart';
-import 'package:flauncher/models/category.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/widgets/add_to_category_dialog.dart';
+import 'package:goodtv_launcher/models/app.dart';
+import 'package:goodtv_launcher/models/category.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/widgets/add_to_category_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 class AppDetailsPage extends StatelessWidget {
   static const String routeName = "app_details_page";
@@ -66,25 +65,35 @@ class AppDetailsPage extends StatelessWidget {
                 title: localizations.open,
                 onTap: () async {
                   await appsService.launchApp(application);
-                  Navigator.of(context).pop(); // Close settings after launch? Or stay? Dialog behavior was close.
+                  Navigator.of(
+                    context,
+                  ).pop(); // Close settings after launch? Or stay? Dialog behavior was close.
                 },
               ),
               _buildListTile(
                 context,
-                icon: appsService.isAppInFavorites(application) ? Icons.star : Icons.star_border,
-                title: appsService.isAppInFavorites(application) ? 'Remove from Fav' : 'Add to Fav',
+                icon: appsService.isAppInFavorites(application)
+                    ? Icons.star
+                    : Icons.star_border,
+                title: appsService.isAppInFavorites(application)
+                    ? 'Remove from Fav'
+                    : 'Add to Fav',
                 onTap: () => appsService.toggleFavorite(application),
               ),
               _buildListTile(
                 context,
-                icon: application.hidden ? Icons.visibility : Icons.visibility_off_outlined,
-                title: application.hidden ? localizations.show : localizations.hide,
+                icon: application.hidden
+                    ? Icons.visibility
+                    : Icons.visibility_off_outlined,
+                title: application.hidden
+                    ? localizations.show
+                    : localizations.hide,
                 onTap: () {
-                   if (application.hidden) {
-                     appsService.showApplication(application);
-                   } else {
-                     appsService.hideApplication(application);
-                   }
+                  if (application.hidden) {
+                    appsService.showApplication(application);
+                  } else {
+                    appsService.hideApplication(application);
+                  }
                 },
               ),
               if (!application.hidden)
@@ -109,8 +118,8 @@ class AppDetailsPage extends StatelessWidget {
                 icon: Icons.delete_outlined,
                 title: localizations.uninstall,
                 onTap: () async {
-                    await appsService.uninstallApp(application);
-                    Navigator.of(context).pop();
+                  await appsService.uninstallApp(application);
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -120,8 +129,12 @@ class AppDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile(BuildContext context,
-      {required IconData icon, required String title, required VoidCallback onTap}) {
+  Widget _buildListTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: Colors.white70),
       title: Text(title, style: Theme.of(context).textTheme.bodyMedium),

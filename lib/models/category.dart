@@ -20,43 +20,25 @@ import 'dart:collection';
 
 import 'app.dart';
 
-enum LauncherSectionType
-{
-  Category,
-  Spacer
-}
+enum LauncherSectionType { Category, Spacer }
 
-enum CategorySort
-{
-  manual,
-  alphabetical,
-  lastUsed,
-}
+enum CategorySort { manual, alphabetical, lastUsed }
 
-enum CategoryType
-{
-  row,
-  grid,
-}
+enum CategoryType { row, grid }
 
-class LauncherSection
-{
+class LauncherSection {
   final int id;
 
   int order;
 
-  LauncherSection({
-    this.id = 0,
-    this.order = 0
-  });
+  LauncherSection({this.id = 0, this.order = 0});
 }
 
-class Category extends LauncherSection
-{
-  static const int          ColumnsCount  = 6;
-  static const int          RowHeight     = 110;
-  static const CategorySort Sort          = CategorySort.manual;
-  static const CategoryType Type          = CategoryType.grid;
+class Category extends LauncherSection {
+  static const int ColumnsCount = 6;
+  static const int RowHeight = 110;
+  static const CategorySort Sort = CategorySort.manual;
+  static const CategoryType Type = CategoryType.grid;
 
   int columnsCount;
 
@@ -77,9 +59,9 @@ class Category extends LauncherSection
     this.columnsCount = Category.ColumnsCount,
     this.rowHeight = Category.RowHeight,
     this.sort = Category.Sort,
-    this.type = Category.Type
-  }):   applications = [],
-        super(id: id, order: order);
+    this.type = Category.Type,
+  }) : applications = [],
+       super(id: id, order: order);
 
   Category.withApplications({
     required this.name,
@@ -89,8 +71,8 @@ class Category extends LauncherSection
     this.columnsCount = Category.ColumnsCount,
     this.rowHeight = Category.RowHeight,
     this.sort = Category.Sort,
-    this.type = Category.Type
-  }): super(id: id, order: order);
+    this.type = Category.Type,
+  }) : super(id: id, order: order);
 
   Category unmodifiable() {
     return Category.withApplications(
@@ -101,17 +83,14 @@ class Category extends LauncherSection
       rowHeight: rowHeight,
       sort: sort,
       type: type,
-      applications: UnmodifiableListView(applications));
+      applications: UnmodifiableListView(applications),
+    );
   }
 }
 
-class LauncherSpacer extends LauncherSection
-{
+class LauncherSpacer extends LauncherSection {
   int height;
 
-  LauncherSpacer({
-    int id = 0,
-    int order = 0,
-    this.height = 0
-  }): super(id: id, order: order);
+  LauncherSpacer({int id = 0, int order = 0, this.height = 0})
+    : super(id: id, order: order);
 }

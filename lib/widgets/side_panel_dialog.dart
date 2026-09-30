@@ -1,4 +1,4 @@
-import 'package:flauncher/actions.dart';
+import 'package:goodtv_launcher/actions.dart';
 import 'package:flutter/material.dart';
 
 class SidePanelDialog extends StatelessWidget {
@@ -27,7 +27,7 @@ class SidePanelDialog extends StatelessWidget {
           width: width,
           padding: const EdgeInsets.all(16),
           child: Actions(
-            actions: { BackIntent: BackAction(context) },
+            actions: {BackIntent: BackAction(context)},
             child: child,
           ),
         ),

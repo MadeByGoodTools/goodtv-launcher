@@ -1,4 +1,4 @@
-import 'package:flauncher/widgets/settings/focusable_settings_tile.dart';
+import 'package:goodtv_launcher/widgets/settings/focusable_settings_tile.dart';
 import 'package:flutter/material.dart';
 
 class RoundedSwitchListTile extends StatelessWidget {
@@ -14,7 +14,7 @@ class RoundedSwitchListTile extends StatelessWidget {
     required this.onChanged,
     required this.title,
     required this.secondary,
-    this.autofocus = false
+    this.autofocus = false,
   });
 
   @override
@@ -26,10 +26,7 @@ class RoundedSwitchListTile extends StatelessWidget {
       title: title,
       trailing: Container(
         constraints: const BoxConstraints(maxHeight: 16),
-        child: Switch(
-          value: value,
-          onChanged: onChanged,
-        )
+        child: Switch(value: value, onChanged: onChanged),
       ),
     );
   }

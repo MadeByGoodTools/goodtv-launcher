@@ -1,4 +1,4 @@
-package com.omeda.arc;
+package ca.goodtools.goodtvlauncher;
 
 import android.telephony.PhoneStateListener;
 

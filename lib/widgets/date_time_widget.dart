@@ -25,18 +25,18 @@ import 'package:intl/intl.dart';
 import 'animated_character.dart';
 
 class DateTimeWidget extends StatefulWidget {
-  final Duration?   updateInterval;
-  final String      _dateTimeFormatString;
-  final TextStyle?  textStyle;
-  final bool        animate;
+  final Duration? updateInterval;
+  final String _dateTimeFormatString;
+  final TextStyle? textStyle;
+  final bool animate;
 
-  const DateTimeWidget(String dateTimeFormatString, {
+  const DateTimeWidget(
+    String dateTimeFormatString, {
     super.key,
     this.updateInterval,
     this.textStyle,
     this.animate = false,
-  }) :
-      _dateTimeFormatString = dateTimeFormatString;
+  }) : _dateTimeFormatString = dateTimeFormatString;
 
   @override
   State<DateTimeWidget> createState() => _DateTimeWidgetState();
@@ -44,8 +44,8 @@ class DateTimeWidget extends StatefulWidget {
 
 class _DateTimeWidgetState extends State<DateTimeWidget> {
   late DateFormat _dateFormat;
-  late DateTime   _now;
-  late Timer      _timer;
+  late DateTime _now;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -53,7 +53,10 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
 
     _dateFormat = DateFormat(widget._dateTimeFormatString, Platform.localeName);
     _now = DateTime.now();
-    _timer = Timer.periodic(widget.updateInterval ?? _defaultInterval(), (_) => _refreshTime());
+    _timer = Timer.periodic(
+      widget.updateInterval ?? _defaultInterval(),
+      (_) => _refreshTime(),
+    );
   }
 
   /// Returns 1-second interval if format contains seconds, otherwise 1-minute.
@@ -67,10 +70,13 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
   @override
   void didUpdateWidget(DateTimeWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Update format if it changed
     if (oldWidget._dateTimeFormatString != widget._dateTimeFormatString) {
-      _dateFormat = DateFormat(widget._dateTimeFormatString, Platform.localeName);
+      _dateFormat = DateFormat(
+        widget._dateTimeFormatString,
+        Platform.localeName,
+      );
       setState(() {
         _now = DateTime.now();
       });
@@ -86,14 +92,14 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
   @override
   Widget build(BuildContext context) {
     final formattedText = _dateFormat.format(_now);
-    
+
     if (widget.animate) {
       return AnimatedTimeDisplay(
         displayText: formattedText,
         textStyle: widget.textStyle,
       );
     }
-    
+
     return Text(formattedText, style: widget.textStyle);
   }
 

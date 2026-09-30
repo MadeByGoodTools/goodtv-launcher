@@ -7,21 +7,25 @@ class Apps extends Table with TableInfo<Apps, AppsData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Apps(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<String> packageName = GeneratedColumn<String>('package_name', aliasedName, false,
+  late final GeneratedColumn<String> packageName = GeneratedColumn<String>(
+      'package_name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  late final GeneratedColumn<String> name =
-      GeneratedColumn<String>('name', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true);
-  late final GeneratedColumn<String> version =
-      GeneratedColumn<String>('version', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true);
-  late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>('hidden', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
-        SqlDialect.sqlite: 'CHECK ("hidden" IN (0, 1))',
-        SqlDialect.mysql: '',
-        SqlDialect.postgres: '',
-      }),
-      defaultValue: Constant(false));
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> version = GeneratedColumn<String>(
+      'version', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<bool> hidden =
+      GeneratedColumn<bool>('hidden', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
+            SqlDialect.sqlite: 'CHECK ("hidden" IN (0, 1))',
+            SqlDialect.mysql: '',
+            SqlDialect.postgres: '',
+          }),
+          defaultValue: Constant(false));
   @override
   List<GeneratedColumn> get $columns => [packageName, name, version, hidden];
   @override
@@ -34,10 +38,14 @@ class Apps extends Table with TableInfo<Apps, AppsData> {
   AppsData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AppsData(
-      packageName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}package_name'])!,
-      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      version: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}version'])!,
-      hidden: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
+      packageName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}package_name'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      version: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}version'])!,
+      hidden: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
     );
   }
 
@@ -76,7 +84,8 @@ class AppsData extends DataClass implements Insertable<AppsData> {
     );
   }
 
-  factory AppsData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory AppsData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AppsData(
       packageName: serializer.fromJson<String>(json['packageName']),
@@ -97,10 +106,7 @@ class AppsData extends DataClass implements Insertable<AppsData> {
   }
 
   AppsData copyWith(
-          {String? packageName,
-          String? name,
-          String? version,
-          bool? hidden}) =>
+          {String? packageName, String? name, String? version, bool? hidden}) =>
       AppsData(
         packageName: packageName ?? this.packageName,
         name: name ?? this.name,
@@ -119,8 +125,7 @@ class AppsData extends DataClass implements Insertable<AppsData> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(packageName, name, version, hidden);
+  int get hashCode => Object.hash(packageName, name, version, hidden);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -212,25 +217,42 @@ class Categories extends Table with TableInfo<Categories, CategoriesData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Categories(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>('id', aliasedName, false,
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
       hasAutoIncrement: true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  late final GeneratedColumn<String> name =
-      GeneratedColumn<String>('name', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true);
-  late final GeneratedColumn<int> sort = GeneratedColumn<int>('sort', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false, defaultValue: Constant(0));
-  late final GeneratedColumn<int> type = GeneratedColumn<int>('type', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false, defaultValue: Constant(0));
-  late final GeneratedColumn<int> rowHeight = GeneratedColumn<int>('row_height', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false, defaultValue: Constant(110));
-  late final GeneratedColumn<int> columnsCount = GeneratedColumn<int>('columns_count', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false, defaultValue: Constant(6));
-  late final GeneratedColumn<int> order =
-      GeneratedColumn<int>('order', aliasedName, false, type: DriftSqlType.int, requiredDuringInsert: true);
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<int> sort = GeneratedColumn<int>(
+      'sort', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
+      'type', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
+  late final GeneratedColumn<int> rowHeight = GeneratedColumn<int>(
+      'row_height', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(110));
+  late final GeneratedColumn<int> columnsCount = GeneratedColumn<int>(
+      'columns_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(6));
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+      'order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, name, sort, type, rowHeight, columnsCount, order];
+  List<GeneratedColumn> get $columns =>
+      [id, name, sort, type, rowHeight, columnsCount, order];
   @override
   String get aliasedName => _alias ?? 'categories';
   @override
@@ -241,13 +263,20 @@ class Categories extends Table with TableInfo<Categories, CategoriesData> {
   CategoriesData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CategoriesData(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      sort: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}sort'])!,
-      type: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}type'])!,
-      rowHeight: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}row_height'])!,
-      columnsCount: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}columns_count'])!,
-      order: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      sort: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}sort'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}type'])!,
+      rowHeight: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}row_height'])!,
+      columnsCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}columns_count'])!,
+      order: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
     );
   }
 
@@ -298,7 +327,8 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
     );
   }
 
-  factory CategoriesData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory CategoriesData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CategoriesData(
       id: serializer.fromJson<int>(json['id']),
@@ -325,7 +355,13 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   }
 
   CategoriesData copyWith(
-          {int? id, String? name, int? sort, int? type, int? rowHeight, int? columnsCount, int? order}) =>
+          {int? id,
+          String? name,
+          int? sort,
+          int? type,
+          int? rowHeight,
+          int? columnsCount,
+          int? order}) =>
       CategoriesData(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -350,7 +386,8 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, sort, type, rowHeight, columnsCount, order);
+  int get hashCode =>
+      Object.hash(id, name, sort, type, rowHeight, columnsCount, order);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -472,21 +509,25 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
   }
 }
 
-class AppsCategories extends Table with TableInfo<AppsCategories, AppsCategoriesData> {
+class AppsCategories extends Table
+    with TableInfo<AppsCategories, AppsCategoriesData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   AppsCategories(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>('category_id', aliasedName, false,
+  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+      'category_id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       $customConstraints: 'REFERENCES categories(id) ON DELETE CASCADE');
-  late final GeneratedColumn<String> appPackageName = GeneratedColumn<String>('app_package_name', aliasedName, false,
+  late final GeneratedColumn<String> appPackageName = GeneratedColumn<String>(
+      'app_package_name', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'REFERENCES apps(package_name) ON DELETE CASCADE');
-  late final GeneratedColumn<int> order =
-      GeneratedColumn<int>('order', aliasedName, false, type: DriftSqlType.int, requiredDuringInsert: true);
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+      'order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [categoryId, appPackageName, order];
   @override
@@ -499,10 +540,12 @@ class AppsCategories extends Table with TableInfo<AppsCategories, AppsCategories
   AppsCategoriesData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AppsCategoriesData(
-      categoryId: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
-      appPackageName:
-          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}app_package_name'])!,
-      order: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+      categoryId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
+      appPackageName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}app_package_name'])!,
+      order: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
     );
   }
 
@@ -512,11 +555,15 @@ class AppsCategories extends Table with TableInfo<AppsCategories, AppsCategories
   }
 }
 
-class AppsCategoriesData extends DataClass implements Insertable<AppsCategoriesData> {
+class AppsCategoriesData extends DataClass
+    implements Insertable<AppsCategoriesData> {
   final int categoryId;
   final String appPackageName;
   final int order;
-  const AppsCategoriesData({required this.categoryId, required this.appPackageName, required this.order});
+  const AppsCategoriesData(
+      {required this.categoryId,
+      required this.appPackageName,
+      required this.order});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -534,7 +581,8 @@ class AppsCategoriesData extends DataClass implements Insertable<AppsCategoriesD
     );
   }
 
-  factory AppsCategoriesData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory AppsCategoriesData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AppsCategoriesData(
       categoryId: serializer.fromJson<int>(json['categoryId']),
@@ -552,7 +600,9 @@ class AppsCategoriesData extends DataClass implements Insertable<AppsCategoriesD
     };
   }
 
-  AppsCategoriesData copyWith({int? categoryId, String? appPackageName, int? order}) => AppsCategoriesData(
+  AppsCategoriesData copyWith(
+          {int? categoryId, String? appPackageName, int? order}) =>
+      AppsCategoriesData(
         categoryId: categoryId ?? this.categoryId,
         appPackageName: appPackageName ?? this.appPackageName,
         order: order ?? this.order,
@@ -606,7 +656,10 @@ class AppsCategoriesCompanion extends UpdateCompanion<AppsCategoriesData> {
     });
   }
 
-  AppsCategoriesCompanion copyWith({Value<int>? categoryId, Value<String>? appPackageName, Value<int>? order}) {
+  AppsCategoriesCompanion copyWith(
+      {Value<int>? categoryId,
+      Value<String>? appPackageName,
+      Value<int>? order}) {
     return AppsCategoriesCompanion(
       categoryId: categoryId ?? this.categoryId,
       appPackageName: appPackageName ?? this.appPackageName,
@@ -646,9 +699,11 @@ class DatabaseAtV4 extends GeneratedDatabase {
   late final Categories categories = Categories(this);
   late final AppsCategories appsCategories = AppsCategories(this);
   @override
-  Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [apps, categories, appsCategories];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [apps, categories, appsCategories];
   @override
   int get schemaVersion => 4;
 }

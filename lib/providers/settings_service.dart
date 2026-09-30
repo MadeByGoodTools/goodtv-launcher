@@ -18,7 +18,7 @@
 
 import 'dart:async';
 
-import 'package:flauncher/widgets/settings/back_button_actions.dart';
+import 'package:goodtv_launcher/widgets/settings/back_button_actions.dart';
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';

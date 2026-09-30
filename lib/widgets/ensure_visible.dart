@@ -22,26 +22,23 @@ class EnsureVisible extends StatelessWidget {
   final Widget child;
   final double alignment;
 
-  EnsureVisible({
-    Key? key,
-    required this.child,
-    this.alignment = 0.0
-  }) : super(key: key);
+  EnsureVisible({Key? key, required this.child, this.alignment = 0.0})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) => Focus(
-        canRequestFocus: false,
-        onFocusChange: (focused) {
-          if (focused) {
-            Scrollable.ensureVisible(
-              context,
-              alignment: alignment,
-              alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
-              curve: Curves.easeOut,
-              duration: const Duration(milliseconds: 300)
-            );
-          }
-        },
-        child: child,
-      );
+    canRequestFocus: false,
+    onFocusChange: (focused) {
+      if (focused) {
+        Scrollable.ensureVisible(
+          context,
+          alignment: alignment,
+          alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+    },
+    child: child,
+  );
 }

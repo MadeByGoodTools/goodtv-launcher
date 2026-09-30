@@ -64,7 +64,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.omeda.arc"
+        applicationId "ca.goodtools.goodtvlauncher"
         compileSdk 36
         minSdkVersion flutter.minSdkVersion
         targetSdk 35
@@ -130,15 +130,15 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    namespace 'com.omeda.arc'
+    namespace 'ca.goodtools.goodtvlauncher'
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                outputFileName = "arc-launcher-${abi}-${variant.buildType.name}.apk"
+                outputFileName = "goodtv-launcher-${abi}-${variant.buildType.name}.apk"
             } else {
-                outputFileName = "arc-launcher-universal-${variant.buildType.name}.apk"
+                outputFileName = "goodtv-launcher-universal-${variant.buildType.name}.apk"
             }
         }
     }

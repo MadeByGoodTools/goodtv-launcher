@@ -18,7 +18,7 @@
 
 import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations.dart';
-import 'package:flauncher/database.dart';
+import 'package:goodtv_launcher/database.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'generated_migrations/schema.dart';
@@ -39,7 +39,9 @@ void main() {
     final schema = await verifier.schemaAt(1);
 
     final oldDb = v1.DatabaseAtV1(schema.newConnection().executor);
-    await oldDb.into(oldDb.apps).insert(
+    await oldDb
+        .into(oldDb.apps)
+        .insert(
           v1.AppsCompanion.insert(
             packageName: "me.efesser.flauncher",
             name: "FLauncher",
@@ -47,11 +49,17 @@ void main() {
             version: "0.0.1",
           ),
         );
-    final categoryId = await oldDb.into(oldDb.categories).insert(
-          v1.CategoriesCompanion.insert(name: "Applications", order: 0),
-        );
-    await oldDb.into(oldDb.appsCategories).insert(
-          v1.AppsCategoriesCompanion.insert(categoryId: categoryId, appPackageName: "me.efesser.flauncher", order: 0),
+    final categoryId = await oldDb
+        .into(oldDb.categories)
+        .insert(v1.CategoriesCompanion.insert(name: "Applications", order: 0));
+    await oldDb
+        .into(oldDb.appsCategories)
+        .insert(
+          v1.AppsCategoriesCompanion.insert(
+            categoryId: categoryId,
+            appPackageName: "me.efesser.flauncher",
+            order: 0,
+          ),
         );
     await oldDb.close();
 
@@ -60,9 +68,15 @@ void main() {
     await db.close();
 
     final migratedDb = v5.DatabaseAtV5(schema.newConnection().executor);
-    final v5.AppsData app = await migratedDb.select(migratedDb.apps).getSingle();
-    final v5.CategoriesData category = await migratedDb.select(migratedDb.categories).getSingle();
-    final v5.AppsCategoriesData appsCategory = await migratedDb.select(migratedDb.appsCategories).getSingle();
+    final v5.AppsData app = await migratedDb
+        .select(migratedDb.apps)
+        .getSingle();
+    final v5.CategoriesData category = await migratedDb
+        .select(migratedDb.categories)
+        .getSingle();
+    final v5.AppsCategoriesData appsCategory = await migratedDb
+        .select(migratedDb.appsCategories)
+        .getSingle();
     expect(app.packageName, "me.efesser.flauncher");
     expect(app.name, "FLauncher");
     expect(app.version, "0.0.1");
@@ -85,18 +99,26 @@ void main() {
     final schema = await verifier.schemaAt(2);
 
     final oldDb = v2.DatabaseAtV2(schema.newConnection().executor);
-    await oldDb.into(oldDb.apps).insert(
+    await oldDb
+        .into(oldDb.apps)
+        .insert(
           v2.AppsCompanion.insert(
             packageName: "me.efesser.flauncher",
             name: "FLauncher",
             version: "0.0.1",
           ),
         );
-    final categoryId = await oldDb.into(oldDb.categories).insert(
-          v2.CategoriesCompanion.insert(name: "Applications", order: 0),
-        );
-    await oldDb.into(oldDb.appsCategories).insert(
-          v2.AppsCategoriesCompanion.insert(categoryId: categoryId, appPackageName: "me.efesser.flauncher", order: 0),
+    final categoryId = await oldDb
+        .into(oldDb.categories)
+        .insert(v2.CategoriesCompanion.insert(name: "Applications", order: 0));
+    await oldDb
+        .into(oldDb.appsCategories)
+        .insert(
+          v2.AppsCategoriesCompanion.insert(
+            categoryId: categoryId,
+            appPackageName: "me.efesser.flauncher",
+            order: 0,
+          ),
         );
     await oldDb.close();
 
@@ -105,9 +127,15 @@ void main() {
     await db.close();
 
     final migratedDb = v5.DatabaseAtV5(schema.newConnection().executor);
-    final v5.AppsData app = await migratedDb.select(migratedDb.apps).getSingle();
-    final v5.CategoriesData category = await migratedDb.select(migratedDb.categories).getSingle();
-    final v5.AppsCategoriesData appsCategory = await migratedDb.select(migratedDb.appsCategories).getSingle();
+    final v5.AppsData app = await migratedDb
+        .select(migratedDb.apps)
+        .getSingle();
+    final v5.CategoriesData category = await migratedDb
+        .select(migratedDb.categories)
+        .getSingle();
+    final v5.AppsCategoriesData appsCategory = await migratedDb
+        .select(migratedDb.appsCategories)
+        .getSingle();
     expect(app.packageName, "me.efesser.flauncher");
     expect(app.name, "FLauncher");
     expect(app.version, "0.0.1");
@@ -130,18 +158,26 @@ void main() {
     final schema = await verifier.schemaAt(3);
 
     final oldDb = v3.DatabaseAtV3(schema.newConnection().executor);
-    await oldDb.into(oldDb.apps).insert(
+    await oldDb
+        .into(oldDb.apps)
+        .insert(
           v3.AppsCompanion.insert(
             packageName: "me.efesser.flauncher",
             name: "FLauncher",
             version: "0.0.1",
           ),
         );
-    final categoryId = await oldDb.into(oldDb.categories).insert(
-          v3.CategoriesCompanion.insert(name: "Applications", order: 0),
-        );
-    await oldDb.into(oldDb.appsCategories).insert(
-          v3.AppsCategoriesCompanion.insert(categoryId: categoryId, appPackageName: "me.efesser.flauncher", order: 0),
+    final categoryId = await oldDb
+        .into(oldDb.categories)
+        .insert(v3.CategoriesCompanion.insert(name: "Applications", order: 0));
+    await oldDb
+        .into(oldDb.appsCategories)
+        .insert(
+          v3.AppsCategoriesCompanion.insert(
+            categoryId: categoryId,
+            appPackageName: "me.efesser.flauncher",
+            order: 0,
+          ),
         );
     await oldDb.close();
 
@@ -150,9 +186,15 @@ void main() {
     await db.close();
 
     final migratedDb = v5.DatabaseAtV5(schema.newConnection().executor);
-    final v5.AppsData app = await migratedDb.select(migratedDb.apps).getSingle();
-    final v5.CategoriesData category = await migratedDb.select(migratedDb.categories).getSingle();
-    final v5.AppsCategoriesData appsCategory = await migratedDb.select(migratedDb.appsCategories).getSingle();
+    final v5.AppsData app = await migratedDb
+        .select(migratedDb.apps)
+        .getSingle();
+    final v5.CategoriesData category = await migratedDb
+        .select(migratedDb.categories)
+        .getSingle();
+    final v5.AppsCategoriesData appsCategory = await migratedDb
+        .select(migratedDb.appsCategories)
+        .getSingle();
     expect(app.packageName, "me.efesser.flauncher");
     expect(app.name, "FLauncher");
     expect(app.version, "0.0.1");
@@ -175,18 +217,32 @@ void main() {
     final schema = await verifier.schemaAt(4);
 
     final oldDb = v4.DatabaseAtV4(schema.newConnection().executor);
-    await oldDb.into(oldDb.apps).insert(
+    await oldDb
+        .into(oldDb.apps)
+        .insert(
           v4.AppsCompanion.insert(
             packageName: "me.efesser.flauncher",
             name: "FLauncher",
             version: "0.0.1",
           ),
         );
-    final categoryId = await oldDb.into(oldDb.categories).insert(
-          v4.CategoriesCompanion.insert(name: "Applications", type: Value(1), order: 0),
+    final categoryId = await oldDb
+        .into(oldDb.categories)
+        .insert(
+          v4.CategoriesCompanion.insert(
+            name: "Applications",
+            type: Value(1),
+            order: 0,
+          ),
         );
-    await oldDb.into(oldDb.appsCategories).insert(
-          v4.AppsCategoriesCompanion.insert(categoryId: categoryId, appPackageName: "me.efesser.flauncher", order: 0),
+    await oldDb
+        .into(oldDb.appsCategories)
+        .insert(
+          v4.AppsCategoriesCompanion.insert(
+            categoryId: categoryId,
+            appPackageName: "me.efesser.flauncher",
+            order: 0,
+          ),
         );
     await oldDb.close();
 
@@ -195,9 +251,15 @@ void main() {
     await db.close();
 
     final migratedDb = v5.DatabaseAtV5(schema.newConnection().executor);
-    final v5.AppsData app = await migratedDb.select(migratedDb.apps).getSingle();
-    final v5.CategoriesData category = await migratedDb.select(migratedDb.categories).getSingle();
-    final v5.AppsCategoriesData appsCategory = await migratedDb.select(migratedDb.appsCategories).getSingle();
+    final v5.AppsData app = await migratedDb
+        .select(migratedDb.apps)
+        .getSingle();
+    final v5.CategoriesData category = await migratedDb
+        .select(migratedDb.categories)
+        .getSingle();
+    final v5.AppsCategoriesData appsCategory = await migratedDb
+        .select(migratedDb.appsCategories)
+        .getSingle();
     expect(app.packageName, "me.efesser.flauncher");
     expect(app.name, "FLauncher");
     expect(app.version, "0.0.1");

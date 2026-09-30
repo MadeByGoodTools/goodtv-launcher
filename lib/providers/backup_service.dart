@@ -1,6 +1,6 @@
 /*
- * Arc Launcher backup and restore
- * Copyright (C) 2026 Arc Launcher contributors
+ * GoodTV Launcher backup and restore
+ * Copyright (C) 2026 GoodTV Launcher contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class BackupService extends ChangeNotifier {
     final directory = await _backupDirectory();
     final stamp = now.toUtc().toIso8601String().replaceAll(':', '-');
     final file = File(
-      path.join(directory.path, 'arc-launcher-$stamp.arcbackup'),
+      path.join(directory.path, 'goodtv-launcher-$stamp.arcbackup'),
     );
     await file.writeAsBytes(encoded, flush: true);
     await _pruneOldBackups();

@@ -1,4 +1,4 @@
-package com.omeda.arc;
+package ca.goodtools.goodtvlauncher;
 
 import android.os.Build;
 import android.telephony.TelephonyCallback;

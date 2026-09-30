@@ -19,7 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import '../../providers/settings_service.dart';
 
 class AccentColorPage extends StatelessWidget {
@@ -55,10 +55,13 @@ class AccentColorPage extends StatelessWidget {
     return Consumer<SettingsService>(
       builder: (context, settingsService, _) {
         final currentColor = settingsService.accentColorHex;
-        
+
         return Column(
           children: [
-            Text(AppLocalizations.of(context)!.accentColor, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              AppLocalizations.of(context)!.accentColor,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const Divider(),
             Expanded(
               child: GridView.builder(
@@ -73,7 +76,7 @@ class AccentColorPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final (hex, name) = colorPresets[index];
                   final isSelected = currentColor == hex;
-                  
+
                   return _ColorTile(
                     color: _hexToColor(hex),
                     name: name,
@@ -151,8 +154,12 @@ class _ColorTileState extends State<_ColorTile> {
   Widget build(BuildContext context) {
     return Actions(
       actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onTap()),
-        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => widget.onTap()),
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) => widget.onTap(),
+        ),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+          onInvoke: (_) => widget.onTap(),
+        ),
       },
       child: Focus(
         autofocus: widget.autofocus,
@@ -165,14 +172,27 @@ class _ColorTileState extends State<_ColorTile> {
               color: widget.color,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _focused ? Colors.white : (widget.isSelected ? Colors.white : Colors.transparent),
+                color: _focused
+                    ? Colors.white
+                    : (widget.isSelected ? Colors.white : Colors.transparent),
                 width: _focused ? 3 : (widget.isSelected ? 2 : 0),
               ),
               boxShadow: _focused
-                  ? [BoxShadow(color: widget.color.withOpacity(0.6), blurRadius: 12, spreadRadius: 2)]
+                  ? [
+                      BoxShadow(
+                        color: widget.color.withOpacity(0.6),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ]
                   : widget.isSelected
-                      ? [BoxShadow(color: widget.color.withOpacity(0.4), blurRadius: 8)]
-                      : null,
+                  ? [
+                      BoxShadow(
+                        color: widget.color.withOpacity(0.4),
+                        blurRadius: 8,
+                      ),
+                    ]
+                  : null,
             ),
             child: Center(
               child: Column(
@@ -181,8 +201,7 @@ class _ColorTileState extends State<_ColorTile> {
                 children: [
                   if (widget.isSelected)
                     const Icon(Icons.check, color: Colors.white, size: 24),
-                  if (widget.isSelected)
-                    const SizedBox(height: 2),
+                  if (widget.isSelected) const SizedBox(height: 2),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(

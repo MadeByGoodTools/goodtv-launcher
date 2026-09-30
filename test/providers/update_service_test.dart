@@ -1,4 +1,4 @@
-import 'package:flauncher/providers/update_service.dart';
+import 'package:goodtv_launcher/providers/update_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -13,7 +13,7 @@ void main() {
     test("treats universal assets as non-split", () {
       expect(isAbiSplitApk("arclauncher-1.0.5.apk"), isFalse);
       expect(isAbiSplitApk("arclauncher.apk"), isFalse);
-      expect(isAbiSplitApk("arc-launcher-universal-release.apk"), isFalse);
+      expect(isAbiSplitApk("goodtv-launcher-universal-release.apk"), isFalse);
     });
   });
 

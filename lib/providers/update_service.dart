@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flauncher/flauncher_channel.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -30,8 +30,8 @@ class DownloadedApk {
   const DownloadedApk({required this.path, required this.version});
 }
 
-/// ABI-split APKs are named like `arclauncher-1.0.5-arm64-v8a.apk`.
-/// Universal builds omit the ABI suffix (`arclauncher-1.0.5.apk`).
+/// ABI-split APKs are named like `goodtv-launcher-1.0.5-arm64-v8a.apk`.
+/// Universal builds omit the ABI suffix (`goodtv-launcher-1.0.5.apk`).
 bool isAbiSplitApk(String name) {
   return RegExp(
     r"-(arm64-v8a|armeabi-v7a|armeabi|x86_64|x86)\.apk$",
@@ -74,12 +74,12 @@ bool isAbiSplitApk(String name) {
 }
 
 class UpdateService {
-  static const String _owner = "meddouribadis";
-  static const String _repo = "arclauncher";
+  static const String _owner = "MadeByGoodTools";
+  static const String _repo = "goodtv-launcher";
   final FLauncherChannel _fLauncherChannel;
 
   UpdateService({FLauncherChannel? fLauncherChannel})
-      : _fLauncherChannel = fLauncherChannel ?? FLauncherChannel();
+    : _fLauncherChannel = fLauncherChannel ?? FLauncherChannel();
 
   Future<UpdateResult> checkForUpdate() async {
     final packageInfo = await PackageInfo.fromPlatform();
@@ -109,7 +109,10 @@ class UpdateService {
     try {
       final request = await httpClient.getUrl(uri);
       request.headers.set(HttpHeaders.acceptHeader, "application/octet-stream");
-      request.headers.set(HttpHeaders.userAgentHeader, "ArcLauncher-Updater");
+      request.headers.set(
+        HttpHeaders.userAgentHeader,
+        "GoodTVLauncher-Updater",
+      );
       final response = await request.close();
 
       if (response.statusCode != HttpStatus.ok) {
@@ -126,7 +129,7 @@ class UpdateService {
       }
 
       final fileName =
-          update.apkName ?? "arclauncher-${update.latestVersion}.apk";
+          update.apkName ?? "goodtv-launcher-${update.latestVersion}.apk";
       final file = File("${updatesDirectory.path}/$fileName");
       await response.pipe(file.openWrite());
       return DownloadedApk(path: file.path, version: update.latestVersion);
@@ -144,15 +147,21 @@ class UpdateService {
   }
 
   Future<_GitHubRelease> _fetchLatestStableRelease() async {
-    final uri =
-        Uri.parse("https://api.github.com/repos/$_owner/$_repo/releases");
+    final uri = Uri.parse(
+      "https://api.github.com/repos/$_owner/$_repo/releases",
+    );
     final httpClient = HttpClient();
 
     try {
       final request = await httpClient.getUrl(uri);
-      request.headers
-          .set(HttpHeaders.acceptHeader, "application/vnd.github+json");
-      request.headers.set(HttpHeaders.userAgentHeader, "ArcLauncher-Updater");
+      request.headers.set(
+        HttpHeaders.acceptHeader,
+        "application/vnd.github+json",
+      );
+      request.headers.set(
+        HttpHeaders.userAgentHeader,
+        "GoodTVLauncher-Updater",
+      );
 
       final response = await request.close();
       if (response.statusCode != HttpStatus.ok) {
@@ -233,7 +242,8 @@ class UpdateService {
     return _normalizeVersion(version)
         .split(".")
         .map(
-            (part) => int.tryParse(part.replaceAll(RegExp(r"[^0-9]"), "")) ?? 0)
+          (part) => int.tryParse(part.replaceAll(RegExp(r"[^0-9]"), "")) ?? 0,
+        )
         .toList();
   }
 }

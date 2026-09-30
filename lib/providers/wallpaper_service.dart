@@ -20,9 +20,9 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flauncher/flauncher_channel.dart';
-import 'package:flauncher/gradients.dart';
-import 'package:flauncher/providers/settings_service.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
+import 'package:goodtv_launcher/gradients.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 

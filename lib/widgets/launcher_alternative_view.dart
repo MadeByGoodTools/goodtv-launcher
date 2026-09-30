@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/widgets/date_time_widget.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/widgets/date_time_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,27 +25,39 @@ class AlternativeLauncherView extends StatelessWidget {
   const AlternativeLauncherView({super.key});
 
   @override
-  Widget build(BuildContext context) => Selector<SettingsService, (String, String, String)>(
-    selector: (_, service) => (service.timeFormat, service.dateFormat, service.screensaverClockStyle),
-    builder: (context, formats, _) {
-      final (timeFormat, dateFormat, clockStyle) = formats;
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildClock(context, timeFormat, clockStyle),
-          const SizedBox(height: 16),
-          DateTimeWidget(dateFormat,
-            updateInterval: const Duration(minutes: 1),
-            textStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-              fontSize: 56,
-              fontWeight: FontWeight.w300,
-              shadows: const [Shadow(color: Colors.black54, offset: Offset(1, 1), blurRadius: 12)],
-            )
-          )
-        ],
+  Widget build(BuildContext context) =>
+      Selector<SettingsService, (String, String, String)>(
+        selector: (_, service) => (
+          service.timeFormat,
+          service.dateFormat,
+          service.screensaverClockStyle,
+        ),
+        builder: (context, formats, _) {
+          final (timeFormat, dateFormat, clockStyle) = formats;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildClock(context, timeFormat, clockStyle),
+              const SizedBox(height: 16),
+              DateTimeWidget(
+                dateFormat,
+                updateInterval: const Duration(minutes: 1),
+                textStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                  fontSize: 56,
+                  fontWeight: FontWeight.w300,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black54,
+                      offset: Offset(1, 1),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       );
-    },
-  );
 
   Widget _buildClock(BuildContext context, String timeFormat, String style) {
     final FontWeight fontWeight;
@@ -96,7 +108,9 @@ class AlternativeLauncherView extends StatelessWidget {
       fontWeight: fontWeight,
       letterSpacing: letterSpacing,
       fontFamily: fontFamily,
-      shadows: const [Shadow(color: Colors.black54, offset: Offset(2, 2), blurRadius: 16)],
+      shadows: const [
+        Shadow(color: Colors.black54, offset: Offset(2, 2), blurRadius: 16),
+      ],
     );
 
     // Check if format has AM/PM (contains 'a')

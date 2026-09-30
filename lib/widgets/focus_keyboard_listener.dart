@@ -19,7 +19,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const longPressableKeys = [LogicalKeyboardKey.select, LogicalKeyboardKey.enter, LogicalKeyboardKey.gameButtonA];
+const longPressableKeys = [
+  LogicalKeyboardKey.select,
+  LogicalKeyboardKey.enter,
+  LogicalKeyboardKey.gameButtonA,
+];
 
 class FocusKeyboardListener extends StatefulWidget {
   final Widget child;
@@ -42,12 +46,12 @@ class _FocusKeyboardListenerState extends State<FocusKeyboardListener> {
 
   @override
   Widget build(BuildContext context) => Focus(
-        canRequestFocus: false,
-        // Using "onKeyEvent", in favor of the deprecated "onKey"
-        // seems to break the fix for issue #21 so, keep using the old property
-        onKey: (_, rawKeyEvent) => _handleKey(context, rawKeyEvent),
-        child: widget.child,
-      );
+    canRequestFocus: false,
+    // Using "onKeyEvent", in favor of the deprecated "onKey"
+    // seems to break the fix for issue #21 so, keep using the old property
+    onKey: (_, rawKeyEvent) => _handleKey(context, rawKeyEvent),
+    child: widget.child,
+  );
 
   KeyEventResult _handleKey(BuildContext context, RawKeyEvent rawKeyEvent) {
     switch (rawKeyEvent.runtimeType) {
@@ -81,5 +85,7 @@ class _FocusKeyboardListenerState extends State<FocusKeyboardListener> {
     return KeyEventResult.ignored;
   }
 
-  bool _longPress() => _keyDownAt != null && DateTime.now().millisecondsSinceEpoch - _keyDownAt! >= 500;
+  bool _longPress() =>
+      _keyDownAt != null &&
+      DateTime.now().millisecondsSinceEpoch - _keyDownAt! >= 500;
 }

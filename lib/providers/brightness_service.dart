@@ -25,19 +25,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // Time slot keys for storage
 const _brightnessEnabled = "brightness_scheduler_enabled";
-const _brightnessMorning = "brightness_morning";     // 6am - 9am
-const _brightnessDay = "brightness_day";             // 9am - 3pm
+const _brightnessMorning = "brightness_morning"; // 6am - 9am
+const _brightnessDay = "brightness_day"; // 9am - 3pm
 const _brightnessAfternoon = "brightness_afternoon"; // 3pm - 6pm
-const _brightnessEvening = "brightness_evening";     // 6pm - 10pm
-const _brightnessNight = "brightness_night";         // 10pm - 6am
+const _brightnessEvening = "brightness_evening"; // 6pm - 10pm
+const _brightnessNight = "brightness_night"; // 10pm - 6am
 
 /// Time slot definitions
 enum TimeSlot {
-  morning,     // 6am - 9am
-  day,         // 9am - 3pm
-  afternoon,   // 3pm - 6pm
-  evening,     // 6pm - 10pm
-  night,       // 10pm - 6am
+  morning, // 6am - 9am
+  day, // 9am - 3pm
+  afternoon, // 3pm - 6pm
+  evening, // 6pm - 10pm
+  night, // 10pm - 6am
 }
 
 extension TimeSlotExtension on TimeSlot {
@@ -90,7 +90,9 @@ class BrightnessService extends ChangeNotifier {
 
   Future<void> checkPermission() async {
     try {
-      final bool result = await _platform.invokeMethod('checkWriteSettingsPermission');
+      final bool result = await _platform.invokeMethod(
+        'checkWriteSettingsPermission',
+      );
       _hasPermission = result;
     } catch (e) {
       debugPrint('Error checking brightness permission: $e');
@@ -112,15 +114,20 @@ class BrightnessService extends ChangeNotifier {
   int getBrightnessForSlot(TimeSlot slot) {
     switch (slot) {
       case TimeSlot.morning:
-        return _sharedPreferences.getInt(_brightnessMorning) ?? slot.defaultBrightness;
+        return _sharedPreferences.getInt(_brightnessMorning) ??
+            slot.defaultBrightness;
       case TimeSlot.day:
-        return _sharedPreferences.getInt(_brightnessDay) ?? slot.defaultBrightness;
+        return _sharedPreferences.getInt(_brightnessDay) ??
+            slot.defaultBrightness;
       case TimeSlot.afternoon:
-        return _sharedPreferences.getInt(_brightnessAfternoon) ?? slot.defaultBrightness;
+        return _sharedPreferences.getInt(_brightnessAfternoon) ??
+            slot.defaultBrightness;
       case TimeSlot.evening:
-        return _sharedPreferences.getInt(_brightnessEvening) ?? slot.defaultBrightness;
+        return _sharedPreferences.getInt(_brightnessEvening) ??
+            slot.defaultBrightness;
       case TimeSlot.night:
-        return _sharedPreferences.getInt(_brightnessNight) ?? slot.defaultBrightness;
+        return _sharedPreferences.getInt(_brightnessNight) ??
+            slot.defaultBrightness;
     }
   }
 
@@ -145,7 +152,7 @@ class BrightnessService extends ChangeNotifier {
     }
     await _sharedPreferences.setInt(key, brightness);
     notifyListeners();
-    
+
     // Apply immediately if this is the current slot and scheduler is enabled
     if (isEnabled && getCurrentTimeSlot() == slot) {
       await _applyBrightness(brightness);
@@ -154,7 +161,7 @@ class BrightnessService extends ChangeNotifier {
 
   Future<void> setEnabled(bool enabled) async {
     await _sharedPreferences.setBool(_brightnessEnabled, enabled);
-    
+
     if (enabled) {
       _startScheduler();
       // Apply brightness for current time slot immediately
@@ -168,7 +175,7 @@ class BrightnessService extends ChangeNotifier {
         debugPrint('Error resetting brightness: $e');
       }
     }
-    
+
     notifyListeners();
   }
 
@@ -191,7 +198,7 @@ class BrightnessService extends ChangeNotifier {
 
   Future<void> applyCurrentSlotBrightness() async {
     if (!isEnabled) return;
-    
+
     final currentSlot = getCurrentTimeSlot();
     final brightness = getBrightnessForSlot(currentSlot);
     await _applyBrightness(brightness);
@@ -201,8 +208,10 @@ class BrightnessService extends ChangeNotifier {
     try {
       // 1. Try system-wide brightness first (needs WRITE_SETTINGS)
       final int brightnessValue255 = ((brightnessPct / 100.0) * 255).round();
-      final bool success = await _platform.invokeMethod('setSystemBrightness', {'brightness': brightnessValue255});
-      
+      final bool success = await _platform.invokeMethod('setSystemBrightness', {
+        'brightness': brightnessValue255,
+      });
+
       if (!success) {
         // 2. Fallback to app-level brightness
         final brightnessValue = brightnessPct / 100.0;

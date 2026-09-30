@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/models/watch_next_item.dart';
-import 'package:flauncher/actions.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/watch_next_service.dart';
-import 'package:flauncher/widgets/app_card.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/models/watch_next_item.dart';
+import 'package:goodtv_launcher/actions.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/watch_next_service.dart';
+import 'package:goodtv_launcher/widgets/app_card.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -57,13 +57,18 @@ class WatchNextRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showWatchNext = context.select<SettingsService, bool>((s) => s.showWatchNextSection);
+    final showWatchNext = context.select<SettingsService, bool>(
+      (s) => s.showWatchNextSection,
+    );
 
     if (!showWatchNext) {
       return const SizedBox.shrink();
     }
 
-    return Selector<WatchNextService, ({bool isLoading, bool hasPermission, List<WatchNextItem> items})>(
+    return Selector<
+      WatchNextService,
+      ({bool isLoading, bool hasPermission, List<WatchNextItem> items})
+    >(
       selector: (_, service) => (
         isLoading: service.isLoading,
         hasPermission: service.hasPermission,
@@ -77,7 +82,9 @@ class WatchNextRow extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _WatchNextSectionTitle(title: localizations.watchNextSectionTitle),
+              _WatchNextSectionTitle(
+                title: localizations.watchNextSectionTitle,
+              ),
               _WatchNextPermissionBanner(
                 onGrant: () => watchNextService.requestPermission(),
                 onRecheck: () => watchNextService.refreshPermissionAndItems(),
@@ -125,11 +132,7 @@ class _WatchNextSectionTitle extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
           shadows: const [
-            Shadow(
-              color: Colors.black54,
-              offset: Offset(1, 1),
-              blurRadius: 8,
-            ),
+            Shadow(color: Colors.black54, offset: Offset(1, 1), blurRadius: 8),
           ],
         ),
       ),
@@ -261,7 +264,8 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
   }
 
   KeyEventResult _handleNavigationKey(int index, LogicalKeyboardKey key) {
-    if (key == LogicalKeyboardKey.arrowRight && index < widget.items.length - 1) {
+    if (key == LogicalKeyboardKey.arrowRight &&
+        index < widget.items.length - 1) {
       _focusNodes[index + 1].requestFocus();
       return KeyEventResult.handled;
     }
@@ -297,7 +301,8 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
     if ((position.pixels - targetOffset).abs() < minDelta) {
       return;
     }
-    if (_lastScrollTarget != null && (_lastScrollTarget! - targetOffset).abs() < minDelta) {
+    if (_lastScrollTarget != null &&
+        (_lastScrollTarget! - targetOffset).abs() < minDelta) {
       return;
     }
 
@@ -316,7 +321,10 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: _kWatchNextHorizontalPadding, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: _kWatchNextHorizontalPadding,
+          vertical: 12,
+        ),
         itemExtent: _kWatchNextItemWidth + _kWatchNextItemSpacing,
         addSemanticIndexes: false,
         addRepaintBoundaries: true,
@@ -377,7 +385,9 @@ class _WatchNextCardState extends State<_WatchNextCard> {
       _isHovered = widget.focusNode.hasFocus;
     }
     if (oldWidget.item.posterUri != widget.item.posterUri) {
-      context.read<WatchNextService>().ensurePosterLoaded(widget.item.posterUri);
+      context.read<WatchNextService>().ensurePosterLoaded(
+        widget.item.posterUri,
+      );
     }
   }
 
@@ -422,16 +432,18 @@ class _WatchNextCardState extends State<_WatchNextCard> {
 
   @override
   Widget build(BuildContext context) {
-    final (posterData, posterLoadFailed) = context.select<WatchNextService, (Uint8List?, bool)>(
-      (service) => (
-        service.getCachedPoster(widget.item.posterUri),
-        service.hasPosterLoadFailed(widget.item.posterUri),
-      ),
-    );
+    final (posterData, posterLoadFailed) = context
+        .select<WatchNextService, (Uint8List?, bool)>(
+          (service) => (
+            service.getCachedPoster(widget.item.posterUri),
+            service.hasPosterLoadFailed(widget.item.posterUri),
+          ),
+        );
     final targetScale = _clicked ? 0.97 : (_isHovered ? _focusedScale : 1.0);
     final targetLift = _isHovered && !_clicked ? _focusedLift : 0.0;
-    final showFocusBorders = context.select<SettingsService, bool>((s) => s.showFocusBorders);
-
+    final showFocusBorders = context.select<SettingsService, bool>(
+      (s) => s.showFocusBorders,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(right: _kWatchNextItemSpacing),
@@ -455,7 +467,10 @@ class _WatchNextCardState extends State<_WatchNextCard> {
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOutCubic,
               builder: (context, lift, child) {
-                return Transform.translate(offset: Offset(0, lift), child: child);
+                return Transform.translate(
+                  offset: Offset(0, lift),
+                  child: child,
+                );
               },
               child: AnimatedScale(
                 scale: targetScale,
@@ -494,7 +509,10 @@ class _WatchNextCardState extends State<_WatchNextCard> {
                               ),
                             ),
                           ),
-                        if (!_isHovered) const IgnorePointer(child: ColoredBox(color: Color(0x1A000000))),
+                        if (!_isHovered)
+                          const IgnorePointer(
+                            child: ColoredBox(color: Color(0x1A000000)),
+                          ),
                       ],
                     ),
                   ),
@@ -534,11 +552,7 @@ class _WatchNextCardState extends State<_WatchNextCard> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.play_circle_outline,
-          size: 40,
-          color: Colors.white70,
-        ),
+        const Icon(Icons.play_circle_outline, size: 40, color: Colors.white70),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -631,7 +645,8 @@ class _WatchNextCardState extends State<_WatchNextCard> {
   }
 
   Widget _buildProgressIndicator() {
-    if (widget.item.progressPercent == null || widget.item.progressPercent == 0) {
+    if (widget.item.progressPercent == null ||
+        widget.item.progressPercent == 0) {
       return const SizedBox.shrink();
     }
 

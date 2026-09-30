@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 Future<void> showUpdateProgressDialog(
   BuildContext context, {
@@ -55,12 +55,14 @@ Future<bool> showUpdateAvailableDialog(
         builder: (dialogContext) => AlertDialog(
           title: Text(localizations.updateAvailableTitle),
           content: Text(
-              localizations.updateAvailableBody(latestVersion, currentVersion)),
+            localizations.updateAvailableBody(latestVersion, currentVersion),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child:
-                  Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+              child: Text(
+                MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -85,8 +87,9 @@ Future<bool> showReadyToInstallDialog(
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child:
-                  Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+              child: Text(
+                MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -111,7 +114,9 @@ Future<void> showInstallPermissionDialog(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(),
-          child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          child: Text(
+            MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+          ),
         ),
         TextButton(
           onPressed: () {

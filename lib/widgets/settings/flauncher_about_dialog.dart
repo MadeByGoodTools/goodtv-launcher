@@ -18,31 +18,35 @@
 
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
-class LTvLauncherAboutDialog extends StatelessWidget {
+class FLauncherAboutDialog extends StatelessWidget {
   final PackageInfo packageInfo;
 
-  LTvLauncherAboutDialog({
-    Key? key,
-    required this.packageInfo,
-  }) : super(key: key);
+  FLauncherAboutDialog({Key? key, required this.packageInfo})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
     return AboutDialog(
-      applicationName: "Arc Launcher",
-      applicationVersion: "v${packageInfo.version} (${packageInfo.buildNumber})",
+      applicationName: "GoodTV Launcher",
+      applicationVersion:
+          "v${packageInfo.version} (${packageInfo.buildNumber})",
       applicationIcon: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image.asset("assets/icon.png", height: 72),
       ),
-      applicationLegalese: "Developed by Badis Meddouri\nBased on LTvLauncher © 2026 LeanBitLab",
+      applicationLegalese:
+          "Developed by Good Tools\nBased on Arc Launcher, LTvLauncher, and FLauncher\nGNU GPL v3",
       children: [
         SizedBox(height: 24),
-        Text(localizations.textAboutDialog("https://github.com/meddouribadis/arclauncher"))
+        Text(
+          localizations.textAboutDialog(
+            "https://github.com/meddouribadis/arclauncher",
+          ),
+        ),
       ],
     );
   }

@@ -17,14 +17,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 class AddCategoryDialog extends StatelessWidget {
   final String initialValue;
 
-  AddCategoryDialog({
-    required this.initialValue,
-  });
+  AddCategoryDialog({required this.initialValue});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,8 @@ class AddCategoryDialog extends StatelessWidget {
           autofocus: true,
           initialValue: initialValue,
           decoration: InputDecoration(labelText: localizations.name),
-          validator: (value) => value!.trim().isEmpty ? localizations.mustNotBeEmpty : null,
+          validator: (value) =>
+              value!.trim().isEmpty ? localizations.mustNotBeEmpty : null,
           autovalidateMode: AutovalidateMode.always,
           keyboardType: TextInputType.text,
           textCapitalization: TextCapitalization.sentences,
@@ -48,7 +47,7 @@ class AddCategoryDialog extends StatelessWidget {
               Navigator.of(context).pop(value);
             }
           },
-        )
+        ),
       ],
     );
   }

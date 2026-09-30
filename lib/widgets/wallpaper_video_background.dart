@@ -22,10 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class WallpaperVideoBackground extends StatefulWidget {
-  const WallpaperVideoBackground({
-    super.key,
-    required this.file,
-  });
+  const WallpaperVideoBackground({super.key, required this.file});
 
   final File file;
 
@@ -57,22 +54,25 @@ class _WallpaperVideoBackgroundState extends State<WallpaperVideoBackground>
   void _initController() {
     final controller = VideoPlayerController.file(widget.file);
     _controller = controller;
-    controller.initialize().then((_) {
-      if (!mounted || _controller != controller) {
-        _controller = null;
-        controller.dispose();
-        return;
-      }
-      controller.setLooping(true);
-      controller.setVolume(0);
-      controller.play();
-      setState(() {});
-    }).catchError((error) {
-      debugPrint('Video wallpaper initialization failed: $error');
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    controller
+        .initialize()
+        .then((_) {
+          if (!mounted || _controller != controller) {
+            _controller = null;
+            controller.dispose();
+            return;
+          }
+          controller.setLooping(true);
+          controller.setVolume(0);
+          controller.play();
+          setState(() {});
+        })
+        .catchError((error) {
+          debugPrint('Video wallpaper initialization failed: $error');
+          if (mounted) {
+            setState(() {});
+          }
+        });
   }
 
   void _disposeController() {
@@ -109,15 +109,16 @@ class _WallpaperVideoBackgroundState extends State<WallpaperVideoBackground>
 
     final size = controller.value.size;
     return RepaintBoundary(
-        child: SizedBox.expand(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: SizedBox(
-          width: size.width,
-          height: size.height,
-          child: RepaintBoundary(child: VideoPlayer(controller)),
+      child: SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: RepaintBoundary(child: VideoPlayer(controller)),
+          ),
         ),
       ),
-    ));
+    );
   }
 }

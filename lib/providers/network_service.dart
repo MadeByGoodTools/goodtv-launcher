@@ -17,74 +17,61 @@
  */
 
 import 'dart:async';
-import 'package:flauncher/flauncher_channel.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:flutter/material.dart';
 
-enum NetworkType
-{
-  Cellular,
-  Wifi,
-  Vpn,
-  Wired,
-  Unknown
-}
+enum NetworkType { Cellular, Wifi, Vpn, Wired, Unknown }
 
 // https://developer.android.com/reference/android/telephony/TelephonyManager#NETWORK_TYPE_CDMA
-enum CellularNetworkType
-{
-  Unknown,  // 0
-  Gprs,     // 1
-  Edge,     // 2
-  Umts,     // 3
-  Cdma,     // 4
+enum CellularNetworkType {
+  Unknown, // 0
+  Gprs, // 1
+  Edge, // 2
+  Umts, // 3
+  Cdma, // 4
   EvdoZero, // 5
-  EvdoA,    // 6
+  EvdoA, // 6
   Unused_1, // 7
-  Hsdpa,    // 8
-  Hsupa,    // 9
-  Hspa,     // 10
-  Iden,     // 11
-  EvdoB,    // 12
-  Lte,      // 13
-  Ehrpd,    // 14
-  Hspap,    // 15
-  Gsm,      // 16
-  TdScdma,  // 17
-  Iwlan,    // 18
+  Hsdpa, // 8
+  Hsupa, // 9
+  Hspa, // 10
+  Iden, // 11
+  EvdoB, // 12
+  Lte, // 13
+  Ehrpd, // 14
+  Hspap, // 15
+  Gsm, // 16
+  TdScdma, // 17
+  Iwlan, // 18
   Unused_2, // 19
-  Nr,       // 20
+  Nr, // 20
 }
 
-class NetworkService extends ChangeNotifier
-{
-  final FLauncherChannel  _channel;
+class NetworkService extends ChangeNotifier {
+  final FLauncherChannel _channel;
 
-  bool                _hasInternetAccess;
+  bool _hasInternetAccess;
   CellularNetworkType _cellularNetworkType;
-  NetworkType         _networkType;
-  int                 _wirelessNetworkSignalLevel;
-  int                 _dailyWifiUsage; // In bytes
-  bool                _hasUsageStatsPermission;
-  Timer?              _usageTimer;
+  NetworkType _networkType;
+  int _wirelessNetworkSignalLevel;
+  int _dailyWifiUsage; // In bytes
+  bool _hasUsageStatsPermission;
+  Timer? _usageTimer;
 
-
-  NetworkService(this._channel) :
-        _hasInternetAccess = false,
-        _cellularNetworkType = CellularNetworkType.Unknown,
-        _networkType = NetworkType.Unknown,
-        _wirelessNetworkSignalLevel = 0,
-        _dailyWifiUsage = 0,
-        _hasUsageStatsPermission = false
-  {
+  NetworkService(this._channel)
+    : _hasInternetAccess = false,
+      _cellularNetworkType = CellularNetworkType.Unknown,
+      _networkType = NetworkType.Unknown,
+      _wirelessNetworkSignalLevel = 0,
+      _dailyWifiUsage = 0,
+      _hasUsageStatsPermission = false {
     _channel.addNetworkChangedListener(_onNetworkChanged);
 
-    _channel
-        .getActiveNetworkInformation()
-        .then((map) {
-          if (map.isNotEmpty) {
-            _getNetworkInformation(map);
-          }
-        });
+    _channel.getActiveNetworkInformation().then((map) {
+      if (map.isNotEmpty) {
+        _getNetworkInformation(map);
+      }
+    });
 
     _checkPermissionAndStartPolling();
   }
@@ -93,7 +80,10 @@ class NetworkService extends ChangeNotifier
     _hasUsageStatsPermission = await _channel.checkUsageStatsPermission();
     if (_hasUsageStatsPermission) {
       _fetchUsage();
-      _usageTimer = Timer.periodic(const Duration(minutes: 5), (_) => _fetchUsage());
+      _usageTimer = Timer.periodic(
+        const Duration(minutes: 5),
+        (_) => _fetchUsage(),
+      );
     }
     notifyListeners();
   }
@@ -111,7 +101,10 @@ class NetworkService extends ChangeNotifier
     if (_hasUsageStatsPermission) {
       _fetchUsage();
       if (_usageTimer == null || !_usageTimer!.isActive) {
-         _usageTimer = Timer.periodic(const Duration(minutes: 5), (_) => _fetchUsage());
+        _usageTimer = Timer.periodic(
+          const Duration(minutes: 5),
+          (_) => _fetchUsage(),
+        );
       }
     } else {
       _usageTimer?.cancel();
@@ -124,13 +117,13 @@ class NetworkService extends ChangeNotifier
   }
 
   Future<void> _fetchUsage() async {
-     // This will be called with the current period from the widget
-     // For now, default to daily
-     int usage = await _channel.getDailyWifiUsage();
-     if (usage != -1) {
-       _dailyWifiUsage = usage;
-       notifyListeners();
-     }
+    // This will be called with the current period from the widget
+    // For now, default to daily
+    int usage = await _channel.getDailyWifiUsage();
+    if (usage != -1) {
+      _dailyWifiUsage = usage;
+      notifyListeners();
+    }
   }
 
   Future<int> getWifiUsageForPeriod(String period) async {
@@ -152,36 +145,35 @@ class NetworkService extends ChangeNotifier
     super.dispose();
   }
 
-  bool                  get   hasInternetAccess             => _hasInternetAccess;
-  CellularNetworkType   get   cellularNetworkType           => _cellularNetworkType;
-  NetworkType           get   networkType                   => _networkType;
-  int                   get   wirelessNetworkSignalLevel    => _wirelessNetworkSignalLevel;
-  int                 get   dailyWifiUsage                => _dailyWifiUsage;
-  bool                get   hasUsageStatsPermission       => _hasUsageStatsPermission;
+  bool get hasInternetAccess => _hasInternetAccess;
+  CellularNetworkType get cellularNetworkType => _cellularNetworkType;
+  NetworkType get networkType => _networkType;
+  int get wirelessNetworkSignalLevel => _wirelessNetworkSignalLevel;
+  int get dailyWifiUsage => _dailyWifiUsage;
+  bool get hasUsageStatsPermission => _hasUsageStatsPermission;
 
-  CellularNetworkType _getCellularNetworkType(int index)
-  {
+  CellularNetworkType _getCellularNetworkType(int index) {
     CellularNetworkType type = CellularNetworkType.values[index];
-    if (type == CellularNetworkType.Unused_1 || type == CellularNetworkType.Unused_2) {
+    if (type == CellularNetworkType.Unused_1 ||
+        type == CellularNetworkType.Unused_2) {
       type = CellularNetworkType.Unknown;
     }
 
     return type;
   }
 
-  void _getNetworkInformation(Map<String, dynamic> map)
-  {
+  void _getNetworkInformation(Map<String, dynamic> map) {
     int networkTypeInt = map["networkType"];
     _hasInternetAccess = map["internetAccess"];
     _networkType = NetworkType.values[networkTypeInt];
 
-    if (_networkType == NetworkType.Cellular || _networkType == NetworkType.Wifi) {
+    if (_networkType == NetworkType.Cellular ||
+        _networkType == NetworkType.Wifi) {
       _wirelessNetworkSignalLevel = map["wirelessSignalLevel"];
     }
   }
 
-  void _onNetworkChanged(Map<String, dynamic> event)
-  {
+  void _onNetworkChanged(Map<String, dynamic> event) {
     switch (event["name"]) {
       case "NETWORK_AVAILABLE":
         Map<dynamic, dynamic> map = event["arguments"];

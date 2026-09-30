@@ -19,7 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flauncher/l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import '../../providers/settings_service.dart';
 
 class ScreensaverClockStylePage extends StatelessWidget {
@@ -36,7 +36,10 @@ class ScreensaverClockStylePage extends StatelessWidget {
 
         return Column(
           children: [
-            Text(AppLocalizations.of(context)!.screensaverClockStyle, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              AppLocalizations.of(context)!.screensaverClockStyle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const Divider(),
             Expanded(
               child: SingleChildScrollView(
@@ -47,7 +50,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Thin, elegant font (Default)',
                       value: 'minimal',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'minimal',
                     ),
                     _StyleRadioTile(
@@ -55,7 +59,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Thick, highly visible font',
                       value: 'bold',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'bold',
                     ),
                     _StyleRadioTile(
@@ -63,7 +68,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Monospaced, retro terminal style',
                       value: 'retro',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'retro',
                     ),
                     _StyleRadioTile(
@@ -71,7 +77,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Classic serif typeface',
                       value: 'elegant',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'elegant',
                     ),
                     _StyleRadioTile(
@@ -79,7 +86,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Ultra-thin, glowing style',
                       value: 'neon',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'neon',
                     ),
                     _StyleRadioTile(
@@ -87,7 +95,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Bold monospaced, arcade feel',
                       value: 'pixel',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'pixel',
                     ),
                     _StyleRadioTile(
@@ -95,7 +104,8 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       subtitle: 'Clean monospaced display',
                       value: 'digital',
                       groupValue: currentStyle,
-                      onChanged: (value) => settingsService.setScreensaverClockStyle(value!),
+                      onChanged: (value) =>
+                          settingsService.setScreensaverClockStyle(value!),
                       autofocus: currentStyle == 'digital',
                     ),
                   ],
@@ -137,18 +147,22 @@ class _StyleRadioTileState extends State<_StyleRadioTile> {
   Widget build(BuildContext context) {
     final isSelected = widget.value == widget.groupValue;
     final primaryColor = Theme.of(context).colorScheme.primary;
-    
+
     return RepaintBoundary(
       child: Actions(
         actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
-            widget.onChanged(widget.value);
-            return null;
-          }),
-          ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) {
-            widget.onChanged(widget.value);
-            return null;
-          }),
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              widget.onChanged(widget.value);
+              return null;
+            },
+          ),
+          ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+            onInvoke: (_) {
+              widget.onChanged(widget.value);
+              return null;
+            },
+          ),
         },
         child: Focus(
           autofocus: widget.autofocus,
@@ -177,7 +191,9 @@ class _StyleRadioTileState extends State<_StyleRadioTile> {
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: _hasFocus ? Colors.white.withOpacity(0.05) : Colors.transparent,
+                color: _hasFocus
+                    ? Colors.white.withOpacity(0.05)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: _hasFocus
                     ? Border.all(color: primaryColor, width: 2)
@@ -191,17 +207,21 @@ class _StyleRadioTileState extends State<_StyleRadioTile> {
                       children: [
                         Text(
                           widget.title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected ? Colors.white : Colors.white70,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.white70,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           widget.subtitle,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white54,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.white54),
                         ),
                       ],
                     ),

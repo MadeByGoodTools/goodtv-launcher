@@ -1,20 +1,12 @@
-# Arc Launcher
+# GoodTV Launcher
 
 <picture>
-  <img alt="Arc Launcher Preview" src="docs/images/home.webp">
+  <img alt="GoodTV Launcher Preview" src="docs/images/home.webp">
 </picture>
 
-[![Version](https://img.shields.io/github/v/release/meddouribadis/arclauncher?style=for-the-badge&color=7C4DFF&label=Version)](https://github.com/meddouribadis/arclauncher/releases/latest) [![Downloads](https://img.shields.io/github/downloads/meddouribadis/arclauncher/total?style=for-the-badge&color=7C4DFF&label=Downloads)](https://github.com/meddouribadis/arclauncher/releases) [![Stars](https://img.shields.io/github/stars/meddouribadis/arclauncher?style=for-the-badge&color=7C4DFF)](https://github.com/meddouribadis/arclauncher/stargazers)
-
-**Arc Launcher** is a fork of [LTvLauncher](https://github.com/LeanBitLab/LtvLauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
-
-This customized version introduces a modern smart TV-style grid layout, usability enhancements, and UX improvements by [meddouribadis](https://github.com/meddouribadis/LtvLauncher).
-
-<a href="https://github.com/meddouribadis/arclauncher/releases/latest">
-  <img alt="Get it on GitHub" src="https://raw.githubusercontent.com/rubenpgrady/get-it-on-github/refs/heads/main/get-it-on-github.png" height="50">
-</a>
-
-### Downloader code : 6330120
+**GoodTV Launcher** is a free, open-source, ad-free home-screen replacement for
+Android TV, Google TV, and Fire TV. It is developed by Good Tools from Arc
+Launcher, LTvLauncher, and FLauncher under the GNU GPL v3.
 
 ## Key Features & Enhancements
 
@@ -97,11 +89,11 @@ This customized version introduces a modern smart TV-style grid layout, usabilit
 - [x] Support for non-TV (sideloaded) apps
 - [x] Navigation sound feedback
 
-## Set Arc Launcher as default launcher
+## Set GoodTV Launcher as default launcher
 
 ### Method 1: Remap the Home button
 
-This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch Arc Launcher.
+This is the safer and easiest method. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch GoodTV Launcher.
 
 ### Method 2: Disable the default launcher
 

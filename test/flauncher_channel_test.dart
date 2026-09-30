@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flauncher/flauncher_channel.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,7 +30,7 @@ void main() {
     channel.setMockMethodCallHandler((call) async {
       if (call.method == "getApplications") {
         return [
-          {'packageName': 'me.efesser.flauncher'}
+          {'packageName': 'me.efesser.flauncher'},
         ];
       }
       fail("Unhandled method name");
@@ -40,7 +40,7 @@ void main() {
     final apps = await fLauncherChannel.getApplications();
 
     expect(apps, [
-      {'packageName': 'me.efesser.flauncher'}
+      {'packageName': 'me.efesser.flauncher'},
     ]);
   });
 
@@ -137,7 +137,8 @@ void main() {
     });
     final fLauncherChannel = FLauncherChannel();
 
-    final getContentAvailable = await fLauncherChannel.checkForGetContentAvailability();
+    final getContentAvailable = await fLauncherChannel
+        .checkForGetContentAvailability();
 
     expect(getContentAvailable, isTrue);
   });

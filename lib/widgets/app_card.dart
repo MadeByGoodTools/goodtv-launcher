@@ -18,12 +18,12 @@
 
 import 'dart:async';
 
-import 'package:flauncher/actions.dart';
-import 'package:flauncher/app_image_type.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/widgets/application_info_panel.dart';
-import 'package:flauncher/widgets/focus_keyboard_listener.dart';
+import 'package:goodtv_launcher/actions.dart';
+import 'package:goodtv_launcher/app_image_type.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/widgets/application_info_panel.dart';
+import 'package:goodtv_launcher/widgets/focus_keyboard_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +32,11 @@ import 'package:provider/provider.dart';
 import '../models/app.dart';
 import '../models/category.dart';
 
-const _validationKeys = [LogicalKeyboardKey.select, LogicalKeyboardKey.enter, LogicalKeyboardKey.gameButtonA];
+const _validationKeys = [
+  LogicalKeyboardKey.select,
+  LogicalKeyboardKey.enter,
+  LogicalKeyboardKey.gameButtonA,
+];
 
 const kAppCardAspectRatio = 16 / 9;
 const kAppCardHorizontalPadding = 12.0;
@@ -41,7 +45,10 @@ const kLauncherSectionHorizontalPadding = 24.0;
 const kAppNameLabelHeight = 24.0;
 
 /// Row extent for a grid/dock line given the content width between section paddings.
-double appCardRowExtentFromContentWidth(double contentWidth, {int columnCount = Category.ColumnsCount}) {
+double appCardRowExtentFromContentWidth(
+  double contentWidth, {
+  int columnCount = Category.ColumnsCount,
+}) {
   final slotWidth = contentWidth / columnCount;
   return slotWidth / kAppCardAspectRatio;
 }
@@ -109,10 +116,17 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _animation = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
-    _curvedAnimation = CurvedAnimation(parent: _animation, curve: Curves.easeInOut);
+    _animation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _curvedAnimation = CurvedAnimation(
+      parent: _animation,
+      curve: Curves.easeInOut,
+    );
     _focusNode = FocusNode();
-    _isTraditionalHighlightMode = FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    _isTraditionalHighlightMode =
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
 
     FocusManager.instance.addHighlightModeListener(_focusHighlightModeChanged);
     _loadAppImage(Provider.of<AppsService>(context, listen: false));
@@ -120,7 +134,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     // Check if we need to restore focus/reorder mode after a move
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appsService = Provider.of<AppsService>(context, listen: false);
-      if (appsService.pendingReorderFocusPackage == widget.application.packageName &&
+      if (appsService.pendingReorderFocusPackage ==
+              widget.application.packageName &&
           appsService.pendingReorderFocusCategoryId == widget.category.id) {
         appsService.clearPendingReorderFocusPackage();
         _focusNode.requestFocus();
@@ -149,7 +164,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     // Check for pending focus on update as well
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appsService = Provider.of<AppsService>(context, listen: false);
-      if (appsService.pendingReorderFocusPackage == widget.application.packageName &&
+      if (appsService.pendingReorderFocusPackage ==
+              widget.application.packageName &&
           appsService.pendingReorderFocusCategoryId == widget.category.id) {
         appsService.clearPendingReorderFocusPackage();
         _focusNode.requestFocus();
@@ -165,7 +181,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    FocusManager.instance.removeHighlightModeListener(_focusHighlightModeChanged);
+    FocusManager.instance.removeHighlightModeListener(
+      _focusHighlightModeChanged,
+    );
     _curvedAnimation.dispose();
     _animation.dispose();
     _focusNode.dispose();
@@ -175,9 +193,19 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final bool showAppNames = context.select<SettingsService, bool>((s) => s.showAppNamesBelowIcons);
-    final (bool animationEnabled, String accentColorHex, bool showFocusBorders) = context.select<SettingsService, (bool, String, bool)>(
-      (s) => (s.appHighlightAnimationEnabled, s.accentColorHex, s.showFocusBorders),
+    final bool showAppNames = context.select<SettingsService, bool>(
+      (s) => s.showAppNamesBelowIcons,
+    );
+    final (
+      bool animationEnabled,
+      String accentColorHex,
+      bool showFocusBorders,
+    ) = context.select<SettingsService, (bool, String, bool)>(
+      (s) => (
+        s.appHighlightAnimationEnabled,
+        s.accentColorHex,
+        s.showFocusBorders,
+      ),
     );
     if (accentColorHex != _accentColorHex) {
       _accentColorHex = accentColorHex;
@@ -229,8 +257,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                   autofocus: widget.autofocus,
                                   focusColor: Colors.transparent,
                                   child: appImageWidget,
-                                  onTap: () => _onPressed(LogicalKeyboardKey.enter),
-                                  onLongPress: () => _onLongPress(LogicalKeyboardKey.enter),
+                                  onTap: () =>
+                                      _onPressed(LogicalKeyboardKey.enter),
+                                  onLongPress: () =>
+                                      _onLongPress(LogicalKeyboardKey.enter),
                                   onFocusChange: (focused) {
                                     _handleFocusChange(context, focused);
                                   },
@@ -241,7 +271,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                     duration: _focusAnimationDuration,
                                     curve: Curves.easeInOut,
                                     opacity: shouldHighlight ? 0.0 : 1.0,
-                                    child: const ColoredBox(color: Color(0x1A000000)),
+                                    child: const ColoredBox(
+                                      color: Color(0x1A000000),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -254,22 +286,34 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                   child: AnimatedBuilder(
                                     animation: _curvedAnimation,
                                     builder: (context, _) {
-                                      final alpha = 0.4 + (_animation.value * 0.6);
-                                      return _HighlightOutline(color: _accentColor.withValues(alpha: alpha));
+                                      final alpha =
+                                          0.4 + (_animation.value * 0.6);
+                                      return _HighlightOutline(
+                                        color: _accentColor.withValues(
+                                          alpha: alpha,
+                                        ),
+                                      );
                                     },
                                   ),
                                 ),
                               )
                             else
-                              IgnorePointer(child: RepaintBoundary(child: _HighlightOutline(color: _accentColor))),
+                              IgnorePointer(
+                                child: RepaintBoundary(
+                                  child: _HighlightOutline(color: _accentColor),
+                                ),
+                              ),
                         ],
                       ),
                     ),
-                ),
+                  ),
                 ),
               ),
               if (showAppNames)
-                Padding(padding: const EdgeInsets.only(top: 8.0), child: _AppNameLabel(name: widget.application.name)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: _AppNameLabel(name: widget.application.name),
+                ),
             ],
           ),
         ),
@@ -318,7 +362,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              Expanded(flex: 2, child: Ink.image(image: image, height: double.maxFinite)),
+              Expanded(
+                flex: 2,
+                child: Ink.image(image: image, height: double.maxFinite),
+              ),
               Flexible(
                 flex: 3,
                 child: Padding(
@@ -356,7 +403,11 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
                 SizedBox(width: 8),
                 Text("Loading"),
               ],
@@ -395,7 +446,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     }
 
     final now = DateTime.now();
-    if (_lastEnsureVisibleAt != null && now.difference(_lastEnsureVisibleAt!).inMilliseconds < 120) {
+    if (_lastEnsureVisibleAt != null &&
+        now.difference(_lastEnsureVisibleAt!).inMilliseconds < 120) {
       return;
     }
     _lastEnsureVisibleAt = now;
@@ -431,7 +483,11 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     }
   }
 
-  void _ensureVisibleIfNeeded(BuildContext context, {required double alignment, bool onlyWhenNearBottom = false}) {
+  void _ensureVisibleIfNeeded(
+    BuildContext context, {
+    required double alignment,
+    bool onlyWhenNearBottom = false,
+  }) {
     final renderObject = context.findRenderObject();
     final scrollable = Scrollable.maybeOf(context);
     if (renderObject == null || scrollable == null) {
@@ -443,13 +499,13 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     final position = scrollable.position;
     const minDeltaToScroll = 24.0;
     if (onlyWhenNearBottom &&
-        (position.axisDirection == AxisDirection.down || position.axisDirection == AxisDirection.up)) {
+        (position.axisDirection == AxisDirection.down ||
+            position.axisDirection == AxisDirection.up)) {
       const topEdgePadding = kToolbarHeight + 24.0;
       const bottomEdgePadding = 96.0;
-      final topTargetOffset = (viewport.getOffsetToReveal(renderObject, 0).offset - topEdgePadding).clamp(
-        position.minScrollExtent,
-        position.maxScrollExtent,
-      );
+      final topTargetOffset =
+          (viewport.getOffsetToReveal(renderObject, 0).offset - topEdgePadding)
+              .clamp(position.minScrollExtent, position.maxScrollExtent);
       if (position.pixels - topTargetOffset >= minDeltaToScroll) {
         position.animateTo(
           topTargetOffset,
@@ -459,10 +515,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         return;
       }
 
-      final bottomTargetOffset = (viewport.getOffsetToReveal(renderObject, 1).offset + bottomEdgePadding).clamp(
-        position.minScrollExtent,
-        position.maxScrollExtent,
-      );
+      final bottomTargetOffset =
+          (viewport.getOffsetToReveal(renderObject, 1).offset +
+                  bottomEdgePadding)
+              .clamp(position.minScrollExtent, position.maxScrollExtent);
       if (bottomTargetOffset - position.pixels < minDeltaToScroll) {
         return;
       }
@@ -475,7 +531,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       return;
     }
 
-    final targetOffset = viewport.getOffsetToReveal(renderObject, alignment).offset;
+    final targetOffset = viewport
+        .getOffsetToReveal(renderObject, alignment)
+        .offset;
     if ((targetOffset - position.pixels).abs() < minDeltaToScroll) {
       return;
     }
@@ -515,17 +573,25 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     return arrows;
   }
 
-  Widget _arrow(Alignment alignment, IconData icon, VoidCallback onTap) => Align(
-    alignment: alignment,
-    child: Ink(
-      decoration: ShapeDecoration(color: Theme.of(context).primaryColor.withValues(alpha: 0.8), shape: CircleBorder()),
-      child: SizedBox(
-        height: 36,
-        width: 36,
-        child: IconButton(icon: Icon(icon, size: 24), onPressed: onTap, padding: EdgeInsets.all(0)),
-      ),
-    ),
-  );
+  Widget _arrow(Alignment alignment, IconData icon, VoidCallback onTap) =>
+      Align(
+        alignment: alignment,
+        child: Ink(
+          decoration: ShapeDecoration(
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+            shape: CircleBorder(),
+          ),
+          child: SizedBox(
+            height: 36,
+            width: 36,
+            child: IconButton(
+              icon: Icon(icon, size: 24),
+              onPressed: onTap,
+              padding: EdgeInsets.all(0),
+            ),
+          ),
+        ),
+      );
 
   KeyEventResult _onPressed(LogicalKeyboardKey? key) {
     if (_moving) {
@@ -535,7 +601,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         widget.onMoveEnd();
       } else {
         final now = DateTime.now();
-        if (_lastMoveAt != null && now.difference(_lastMoveAt!).inMilliseconds < 60) {
+        if (_lastMoveAt != null &&
+            now.difference(_lastMoveAt!).inMilliseconds < 60) {
           return KeyEventResult.handled;
         }
 
@@ -553,9 +620,13 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
         _lastMoveAt = now;
         final nowForScroll = DateTime.now();
-        if (_lastEnsureVisibleAt == null || nowForScroll.difference(_lastEnsureVisibleAt!).inMilliseconds >= 120) {
+        if (_lastEnsureVisibleAt == null ||
+            nowForScroll.difference(_lastEnsureVisibleAt!).inMilliseconds >=
+                120) {
           _lastEnsureVisibleAt = nowForScroll;
-          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureVisibleIfNeeded(context, alignment: 0.1));
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _ensureVisibleIfNeeded(context, alignment: 0.1),
+          );
         }
       }
 
@@ -575,7 +646,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         });
       }
       return KeyEventResult.handled;
-    } else if (key == LogicalKeyboardKey.arrowUp && widget.handleUpNavigationToSettings) {
+    } else if (key == LogicalKeyboardKey.arrowUp &&
+        widget.handleUpNavigationToSettings) {
       Actions.invoke(context, const MoveFocusToSettingsIntent());
       return KeyEventResult.handled;
     }
@@ -593,7 +665,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   Future<void> _showPanel() async {
     final result = await showDialog<ApplicationInfoPanelResult>(
       context: context,
-      builder: (context) => ApplicationInfoPanel(category: widget.category, application: widget.application),
+      builder: (context) => ApplicationInfoPanel(
+        category: widget.category,
+        application: widget.application,
+      ),
     );
     if (result == ApplicationInfoPanelResult.reorderApp) {
       setState(() => _moving = true);

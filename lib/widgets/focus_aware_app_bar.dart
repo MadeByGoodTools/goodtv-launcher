@@ -1,4 +1,4 @@
-import 'package:flauncher/widgets/settings/settings_panel.dart';
+import 'package:goodtv_launcher/widgets/settings/settings_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,8 +8,7 @@ import 'daily_wifi_usage_widget.dart';
 import 'date_time_widget.dart';
 import 'network_widget.dart';
 
-class FocusAwareAppBar extends StatefulWidget implements PreferredSizeWidget
-{
+class FocusAwareAppBar extends StatefulWidget implements PreferredSizeWidget {
   const FocusAwareAppBar({Key? key}) : super(key: key);
 
   @override
@@ -21,8 +20,7 @@ class FocusAwareAppBar extends StatefulWidget implements PreferredSizeWidget
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class FocusAwareAppBarState extends State<FocusAwareAppBar>
-{
+class FocusAwareAppBarState extends State<FocusAwareAppBar> {
   bool focused = false;
   late FocusNode _settingsFocusNode;
 
@@ -54,7 +52,7 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar>
               curve: Curves.decelerate,
               duration: Duration(milliseconds: 150),
               height: focused ? kToolbarHeight : 0,
-              child: widget!
+              child: widget!,
             ),
             onFocusChange: (hasFocus) {
               if (hasFocus) {
@@ -63,7 +61,7 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar>
               this.setState(() {
                 focused = hasFocus;
               });
-            }
+            },
           );
         }
 
@@ -82,25 +80,29 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar>
               _FocusableIconButton(
                 icon: Icons.settings_outlined,
                 focusNode: _settingsFocusNode,
-                onPressed: () => showDialog(context: context, builder: (_) => const SettingsPanel()),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => const SettingsPanel(),
+                ),
               ),
               const SizedBox(width: 16),
               // Network indicator (conditionally shown)
               Selector<SettingsService, bool>(
-                selector: (_, settings) => settings.showNetworkIndicatorInStatusBar,
+                selector: (_, settings) =>
+                    settings.showNetworkIndicatorInStatusBar,
                 builder: (context, showNetwork, _) => showNetwork
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: _FocusableNetworkWidget(),
-                    )
-                  : const SizedBox.shrink(),
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: _FocusableNetworkWidget(),
+                      )
+                    : const SizedBox.shrink(),
               ),
               // WiFi usage widget
               Selector<SettingsService, bool>(
                 selector: (_, settings) => settings.showWifiWidgetInStatusBar,
                 builder: (context, showWifi, _) => showWifi
-                  ? const DailyWifiUsageWidget()
-                  : const SizedBox.shrink(),
+                    ? const DailyWifiUsageWidget()
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -108,55 +110,67 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar>
           actions: [
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 32),
-              child: Selector<SettingsService,
-                  ({
-                    bool showDateInStatusBar,
-                    bool showTimeInStatusBar,
-                    String dateFormat,
-                    String timeFormat })>(
-                selector: (context, service) => (
-                showDateInStatusBar: service.showDateInStatusBar,
-                showTimeInStatusBar: service.showTimeInStatusBar,
-                dateFormat: service.dateFormat,
-                timeFormat: service.timeFormat),
-                builder: (context, dateTimeSettings, _) {
-                  // Define standard text style
-                  const textStyle = TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 4)
-                    ],
-                  );
+              child:
+                  Selector<
+                    SettingsService,
+                    ({
+                      bool showDateInStatusBar,
+                      bool showTimeInStatusBar,
+                      String dateFormat,
+                      String timeFormat,
+                    })
+                  >(
+                    selector: (context, service) => (
+                      showDateInStatusBar: service.showDateInStatusBar,
+                      showTimeInStatusBar: service.showTimeInStatusBar,
+                      dateFormat: service.dateFormat,
+                      timeFormat: service.timeFormat,
+                    ),
+                    builder: (context, dateTimeSettings, _) {
+                      // Define standard text style
+                      const textStyle = TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            offset: Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      );
 
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Date
-                      if (dateTimeSettings.showDateInStatusBar)
-                        DateTimeWidget(
-                          dateTimeSettings.dateFormat,
-                          key: const Key("statusbar_date"),
-                          updateInterval: const Duration(minutes: 1),
-                          textStyle: textStyle,
-                        ),
-                      
-                      if (dateTimeSettings.showDateInStatusBar && dateTimeSettings.showTimeInStatusBar)
-                          const SizedBox(width: 16),
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Date
+                          if (dateTimeSettings.showDateInStatusBar)
+                            DateTimeWidget(
+                              dateTimeSettings.dateFormat,
+                              key: const Key("statusbar_date"),
+                              updateInterval: const Duration(minutes: 1),
+                              textStyle: textStyle,
+                            ),
 
-                      // Clock
-                      if (dateTimeSettings.showTimeInStatusBar)
-                        DateTimeWidget(
-                          dateTimeSettings.timeFormat,
-                          key: const Key("statusbar_clock"),
-                          updateInterval: const Duration(minutes: 1),
-                          textStyle: textStyle.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                    ]
-                  );
-                },
-              ),
+                          if (dateTimeSettings.showDateInStatusBar &&
+                              dateTimeSettings.showTimeInStatusBar)
+                            const SizedBox(width: 16),
+
+                          // Clock
+                          if (dateTimeSettings.showTimeInStatusBar)
+                            DateTimeWidget(
+                              dateTimeSettings.timeFormat,
+                              key: const Key("statusbar_clock"),
+                              updateInterval: const Duration(minutes: 1),
+                              textStyle: textStyle.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
             ),
           ],
         ),
@@ -171,7 +185,11 @@ class _FocusableIconButton extends StatefulWidget {
   final VoidCallback onPressed;
   final FocusNode? focusNode;
 
-  const _FocusableIconButton({required this.icon, required this.onPressed, this.focusNode});
+  const _FocusableIconButton({
+    required this.icon,
+    required this.onPressed,
+    this.focusNode,
+  });
 
   @override
   State<_FocusableIconButton> createState() => _FocusableIconButtonState();
@@ -184,8 +202,12 @@ class _FocusableIconButtonState extends State<_FocusableIconButton> {
   Widget build(BuildContext context) {
     return Actions(
       actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onPressed()),
-        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: (_) => widget.onPressed()),
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) => widget.onPressed(),
+        ),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+          onInvoke: (_) => widget.onPressed(),
+        ),
       },
       child: Focus(
         focusNode: widget.focusNode,
@@ -199,19 +221,33 @@ class _FocusableIconButtonState extends State<_FocusableIconButton> {
           onTap: widget.onPressed,
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.all(4),  // Match network indicator padding
+            padding: const EdgeInsets.all(4), // Match network indicator padding
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: _focused
-                ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
-                : null,
+                  ? Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    )
+                  : null,
               boxShadow: _focused
-                ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
-                : null,
+                  ? const [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
             ),
-            child: Icon(widget.icon,
+            child: Icon(
+              widget.icon,
               shadows: const [
-                Shadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 2))
+                Shadow(
+                  color: Colors.black54,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
               ],
             ),
           ),
@@ -224,7 +260,8 @@ class _FocusableIconButtonState extends State<_FocusableIconButton> {
 /// Network widget with consistent focus indicator
 class _FocusableNetworkWidget extends StatefulWidget {
   @override
-  State<_FocusableNetworkWidget> createState() => _FocusableNetworkWidgetState();
+  State<_FocusableNetworkWidget> createState() =>
+      _FocusableNetworkWidgetState();
 }
 
 class _FocusableNetworkWidgetState extends State<_FocusableNetworkWidget> {
@@ -243,11 +280,20 @@ class _FocusableNetworkWidgetState extends State<_FocusableNetworkWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: _focused
-            ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
-            : null,
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                )
+              : null,
           boxShadow: _focused
-            ? const [BoxShadow(color: Colors.black54, blurRadius: 8, spreadRadius: 1)]
-            : null,
+              ? const [
+                  BoxShadow(
+                    color: Colors.black54,
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
         ),
         child: const NetworkWidget(),
       ),

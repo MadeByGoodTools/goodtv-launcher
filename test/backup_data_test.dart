@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flauncher/database.dart';
-import 'package:flauncher/models/category.dart';
+import 'package:goodtv_launcher/database.dart';
+import 'package:goodtv_launcher/models/category.dart';
 
 void main() {
   late FLauncherDatabase database;

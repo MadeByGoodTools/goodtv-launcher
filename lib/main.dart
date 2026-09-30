@@ -18,16 +18,16 @@
 
 import 'dart:async';
 
-import 'package:flauncher/database.dart';
-import 'package:flauncher/flauncher_channel.dart';
-import 'package:flauncher/providers/apps_service.dart';
-import 'package:flauncher/providers/launcher_state.dart';
-import 'package:flauncher/providers/network_service.dart';
-import 'package:flauncher/providers/settings_service.dart';
-import 'package:flauncher/providers/brightness_service.dart';
-import 'package:flauncher/providers/wallpaper_service.dart';
-import 'package:flauncher/providers/watch_next_service.dart';
-import 'package:flauncher/providers/backup_service.dart';
+import 'package:goodtv_launcher/database.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
+import 'package:goodtv_launcher/providers/apps_service.dart';
+import 'package:goodtv_launcher/providers/launcher_state.dart';
+import 'package:goodtv_launcher/providers/network_service.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
+import 'package:goodtv_launcher/providers/brightness_service.dart';
+import 'package:goodtv_launcher/providers/wallpaper_service.dart';
+import 'package:goodtv_launcher/providers/watch_next_service.dart';
+import 'package:goodtv_launcher/providers/backup_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
