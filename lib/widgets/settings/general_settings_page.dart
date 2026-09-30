@@ -26,6 +26,7 @@ import 'back_button_action_page.dart';
 import 'wifi_usage_period_page.dart';
 import 'screensaver_clock_style_page.dart';
 import 'backup_settings_page.dart';
+import 'system_setup_page.dart';
 
 class GeneralSettingsPage extends StatelessWidget {
   static const String routeName = "general_settings_panel";
@@ -49,6 +50,16 @@ class GeneralSettingsPage extends StatelessWidget {
               children: [
                 FocusableSettingsTile(
                   autofocus: true,
+                  leading: const Icon(Icons.auto_fix_high),
+                  title: Text(
+                    localizations.configureThisTv,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(SystemSetupPage.routeName),
+                ),
+                FocusableSettingsTile(
                   leading: const Icon(Icons.brightness_6),
                   title: Text(
                     localizations.brightnessScheduler,

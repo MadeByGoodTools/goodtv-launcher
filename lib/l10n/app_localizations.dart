@@ -346,6 +346,54 @@ abstract class AppLocalizations {
   /// **'Column count'**
   String get columnCount;
 
+  /// No description provided for @configureThisTv.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure this TV'**
+  String get configureThisTv;
+
+  /// No description provided for @applyRecommendedSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply recommended setup'**
+  String get applyRecommendedSetup;
+
+  /// No description provided for @goodTvIsDefaultLauncher.
+  ///
+  /// In en, this message translates to:
+  /// **'GoodTV is the default launcher'**
+  String get goodTvIsDefaultLauncher;
+
+  /// No description provided for @chooseDefaultLauncher.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose GoodTV as the Home app'**
+  String get chooseDefaultLauncher;
+
+  /// No description provided for @unknownDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown TV device'**
+  String get unknownDevice;
+
+  /// No description provided for @androidVersionDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Android {version}'**
+  String androidVersionDetected(String version);
+
+  /// No description provided for @recommendedSetupApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'{profile} settings applied'**
+  String recommendedSetupApplied(String profile);
+
+  /// No description provided for @systemSetupLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'GoodTV can detect your TV and apply safe launcher settings automatically. Android requires you to approve the default Home app in the system screen. Other launchers cannot be disabled silently without device-owner, ADB, or root access.'**
+  String get systemSetupLimitations;
+
   /// No description provided for @date.
   ///
   /// In en, this message translates to:

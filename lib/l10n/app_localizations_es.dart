@@ -138,6 +138,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get columnCount => 'Cantidad de columnas';
 
   @override
+  String get configureThisTv => 'Configurar este televisor';
+
+  @override
+  String get applyRecommendedSetup => 'Aplicar configuración recomendada';
+
+  @override
+  String get goodTvIsDefaultLauncher => 'GoodTV es el lanzador predeterminado';
+
+  @override
+  String get chooseDefaultLauncher => 'Elegir GoodTV como aplicación de inicio';
+
+  @override
+  String get unknownDevice => 'Dispositivo de TV desconocido';
+
+  @override
+  String androidVersionDetected(String version) {
+    return 'Android $version';
+  }
+
+  @override
+  String recommendedSetupApplied(String profile) {
+    return 'Configuración $profile aplicada';
+  }
+
+  @override
+  String get systemSetupLimitations =>
+      'GoodTV puede detectar el televisor y aplicar ajustes seguros automáticamente. Android requiere que apruebes la aplicación de inicio en la pantalla del sistema. No se pueden desactivar otros lanzadores silenciosamente sin acceso de propietario del dispositivo, ADB o root.';
+
+  @override
   String get date => 'Fecha';
 
   @override

@@ -74,6 +74,16 @@ class FLauncherChannel {
   Future<bool> isDefaultLauncher() async =>
       await _methodChannel.invokeMethod('isDefaultLauncher');
 
+  Future<Map<String, dynamic>> getSystemProfile() async {
+    final profile = await _methodChannel.invokeMapMethod<dynamic, dynamic>(
+      'getSystemProfile',
+    );
+    return Map<String, dynamic>.from(profile ?? const {});
+  }
+
+  Future<bool> openHomeSettings() async =>
+      await _methodChannel.invokeMethod('openHomeSettings') ?? false;
+
   Future<bool> checkForGetContentAvailability() async =>
       await _methodChannel.invokeMethod("checkForGetContentAvailability");
 

@@ -138,6 +138,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get columnCount => 'Column count';
 
   @override
+  String get configureThisTv => 'Configure this TV';
+
+  @override
+  String get applyRecommendedSetup => 'Apply recommended setup';
+
+  @override
+  String get goodTvIsDefaultLauncher => 'GoodTV is the default launcher';
+
+  @override
+  String get chooseDefaultLauncher => 'Choose GoodTV as the Home app';
+
+  @override
+  String get unknownDevice => 'Unknown TV device';
+
+  @override
+  String androidVersionDetected(String version) {
+    return 'Android $version';
+  }
+
+  @override
+  String recommendedSetupApplied(String profile) {
+    return '$profile settings applied';
+  }
+
+  @override
+  String get systemSetupLimitations =>
+      'GoodTV can detect your TV and apply safe launcher settings automatically. Android requires you to approve the default Home app in the system screen. Other launchers cannot be disabled silently without device-owner, ADB, or root access.';
+
+  @override
   String get date => 'Date';
 
   @override

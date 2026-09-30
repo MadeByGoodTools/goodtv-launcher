@@ -138,6 +138,35 @@ class AppLocalizationsTr extends AppLocalizations {
   String get columnCount => 'Sütun sayısı';
 
   @override
+  String get configureThisTv => 'Bu TV\'yi yapılandır';
+
+  @override
+  String get applyRecommendedSetup => 'Önerilen kurulumu uygula';
+
+  @override
+  String get goodTvIsDefaultLauncher => 'GoodTV varsayılan başlatıcı';
+
+  @override
+  String get chooseDefaultLauncher => 'GoodTV\'yi Ana Ekran uygulaması seç';
+
+  @override
+  String get unknownDevice => 'Bilinmeyen TV cihazı';
+
+  @override
+  String androidVersionDetected(String version) {
+    return 'Android $version';
+  }
+
+  @override
+  String recommendedSetupApplied(String profile) {
+    return '$profile ayarları uygulandı';
+  }
+
+  @override
+  String get systemSetupLimitations =>
+      'GoodTV televizyonunuzu algılayabilir ve güvenli başlatıcı ayarlarını otomatik uygulayabilir. Android, varsayılan Ana Ekran uygulamasını sistem ekranında onaylamanızı gerektirir. Diğer başlatıcılar cihaz sahibi, ADB veya root erişimi olmadan sessizce devre dışı bırakılamaz.';
+
+  @override
   String get date => 'Tarih';
 
   @override

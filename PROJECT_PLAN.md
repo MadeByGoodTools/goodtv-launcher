@@ -29,6 +29,9 @@ feature set. New work is additive and remains GPL-3.0.
    launcher-density controls are now live.
 5. Add optional PIN-protected settings and parental controls.
 6. Add boot targets, shortcuts, and device-aware input actions where supported.
+   **In progress:** Configure This TV now detects Android/Google TV/Fire TV,
+   applies a safe performance-aware profile, checks the current Home app, and
+   opens the system-owned default-launcher approval screen.
 7. Add wallpaper providers and polished media-source management.
 8. Complete accessibility, performance, migration, and device-compatibility QA.
 

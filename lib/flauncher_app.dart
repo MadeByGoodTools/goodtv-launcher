@@ -81,7 +81,7 @@ class FLauncherApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          title: 'FLauncher',
+          title: 'GoodTV Launcher',
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,

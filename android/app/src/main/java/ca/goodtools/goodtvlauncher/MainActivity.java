@@ -104,6 +104,8 @@ public class MainActivity extends FlutterActivity {
                 case "openAppInfo" -> result.success(openAppInfo(call.arguments()));
                 case "uninstallApp" -> result.success(uninstallApp(call.arguments()));
                 case "isDefaultLauncher" -> result.success(isDefaultLauncher());
+                case "getSystemProfile" -> result.success(getSystemProfile());
+                case "openHomeSettings" -> result.success(openHomeSettings());
                 case "checkForGetContentAvailability" -> result.success(checkForGetContentAvailability());
                 case "startAmbientMode" -> result.success(startAmbientMode());
                 case "getActiveNetworkInformation" -> result.success(getActiveNetworkInformation());
@@ -481,6 +483,48 @@ public class MainActivity extends FlutterActivity {
         }
 
         return false;
+    }
+
+    private Map<String, Object> getSystemProfile() {
+        PackageManager packageManager = getPackageManager();
+        Intent homeIntent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo currentHome = packageManager.resolveActivity(homeIntent, 0);
+        List<ResolveInfo> homeApps = packageManager.queryIntentActivities(homeIntent, 0);
+        String manufacturer = Build.MANUFACTURER == null ? "" : Build.MANUFACTURER;
+        boolean isFireTv = manufacturer.equalsIgnoreCase("Amazon");
+        boolean isGoogleTv = packageManager.hasSystemFeature("com.google.android.feature.GOOGLE_TV");
+        boolean isAndroidTv = packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("manufacturer", manufacturer);
+        profile.put("model", Build.MODEL == null ? "" : Build.MODEL);
+        profile.put("androidVersion", Build.VERSION.RELEASE == null ? "" : Build.VERSION.RELEASE);
+        profile.put("sdkInt", Build.VERSION.SDK_INT);
+        profile.put("isFireTv", isFireTv);
+        profile.put("isGoogleTv", isGoogleTv);
+        profile.put("isAndroidTv", isAndroidTv);
+        profile.put("isDefaultLauncher", isDefaultLauncher());
+        profile.put("homeAppCount", homeApps.size());
+        profile.put("currentLauncherPackage",
+                currentHome != null && currentHome.activityInfo != null
+                        ? currentHome.activityInfo.packageName
+                        : "");
+        return profile;
+    }
+
+    private boolean openHomeSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (tryStartActivity(new Intent(Settings.ACTION_HOME_SETTINGS))) {
+                return true;
+            }
+        }
+        Intent chooser = new Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_HOME)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (tryStartActivity(Intent.createChooser(chooser, "Choose home app"))) {
+            return true;
+        }
+        return openSettings();
     }
 
     private boolean startAmbientMode() {
