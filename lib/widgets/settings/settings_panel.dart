@@ -36,6 +36,7 @@ import 'package:goodtv_launcher/widgets/settings/interface_settings_page.dart';
 import 'package:goodtv_launcher/widgets/settings/general_settings_page.dart';
 import 'package:goodtv_launcher/widgets/settings/screensaver_clock_style_page.dart';
 import 'package:goodtv_launcher/widgets/settings/backup_settings_page.dart';
+import 'package:goodtv_launcher/widgets/settings/display_presets_page.dart';
 import 'package:goodtv_launcher/models/app.dart';
 import 'package:flutter/material.dart';
 
@@ -143,6 +144,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     case BackupSettingsPage.routeName:
                       return _FastPageRoute(
                         builder: (_) => const BackupSettingsPage(),
+                      );
+                    case DisplayPresetsPage.routeName:
+                      return _FastPageRoute(
+                        builder: (_) => const DisplayPresetsPage(),
                       );
                     case AppDetailsPage.routeName:
                       return _FastPageRoute(

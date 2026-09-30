@@ -48,6 +48,39 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dockShadow => 'Dock gölgesi';
 
   @override
+  String get displayProfiles => 'Görüntü profilleri';
+
+  @override
+  String get displayProfilesDescription =>
+      'Profiller birden fazla görünüm ayarını birlikte değiştirir. Daha sonra her ayarı ayrı ayrı düzenleyebilirsiniz.';
+
+  @override
+  String get displayProfileCinema => 'Sinema';
+
+  @override
+  String get displayProfileCinemaDescription =>
+      'Sıradaki içerikler ve zengin görsel efektlerle temiz, sürükleyici düzen.';
+
+  @override
+  String get displayProfileCompact => 'Kompakt';
+
+  @override
+  String get displayProfileCompactDescription =>
+      'Daha az görsel efekt kullanan hızlı ve yoğun düzen.';
+
+  @override
+  String get displayProfileEasyRead => 'Kolay Okuma';
+
+  @override
+  String get displayProfileEasyReadDescription =>
+      'Her zaman görünür etiketler, durum bilgileri ve güçlü odak geri bildirimi.';
+
+  @override
+  String displayProfileApplied(String profile) {
+    return '$profile profili uygulandı';
+  }
+
+  @override
   String get applications => 'Uygulamalar';
 
   @override

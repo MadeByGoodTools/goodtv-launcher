@@ -48,6 +48,39 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dockShadow => 'Sombra del dock';
 
   @override
+  String get displayProfiles => 'Perfiles de pantalla';
+
+  @override
+  String get displayProfilesDescription =>
+      'Los perfiles cambian varios ajustes de apariencia a la vez. Después puedes ajustar cada opción.';
+
+  @override
+  String get displayProfileCinema => 'Cine';
+
+  @override
+  String get displayProfileCinemaDescription =>
+      'Un diseño limpio e inmersivo con Ver a continuación y efectos visuales.';
+
+  @override
+  String get displayProfileCompact => 'Compacto';
+
+  @override
+  String get displayProfileCompactDescription =>
+      'Un diseño rápido y denso con menos efectos visuales.';
+
+  @override
+  String get displayProfileEasyRead => 'Lectura fácil';
+
+  @override
+  String get displayProfileEasyReadDescription =>
+      'Etiquetas y estado siempre visibles, con enfoque destacado.';
+
+  @override
+  String displayProfileApplied(String profile) {
+    return 'Perfil $profile aplicado';
+  }
+
+  @override
   String get applications => 'Aplicaciones';
 
   @override

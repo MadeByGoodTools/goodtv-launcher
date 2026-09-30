@@ -46,6 +46,9 @@ const String _showWatchNextSection = "show_watch_next_section";
 const String _dockDarkBackground = "dock_dark_background";
 const String _dockShadowEnabled = "dock_shadow_enabled";
 const String _showFocusBorders = "show_focus_borders";
+const String _displayPreset = "display_preset";
+
+enum DisplayPreset { cinema, compact, easyRead }
 
 // WiFi usage period options
 const String WIFI_USAGE_DAILY = "daily";
@@ -140,6 +143,14 @@ class SettingsService extends ChangeNotifier {
 
   bool get showFocusBorders =>
       _sharedPreferences.getBool(_showFocusBorders) ?? true;
+
+  DisplayPreset? get displayPreset {
+    final value = _sharedPreferences.getString(_displayPreset);
+    for (final preset in DisplayPreset.values) {
+      if (preset.name == value) return preset;
+    }
+    return null;
+  }
 
   Color get accentColor {
     final hex = accentColorHex;
@@ -287,6 +298,65 @@ class SettingsService extends ChangeNotifier {
     if (!value) {
       await setAppHighlightAnimationEnabled(false);
     }
+  }
+
+  Future<void> applyDisplayPreset(DisplayPreset preset) async {
+    final values = switch (preset) {
+      DisplayPreset.cinema => <String, bool>{
+        _autoHideAppBar: true,
+        _showCategoryTitles: false,
+        _showAppNamesBelowIcons: false,
+        _showDateInStatusBar: false,
+        _showTimeInStatusBar: false,
+        _showWatchNextSection: true,
+        _dockBackdropFilterDisabled: false,
+        _backgroundBlurDisabled: false,
+        _dockDarkBackground: true,
+        _dockShadowEnabled: true,
+        _showFocusBorders: true,
+        _appHighlightAnimationEnabledKey: true,
+      },
+      DisplayPreset.compact => <String, bool>{
+        _autoHideAppBar: false,
+        _showCategoryTitles: true,
+        _showAppNamesBelowIcons: false,
+        _showDateInStatusBar: false,
+        _showTimeInStatusBar: true,
+        _showWatchNextSection: false,
+        _dockBackdropFilterDisabled: true,
+        _backgroundBlurDisabled: true,
+        _dockDarkBackground: false,
+        _dockShadowEnabled: false,
+        _showFocusBorders: true,
+        _appHighlightAnimationEnabledKey: false,
+      },
+      DisplayPreset.easyRead => <String, bool>{
+        _autoHideAppBar: false,
+        _showCategoryTitles: true,
+        _showAppNamesBelowIcons: true,
+        _showDateInStatusBar: true,
+        _showTimeInStatusBar: true,
+        _showWatchNextSection: false,
+        _dockBackdropFilterDisabled: true,
+        _backgroundBlurDisabled: true,
+        _dockDarkBackground: true,
+        _dockShadowEnabled: false,
+        _showFocusBorders: true,
+        _appHighlightAnimationEnabledKey: true,
+      },
+    };
+
+    await Future.wait([
+      for (final entry in values.entries)
+        _sharedPreferences.setBool(entry.key, entry.value),
+      _sharedPreferences.setString(_displayPreset, preset.name),
+      _sharedPreferences.setString(_accentColor, switch (preset) {
+        DisplayPreset.cinema => ACCENT_COLOR_GREEN,
+        DisplayPreset.compact => ACCENT_COLOR_WHITE,
+        DisplayPreset.easyRead => ACCENT_COLOR_YELLOW,
+      }),
+    ]);
+    notifyListeners();
   }
 
   bool get timeBasedWallpaperEnabled =>

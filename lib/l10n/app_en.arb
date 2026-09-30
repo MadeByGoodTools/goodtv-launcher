@@ -12,6 +12,20 @@
     "dockBlur": "Dock blur",
     "dockDarkBackground": "Dark dock background",
     "dockShadow": "Dock shadow",
+    "displayProfiles": "Display profiles",
+    "displayProfilesDescription": "Profiles change several appearance settings together. You can still fine-tune every setting afterward.",
+    "displayProfileCinema": "Cinema",
+    "displayProfileCinemaDescription": "A clean, immersive layout with Watch Next and rich visual effects.",
+    "displayProfileCompact": "Compact",
+    "displayProfileCompactDescription": "A fast, information-dense layout with fewer visual effects.",
+    "displayProfileEasyRead": "Easy Read",
+    "displayProfileEasyReadDescription": "Always-visible labels, status details, and strong focus feedback.",
+    "displayProfileApplied": "{profile} profile applied",
+    "@displayProfileApplied": {
+        "placeholders": {
+            "profile": { "type": "String" }
+        }
+    },
     "applications": "Applications",
     "autoHideAppBar": "Automatically hide status bar",
     "backButtonAction": "Back button action",

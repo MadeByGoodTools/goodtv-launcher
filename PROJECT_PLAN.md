@@ -21,7 +21,9 @@ feature set. New work is additive and remains GPL-3.0.
 2. Add configuration backup and restore. **Completed:** rotating local backups
    now include layout, settings, categories, favourites, hidden apps, custom
    banners, and image/video wallpapers.
-3. Add display profiles and layout presets.
+3. Add display profiles and layout presets. **Completed:** Cinema, Compact, and
+   Easy Read profiles now apply coordinated launcher visibility, focus,
+   performance, Watch Next, and colour choices in one click.
 4. Add deeper card, icon, type, spacing, alignment, and colour controls.
 5. Add optional PIN-protected settings and parental controls.
 6. Add boot targets, shortcuts, and device-aware input actions where supported.

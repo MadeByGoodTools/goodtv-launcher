@@ -25,6 +25,7 @@ import 'status_bar_panel_page.dart';
 import 'accent_color_page.dart';
 import 'appearance_panel_page.dart';
 import 'misc_panel_page.dart';
+import 'display_presets_page.dart';
 
 class InterfaceSettingsPage extends StatelessWidget {
   static const String routeName = "interface_settings_panel";
@@ -48,6 +49,16 @@ class InterfaceSettingsPage extends StatelessWidget {
               children: [
                 FocusableSettingsTile(
                   autofocus: true,
+                  leading: const Icon(Icons.view_quilt_outlined),
+                  title: Text(
+                    localizations.displayProfiles,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(DisplayPresetsPage.routeName),
+                ),
+                FocusableSettingsTile(
                   leading: const Icon(Icons.category),
                   title: Text(
                     localizations.launcherSections,

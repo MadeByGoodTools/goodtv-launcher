@@ -98,4 +98,28 @@ void main() async {
       expect(settingsService.dateFormat, expected);
     });
   });
+
+  group("display presets", () {
+    test("cinema applies a media-first profile", () async {
+      await settingsService.applyDisplayPreset(DisplayPreset.cinema);
+
+      expect(settingsService.displayPreset, DisplayPreset.cinema);
+      expect(settingsService.autoHideAppBarEnabled, isTrue);
+      expect(settingsService.showWatchNextSection, isTrue);
+      expect(settingsService.showAppNamesBelowIcons, isFalse);
+      expect(settingsService.backgroundBlurDisabled, isFalse);
+      expect(settingsService.accentColorHex, ACCENT_COLOR_GREEN);
+    });
+
+    test("easy read keeps labels and status information visible", () async {
+      await settingsService.applyDisplayPreset(DisplayPreset.easyRead);
+
+      expect(settingsService.displayPreset, DisplayPreset.easyRead);
+      expect(settingsService.showCategoryTitles, isTrue);
+      expect(settingsService.showAppNamesBelowIcons, isTrue);
+      expect(settingsService.showDateInStatusBar, isTrue);
+      expect(settingsService.showTimeInStatusBar, isTrue);
+      expect(settingsService.accentColorHex, ACCENT_COLOR_YELLOW);
+    });
+  });
 }

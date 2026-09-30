@@ -12,6 +12,20 @@
     "dockBlur": "Desenfoque del dock",
     "dockDarkBackground": "Fondo oscuro del dock",
     "dockShadow": "Sombra del dock",
+    "displayProfiles": "Perfiles de pantalla",
+    "displayProfilesDescription": "Los perfiles cambian varios ajustes de apariencia a la vez. Después puedes ajustar cada opción.",
+    "displayProfileCinema": "Cine",
+    "displayProfileCinemaDescription": "Un diseño limpio e inmersivo con Ver a continuación y efectos visuales.",
+    "displayProfileCompact": "Compacto",
+    "displayProfileCompactDescription": "Un diseño rápido y denso con menos efectos visuales.",
+    "displayProfileEasyRead": "Lectura fácil",
+    "displayProfileEasyReadDescription": "Etiquetas y estado siempre visibles, con enfoque destacado.",
+    "displayProfileApplied": "Perfil {profile} aplicado",
+    "@displayProfileApplied": {
+        "placeholders": {
+            "profile": { "type": "String" }
+        }
+    },
     "applications": "Aplicaciones",
     "autoHideAppBar": "Ocultar barra de estado automáticamente",
     "backButtonAction": "Acción del botón 'Atrás'",

@@ -178,6 +178,60 @@ abstract class AppLocalizations {
   /// **'Dock shadow'**
   String get dockShadow;
 
+  /// No description provided for @displayProfiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Display profiles'**
+  String get displayProfiles;
+
+  /// No description provided for @displayProfilesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles change several appearance settings together. You can still fine-tune every setting afterward.'**
+  String get displayProfilesDescription;
+
+  /// No description provided for @displayProfileCinema.
+  ///
+  /// In en, this message translates to:
+  /// **'Cinema'**
+  String get displayProfileCinema;
+
+  /// No description provided for @displayProfileCinemaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A clean, immersive layout with Watch Next and rich visual effects.'**
+  String get displayProfileCinemaDescription;
+
+  /// No description provided for @displayProfileCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get displayProfileCompact;
+
+  /// No description provided for @displayProfileCompactDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A fast, information-dense layout with fewer visual effects.'**
+  String get displayProfileCompactDescription;
+
+  /// No description provided for @displayProfileEasyRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy Read'**
+  String get displayProfileEasyRead;
+
+  /// No description provided for @displayProfileEasyReadDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Always-visible labels, status details, and strong focus feedback.'**
+  String get displayProfileEasyReadDescription;
+
+  /// No description provided for @displayProfileApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'{profile} profile applied'**
+  String displayProfileApplied(String profile);
+
   /// No description provided for @applications.
   ///
   /// In en, this message translates to:

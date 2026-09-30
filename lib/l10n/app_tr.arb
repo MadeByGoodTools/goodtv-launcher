@@ -12,6 +12,20 @@
     "dockBlur": "Dock bulanıklığı",
     "dockDarkBackground": "Koyu dock arka planı",
     "dockShadow": "Dock gölgesi",
+    "displayProfiles": "Görüntü profilleri",
+    "displayProfilesDescription": "Profiller birden fazla görünüm ayarını birlikte değiştirir. Daha sonra her ayarı ayrı ayrı düzenleyebilirsiniz.",
+    "displayProfileCinema": "Sinema",
+    "displayProfileCinemaDescription": "Sıradaki içerikler ve zengin görsel efektlerle temiz, sürükleyici düzen.",
+    "displayProfileCompact": "Kompakt",
+    "displayProfileCompactDescription": "Daha az görsel efekt kullanan hızlı ve yoğun düzen.",
+    "displayProfileEasyRead": "Kolay Okuma",
+    "displayProfileEasyReadDescription": "Her zaman görünür etiketler, durum bilgileri ve güçlü odak geri bildirimi.",
+    "displayProfileApplied": "{profile} profili uygulandı",
+    "@displayProfileApplied": {
+        "placeholders": {
+            "profile": { "type": "String" }
+        }
+    },
     "applications": "Uygulamalar",
     "autoHideAppBar": "Durum çubuğunu otomatik gizle",
     "backButtonAction": "Geri tuşu eylemi",
