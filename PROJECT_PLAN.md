@@ -25,6 +25,7 @@ feature set. New work is additive and remains GPL-3.0.
    Easy Read profiles now apply coordinated launcher visibility, focus,
    performance, Watch Next, and colour choices in one click.
 4. Add deeper card, icon, type, spacing, alignment, and colour controls.
+   **In progress:** app-card corner shape and focus-zoom controls are now live.
 5. Add optional PIN-protected settings and parental controls.
 6. Add boot targets, shortcuts, and device-aware input actions where supported.
 7. Add wallpaper providers and polished media-source management.

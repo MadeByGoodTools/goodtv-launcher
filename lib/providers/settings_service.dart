@@ -47,8 +47,14 @@ const String _dockDarkBackground = "dock_dark_background";
 const String _dockShadowEnabled = "dock_shadow_enabled";
 const String _showFocusBorders = "show_focus_borders";
 const String _displayPreset = "display_preset";
+const String _appCardCornerStyle = "app_card_corner_style";
+const String _appCardFocusZoom = "app_card_focus_zoom";
 
 enum DisplayPreset { cinema, compact, easyRead }
+
+enum AppCardCornerStyle { square, soft, rounded }
+
+enum AppCardFocusZoom { none, standard, strong }
 
 // WiFi usage period options
 const String WIFI_USAGE_DAILY = "daily";
@@ -151,6 +157,34 @@ class SettingsService extends ChangeNotifier {
     }
     return null;
   }
+
+  AppCardCornerStyle get appCardCornerStyle {
+    final value = _sharedPreferences.getString(_appCardCornerStyle);
+    return AppCardCornerStyle.values.firstWhere(
+      (style) => style.name == value,
+      orElse: () => AppCardCornerStyle.soft,
+    );
+  }
+
+  double get appCardCornerRadius => switch (appCardCornerStyle) {
+    AppCardCornerStyle.square => 0,
+    AppCardCornerStyle.soft => 12,
+    AppCardCornerStyle.rounded => 24,
+  };
+
+  AppCardFocusZoom get appCardFocusZoom {
+    final value = _sharedPreferences.getString(_appCardFocusZoom);
+    return AppCardFocusZoom.values.firstWhere(
+      (zoom) => zoom.name == value,
+      orElse: () => AppCardFocusZoom.standard,
+    );
+  }
+
+  double get appCardFocusScale => switch (appCardFocusZoom) {
+    AppCardFocusZoom.none => 1,
+    AppCardFocusZoom.standard => 1.07,
+    AppCardFocusZoom.strong => 1.12,
+  };
 
   Color get accentColor {
     final hex = accentColorHex;
@@ -300,6 +334,16 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
+  Future<void> setAppCardCornerStyle(AppCardCornerStyle style) async {
+    await _sharedPreferences.setString(_appCardCornerStyle, style.name);
+    notifyListeners();
+  }
+
+  Future<void> setAppCardFocusZoom(AppCardFocusZoom zoom) async {
+    await _sharedPreferences.setString(_appCardFocusZoom, zoom.name);
+    notifyListeners();
+  }
+
   Future<void> applyDisplayPreset(DisplayPreset preset) async {
     final values = switch (preset) {
       DisplayPreset.cinema => <String, bool>{
@@ -354,6 +398,16 @@ class SettingsService extends ChangeNotifier {
         DisplayPreset.cinema => ACCENT_COLOR_GREEN,
         DisplayPreset.compact => ACCENT_COLOR_WHITE,
         DisplayPreset.easyRead => ACCENT_COLOR_YELLOW,
+      }),
+      _sharedPreferences.setString(_appCardCornerStyle, switch (preset) {
+        DisplayPreset.cinema => AppCardCornerStyle.rounded.name,
+        DisplayPreset.compact => AppCardCornerStyle.square.name,
+        DisplayPreset.easyRead => AppCardCornerStyle.soft.name,
+      }),
+      _sharedPreferences.setString(_appCardFocusZoom, switch (preset) {
+        DisplayPreset.cinema => AppCardFocusZoom.strong.name,
+        DisplayPreset.compact => AppCardFocusZoom.none.name,
+        DisplayPreset.easyRead => AppCardFocusZoom.strong.name,
       }),
     ]);
     notifyListeners();

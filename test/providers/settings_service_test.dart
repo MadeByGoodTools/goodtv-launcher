@@ -109,6 +109,8 @@ void main() async {
       expect(settingsService.showAppNamesBelowIcons, isFalse);
       expect(settingsService.backgroundBlurDisabled, isFalse);
       expect(settingsService.accentColorHex, ACCENT_COLOR_GREEN);
+      expect(settingsService.appCardCornerStyle, AppCardCornerStyle.rounded);
+      expect(settingsService.appCardFocusZoom, AppCardFocusZoom.strong);
     });
 
     test("easy read keeps labels and status information visible", () async {
@@ -120,6 +122,14 @@ void main() async {
       expect(settingsService.showDateInStatusBar, isTrue);
       expect(settingsService.showTimeInStatusBar, isTrue);
       expect(settingsService.accentColorHex, ACCENT_COLOR_YELLOW);
+    });
+
+    test("card style controls persist custom choices", () async {
+      await settingsService.setAppCardCornerStyle(AppCardCornerStyle.square);
+      await settingsService.setAppCardFocusZoom(AppCardFocusZoom.none);
+
+      expect(settingsService.appCardCornerRadius, 0);
+      expect(settingsService.appCardFocusScale, 1);
     });
   });
 }

@@ -33,6 +33,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appKeyClick => 'Click sound on key press';
 
   @override
+  String get appCardStyle => 'App card style';
+
+  @override
+  String get appCardCorners => 'Card corners';
+
+  @override
+  String get appCardCornersSquare => 'Square';
+
+  @override
+  String get appCardCornersSoft => 'Soft';
+
+  @override
+  String get appCardCornersRounded => 'Rounded';
+
+  @override
+  String get appCardFocusZoom => 'Focus zoom';
+
+  @override
+  String get appCardFocusZoomNone => 'None';
+
+  @override
+  String get appCardFocusZoomStandard => 'Standard';
+
+  @override
+  String get appCardFocusZoomStrong => 'Strong';
+
+  @override
   String get appearanceSettings => 'Appearance';
 
   @override

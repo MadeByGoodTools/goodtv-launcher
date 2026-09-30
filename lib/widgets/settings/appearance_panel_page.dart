@@ -4,6 +4,9 @@ import 'package:goodtv_launcher/widgets/rounded_switch_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'app_card_style_page.dart';
+import 'focusable_settings_tile.dart';
+
 class AppearancePanelPage extends StatelessWidget {
   static const String routeName = "appearance_panel";
 
@@ -25,8 +28,17 @@ class AppearancePanelPage extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              RoundedSwitchListTile(
+              FocusableSettingsTile(
                 autofocus: true,
+                leading: const Icon(Icons.style_outlined),
+                title: Text(
+                  localizations.appCardStyle,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppCardStylePage.routeName),
+              ),
+              RoundedSwitchListTile(
                 value: !settingsService.dockBackdropFilterDisabled,
                 onChanged: (value) =>
                     settingsService.setDockBackdropFilterDisabled(!value),

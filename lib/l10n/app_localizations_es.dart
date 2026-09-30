@@ -33,6 +33,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appKeyClick => 'Sonido al presionar una tecla';
 
   @override
+  String get appCardStyle => 'Estilo de tarjetas';
+
+  @override
+  String get appCardCorners => 'Esquinas de tarjetas';
+
+  @override
+  String get appCardCornersSquare => 'Cuadradas';
+
+  @override
+  String get appCardCornersSoft => 'Suaves';
+
+  @override
+  String get appCardCornersRounded => 'Redondeadas';
+
+  @override
+  String get appCardFocusZoom => 'Zoom de enfoque';
+
+  @override
+  String get appCardFocusZoomNone => 'Ninguno';
+
+  @override
+  String get appCardFocusZoomStandard => 'Estándar';
+
+  @override
+  String get appCardFocusZoomStrong => 'Fuerte';
+
+  @override
   String get appearanceSettings => 'Apariencia';
 
   @override

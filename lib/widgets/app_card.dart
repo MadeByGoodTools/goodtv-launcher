@@ -110,7 +110,6 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   late final AnimationController _animation;
 
   late final CurvedAnimation _curvedAnimation;
-  static const double _focusedScale = 1.07;
   static const Duration _focusAnimationDuration = Duration(milliseconds: 180);
 
   @override
@@ -200,11 +199,15 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       bool animationEnabled,
       String accentColorHex,
       bool showFocusBorders,
-    ) = context.select<SettingsService, (bool, String, bool)>(
+      double cornerRadius,
+      double focusScale,
+    ) = context.select<SettingsService, (bool, String, bool, double, double)>(
       (s) => (
         s.appHighlightAnimationEnabled,
         s.accentColorHex,
         s.showFocusBorders,
+        s.appCardCornerRadius,
+        s.appCardFocusScale,
       ),
     );
     if (accentColorHex != _accentColorHex) {
@@ -237,7 +240,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                 child: _wrapAspectRatio(
                   RepaintBoundary(
                     child: AnimatedScale(
-                      scale: !_moving && shouldHighlight ? _focusedScale : 1.0,
+                      scale: !_moving && shouldHighlight ? focusScale : 1.0,
                       duration: _focusAnimationDuration,
                       alignment: Alignment.center,
                       curve: Curves.easeOutCubic,
@@ -245,7 +248,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                         fit: StackFit.expand,
                         children: [
                           Material(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(cornerRadius),
                             clipBehavior: Clip.antiAlias,
                             elevation: shouldHighlight ? 7 : 4,
                             shadowColor: Colors.black,
@@ -292,6 +295,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                                         color: _accentColor.withValues(
                                           alpha: alpha,
                                         ),
+                                        cornerRadius: cornerRadius,
                                       );
                                     },
                                   ),
@@ -300,7 +304,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                             else
                               IgnorePointer(
                                 child: RepaintBoundary(
-                                  child: _HighlightOutline(color: _accentColor),
+                                  child: _HighlightOutline(
+                                    color: _accentColor,
+                                    cornerRadius: cornerRadius,
+                                  ),
                                 ),
                               ),
                         ],
@@ -695,8 +702,9 @@ class _AppNameLabel extends StatelessWidget {
 
 class _HighlightOutline extends StatelessWidget {
   final Color color;
+  final double cornerRadius;
 
-  const _HighlightOutline({required this.color});
+  const _HighlightOutline({required this.color, required this.cornerRadius});
 
   @override
   Widget build(BuildContext context) {
@@ -705,7 +713,7 @@ class _HighlightOutline extends StatelessWidget {
       children: [
         DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(cornerRadius),
             border: Border.all(color: color, width: 1),
           ),
         ),

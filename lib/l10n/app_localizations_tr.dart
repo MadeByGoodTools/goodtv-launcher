@@ -33,6 +33,33 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appKeyClick => 'Tuşa basıldığında tıklama sesi';
 
   @override
+  String get appCardStyle => 'Uygulama kartı stili';
+
+  @override
+  String get appCardCorners => 'Kart köşeleri';
+
+  @override
+  String get appCardCornersSquare => 'Kare';
+
+  @override
+  String get appCardCornersSoft => 'Yumuşak';
+
+  @override
+  String get appCardCornersRounded => 'Yuvarlak';
+
+  @override
+  String get appCardFocusZoom => 'Odak yakınlaştırması';
+
+  @override
+  String get appCardFocusZoomNone => 'Yok';
+
+  @override
+  String get appCardFocusZoomStandard => 'Standart';
+
+  @override
+  String get appCardFocusZoomStrong => 'Güçlü';
+
+  @override
   String get appearanceSettings => 'Görünüm';
 
   @override

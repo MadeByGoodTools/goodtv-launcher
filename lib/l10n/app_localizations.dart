@@ -148,6 +148,60 @@ abstract class AppLocalizations {
   /// **'Click sound on key press'**
   String get appKeyClick;
 
+  /// No description provided for @appCardStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'App card style'**
+  String get appCardStyle;
+
+  /// No description provided for @appCardCorners.
+  ///
+  /// In en, this message translates to:
+  /// **'Card corners'**
+  String get appCardCorners;
+
+  /// No description provided for @appCardCornersSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get appCardCornersSquare;
+
+  /// No description provided for @appCardCornersSoft.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft'**
+  String get appCardCornersSoft;
+
+  /// No description provided for @appCardCornersRounded.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounded'**
+  String get appCardCornersRounded;
+
+  /// No description provided for @appCardFocusZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus zoom'**
+  String get appCardFocusZoom;
+
+  /// No description provided for @appCardFocusZoomNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get appCardFocusZoomNone;
+
+  /// No description provided for @appCardFocusZoomStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get appCardFocusZoomStandard;
+
+  /// No description provided for @appCardFocusZoomStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get appCardFocusZoomStrong;
+
   /// No description provided for @appearanceSettings.
   ///
   /// In en, this message translates to:
