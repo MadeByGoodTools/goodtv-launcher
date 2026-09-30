@@ -18,7 +18,9 @@ existing feature set. New work is additive and remains GPL-3.0.
 ## Evolution milestones
 
 1. Reproduce a debug APK and validate it on a real target device.
-2. Add configuration backup and restore.
+2. Add configuration backup and restore. **Completed:** rotating local backups
+   now include layout, settings, categories, favourites, hidden apps, custom
+   banners, and image/video wallpapers.
 3. Add display profiles and layout presets.
 4. Add deeper card, icon, type, spacing, alignment, and colour controls.
 5. Add optional PIN-protected settings and parental controls.

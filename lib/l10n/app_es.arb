@@ -174,5 +174,18 @@
     "weekly": "Semanal",
     "monthly": "Mensual",
     "grantPermission": "Conceder permiso",
-    "checkStatus": "Comprobar estado"
+    "checkStatus": "Comprobar estado",
+    "backupAndRestore": "Copia y restauración",
+    "createBackup": "Crear copia ahora",
+    "restoreLatestBackup": "Restaurar la última copia",
+    "noBackups": "Aún no hay copias",
+    "backupDescription": "Las copias incluyen la distribución, categorías, favoritas, aplicaciones ocultas, ajustes, banners y fondos de imagen o vídeo. Se conservan las cinco copias más recientes en este dispositivo.",
+    "backupCreated": "Copia creada",
+    "backupFailed": "No se pudo crear la copia",
+    "restoreBackupTitle": "¿Restaurar la copia del lanzador?",
+    "restoreBackupWarning": "Esto reemplaza la distribución, los ajustes, banners y fondos actuales con la última copia.",
+    "restore": "Restaurar",
+    "cancel": "Cancelar",
+    "backupRestored": "Copia restaurada",
+    "restoreFailed": "No se pudo restaurar la copia"
 }

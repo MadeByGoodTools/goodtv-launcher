@@ -93,6 +93,16 @@ class WallpaperService extends ChangeNotifier {
     _updateTimerState();
   }
 
+  Future<void> reloadFromStorage() async {
+    if (!_initialized) {
+      await _init();
+      return;
+    }
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    _updateWallpaper(force: true);
+  }
+
   void _updateTimerState() {
     final enabled = _settingsService.timeBasedWallpaperEnabled;
     if (enabled && (_timer == null || !_timer!.isActive)) {

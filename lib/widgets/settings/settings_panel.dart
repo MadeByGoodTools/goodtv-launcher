@@ -35,6 +35,7 @@ import 'package:flauncher/widgets/settings/misc_panel_page.dart';
 import 'package:flauncher/widgets/settings/interface_settings_page.dart';
 import 'package:flauncher/widgets/settings/general_settings_page.dart';
 import 'package:flauncher/widgets/settings/screensaver_clock_style_page.dart';
+import 'package:flauncher/widgets/settings/backup_settings_page.dart';
 import 'package:flauncher/models/app.dart';
 import 'package:flutter/material.dart';
 
@@ -69,49 +70,92 @@ class _SettingsPanelState extends State<SettingsPanel> {
               isRightSide: false,
               child: Navigator(
                 key: _navigatorKey,
-                initialRoute: widget.initialRoute ?? SettingsPanelPage.routeName,
+                initialRoute:
+                    widget.initialRoute ?? SettingsPanelPage.routeName,
                 onGenerateRoute: (settings) {
                   switch (settings.name) {
                     case SettingsPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => SettingsPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => SettingsPanelPage(),
+                      );
                     case GeneralSettingsPage.routeName:
-                      return _FastPageRoute(builder: (_) => GeneralSettingsPage());
+                      return _FastPageRoute(
+                        builder: (_) => GeneralSettingsPage(),
+                      );
                     case InterfaceSettingsPage.routeName:
-                      return _FastPageRoute(builder: (_) => InterfaceSettingsPage());
+                      return _FastPageRoute(
+                        builder: (_) => InterfaceSettingsPage(),
+                      );
                     case WallpaperPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => WallpaperPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => WallpaperPanelPage(),
+                      );
                     case StatusBarPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => StatusBarPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => StatusBarPanelPage(),
+                      );
                     case GradientPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => GradientPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => GradientPanelPage(),
+                      );
                     case ApplicationsPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => ApplicationsPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => ApplicationsPanelPage(),
+                      );
                     case LauncherSectionsPanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => LauncherSectionsPanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => LauncherSectionsPanelPage(),
+                      );
                     case LauncherSectionPanelPage.routeName:
                       return _FastPageRoute(
-                          builder: (_) => LauncherSectionPanelPage(sectionIndex: settings.arguments as int?));
+                        builder: (_) => LauncherSectionPanelPage(
+                          sectionIndex: settings.arguments as int?,
+                        ),
+                      );
                     case WifiUsagePeriodPage.routeName:
-                      return _FastPageRoute(builder: (_) => WifiUsagePeriodPage());
+                      return _FastPageRoute(
+                        builder: (_) => WifiUsagePeriodPage(),
+                      );
                     case BackButtonActionPage.routeName:
-                      return _FastPageRoute(builder: (_) => BackButtonActionPage());
+                      return _FastPageRoute(
+                        builder: (_) => BackButtonActionPage(),
+                      );
                     case DateTimeFormatPage.routeName:
-                      return _FastPageRoute(builder: (_) => DateTimeFormatPage());
+                      return _FastPageRoute(
+                        builder: (_) => DateTimeFormatPage(),
+                      );
                     case AppearancePanelPage.routeName:
-                      return _FastPageRoute(builder: (_) => const AppearancePanelPage());
+                      return _FastPageRoute(
+                        builder: (_) => const AppearancePanelPage(),
+                      );
                     case MiscPanelPage.routeName:
                       return _FastPageRoute(builder: (_) => MiscPanelPage());
                     case ScreensaverClockStylePage.routeName:
-                      return _FastPageRoute(builder: (_) => const ScreensaverClockStylePage());
+                      return _FastPageRoute(
+                        builder: (_) => const ScreensaverClockStylePage(),
+                      );
                     case AccentColorPage.routeName:
                       return _FastPageRoute(builder: (_) => AccentColorPage());
                     case BrightnessSettingsPage.routeName:
-                      return _FastPageRoute(builder: (_) => BrightnessSettingsPage());
+                      return _FastPageRoute(
+                        builder: (_) => BrightnessSettingsPage(),
+                      );
+                    case BackupSettingsPage.routeName:
+                      return _FastPageRoute(
+                        builder: (_) => const BackupSettingsPage(),
+                      );
                     case AppDetailsPage.routeName:
                       return _FastPageRoute(
-                          builder: (_) => AppDetailsPage(application: settings.arguments as App));
+                        builder: (_) => AppDetailsPage(
+                          application: settings.arguments as App,
+                        ),
+                      );
                     default:
-                      throw ArgumentError.value(settings.name, "settings.name", "Route not supported.");
+                      throw ArgumentError.value(
+                        settings.name,
+                        "settings.name",
+                        "Route not supported.",
+                      );
                   }
                 },
               ),

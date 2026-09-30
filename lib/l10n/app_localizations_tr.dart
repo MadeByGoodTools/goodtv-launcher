@@ -387,4 +387,45 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get checkStatus => 'Durumu denetle';
+
+  @override
+  String get backupAndRestore => 'Yedekleme ve Geri Yükleme';
+
+  @override
+  String get createBackup => 'Şimdi yedekle';
+
+  @override
+  String get restoreLatestBackup => 'Son yedeği geri yükle';
+
+  @override
+  String get noBackups => 'Henüz yedek yok';
+
+  @override
+  String get backupDescription =>
+      'Yedekler düzeninizi, kategorilerinizi, favorilerinizi, gizli uygulamalarınızı, ayarlarınızı, özel afişlerinizi ve resim veya video duvar kağıtlarınızı içerir. En yeni beş yedek bu cihazda tutulur.';
+
+  @override
+  String get backupCreated => 'Yedek oluşturuldu';
+
+  @override
+  String get backupFailed => 'Yedek oluşturulamadı';
+
+  @override
+  String get restoreBackupTitle => 'Başlatıcı yedeği geri yüklensin mi?';
+
+  @override
+  String get restoreBackupWarning =>
+      'Bu işlem mevcut düzeni, ayarları, afişleri ve duvar kağıtlarını son yedekle değiştirir.';
+
+  @override
+  String get restore => 'Geri yükle';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get backupRestored => 'Yedek geri yüklendi';
+
+  @override
+  String get restoreFailed => 'Yedek geri yüklenemedi';
 }

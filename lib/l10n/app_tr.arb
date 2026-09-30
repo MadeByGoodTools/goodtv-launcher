@@ -117,5 +117,18 @@
     "weekly": "Haftalık",
     "monthly": "Aylık",
     "grantPermission": "İzin ver",
-    "checkStatus": "Durumu denetle"
+    "checkStatus": "Durumu denetle",
+    "backupAndRestore": "Yedekleme ve Geri Yükleme",
+    "createBackup": "Şimdi yedekle",
+    "restoreLatestBackup": "Son yedeği geri yükle",
+    "noBackups": "Henüz yedek yok",
+    "backupDescription": "Yedekler düzeninizi, kategorilerinizi, favorilerinizi, gizli uygulamalarınızı, ayarlarınızı, özel afişlerinizi ve resim veya video duvar kağıtlarınızı içerir. En yeni beş yedek bu cihazda tutulur.",
+    "backupCreated": "Yedek oluşturuldu",
+    "backupFailed": "Yedek oluşturulamadı",
+    "restoreBackupTitle": "Başlatıcı yedeği geri yüklensin mi?",
+    "restoreBackupWarning": "Bu işlem mevcut düzeni, ayarları, afişleri ve duvar kağıtlarını son yedekle değiştirir.",
+    "restore": "Geri yükle",
+    "cancel": "İptal",
+    "backupRestored": "Yedek geri yüklendi",
+    "restoreFailed": "Yedek geri yüklenemedi"
 }

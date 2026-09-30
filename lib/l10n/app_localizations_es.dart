@@ -390,4 +390,45 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get checkStatus => 'Comprobar estado';
+
+  @override
+  String get backupAndRestore => 'Copia y restauración';
+
+  @override
+  String get createBackup => 'Crear copia ahora';
+
+  @override
+  String get restoreLatestBackup => 'Restaurar la última copia';
+
+  @override
+  String get noBackups => 'Aún no hay copias';
+
+  @override
+  String get backupDescription =>
+      'Las copias incluyen la distribución, categorías, favoritas, aplicaciones ocultas, ajustes, banners y fondos de imagen o vídeo. Se conservan las cinco copias más recientes en este dispositivo.';
+
+  @override
+  String get backupCreated => 'Copia creada';
+
+  @override
+  String get backupFailed => 'No se pudo crear la copia';
+
+  @override
+  String get restoreBackupTitle => '¿Restaurar la copia del lanzador?';
+
+  @override
+  String get restoreBackupWarning =>
+      'Esto reemplaza la distribución, los ajustes, banners y fondos actuales con la última copia.';
+
+  @override
+  String get restore => 'Restaurar';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get backupRestored => 'Copia restaurada';
+
+  @override
+  String get restoreFailed => 'No se pudo restaurar la copia';
 }

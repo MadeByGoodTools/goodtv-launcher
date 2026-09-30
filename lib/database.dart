@@ -30,8 +30,7 @@ import 'package:flauncher/models/category.dart';
 part 'database.drift.dart';
 
 @UseRowClass(App)
-class Apps extends Table
-{
+class Apps extends Table {
   TextColumn get packageName => text()();
 
   TextColumn get name => text()();
@@ -47,26 +46,28 @@ class Apps extends Table
 }
 
 @UseRowClass(Category)
-class Categories extends Table
-{
+class Categories extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
 
-  IntColumn get sort => intEnum<CategorySort>().withDefault(Constant(Category.Sort.index))();
+  IntColumn get sort =>
+      intEnum<CategorySort>().withDefault(Constant(Category.Sort.index))();
 
-  IntColumn get type => intEnum<CategoryType>().withDefault(Constant(Category.Type.index))();
+  IntColumn get type =>
+      intEnum<CategoryType>().withDefault(Constant(Category.Type.index))();
 
-  IntColumn get rowHeight => integer().withDefault(const Constant(Category.RowHeight))();
+  IntColumn get rowHeight =>
+      integer().withDefault(const Constant(Category.RowHeight))();
 
-  IntColumn get columnsCount => integer().withDefault(const Constant(Category.ColumnsCount))();
+  IntColumn get columnsCount =>
+      integer().withDefault(const Constant(Category.ColumnsCount))();
 
   IntColumn get order => integer()();
 }
 
 @UseRowClass(LauncherSpacer)
-class LauncherSpacers extends Table
-{
+class LauncherSpacers extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   IntColumn get height => integer()();
@@ -75,11 +76,14 @@ class LauncherSpacers extends Table
 }
 
 @DataClassName("AppCategory")
-class AppsCategories extends Table
-{
-  IntColumn get categoryId => integer().customConstraint("REFERENCES categories(id) ON DELETE CASCADE")();
+class AppsCategories extends Table {
+  IntColumn get categoryId => integer().customConstraint(
+    "REFERENCES categories(id) ON DELETE CASCADE",
+  )();
 
-  TextColumn get appPackageName => text().customConstraint("REFERENCES apps(package_name) ON DELETE CASCADE")();
+  TextColumn get appPackageName => text().customConstraint(
+    "REFERENCES apps(package_name) ON DELETE CASCADE",
+  )();
 
   IntColumn get order => integer()();
 
@@ -88,61 +92,64 @@ class AppsCategories extends Table
 }
 
 @DriftDatabase(tables: [Apps, Categories, AppsCategories, LauncherSpacers])
-class FLauncherDatabase extends _$FLauncherDatabase
-{
+class FLauncherDatabase extends _$FLauncherDatabase {
   late final bool wasCreated;
 
   FLauncherDatabase(DatabaseConnection super.databaseConnection);
 
-  FLauncherDatabase.inMemory() : super(LazyDatabase(() => NativeDatabase.memory()));
+  FLauncherDatabase.inMemory()
+    : super(LazyDatabase(() => NativeDatabase.memory()));
 
   @override
   int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (migrator) async {
-          await migrator.createAll();
-        },
-        onUpgrade: (migrator, from, to) async {
-          if (from <= 1) {
-            await migrator.alterTable(TableMigration(apps, newColumns: [apps.hidden]));
-          }
-          if (from <= 2 && from != 1) {
-            await migrator.addColumn(apps, apps.hidden);
-          }
-          if (from <= 3) {
-            await migrator.addColumn(categories, categories.sort);
-            await migrator.addColumn(categories, categories.type);
-            await migrator.addColumn(categories, categories.rowHeight);
-            await migrator.addColumn(categories, categories.columnsCount);
-            await (update(categories)..where((tbl) => tbl.name.equals("Applications")))
-                .write(const CategoriesCompanion(type: Value(CategoryType.grid)));
-          }
-          if (from < 6) {
-            await customStatement("ALTER TABLE apps DROP COLUMN banner;");
-            await customStatement("ALTER TABLE apps DROP COLUMN icon;");
-          }
-          if (from < 7) {
-            await migrator.createTable(launcherSpacers);
-            await migrator.dropColumn(apps, "sideloaded");
-          }
-          if (from < 8) {
-            await migrator.addColumn(apps, apps.lastLaunchedAt);
-          }
-          if (from < 9) {
-            await _mergeTvAndNonTvCategories();
-          }
-          if (from < 10) {
-            await _stripFavoritesFromAllApps();
-          }
-        },
-        beforeOpen: (openingDetails) async {
-          await customStatement('PRAGMA foreign_keys = ON;');
-          await customStatement('PRAGMA journal_mode = WAL;');
-          wasCreated = openingDetails.wasCreated;
-        },
-      );
+    onCreate: (migrator) async {
+      await migrator.createAll();
+    },
+    onUpgrade: (migrator, from, to) async {
+      if (from <= 1) {
+        await migrator.alterTable(
+          TableMigration(apps, newColumns: [apps.hidden]),
+        );
+      }
+      if (from <= 2 && from != 1) {
+        await migrator.addColumn(apps, apps.hidden);
+      }
+      if (from <= 3) {
+        await migrator.addColumn(categories, categories.sort);
+        await migrator.addColumn(categories, categories.type);
+        await migrator.addColumn(categories, categories.rowHeight);
+        await migrator.addColumn(categories, categories.columnsCount);
+        await (update(categories)
+              ..where((tbl) => tbl.name.equals("Applications")))
+            .write(const CategoriesCompanion(type: Value(CategoryType.grid)));
+      }
+      if (from < 6) {
+        await customStatement("ALTER TABLE apps DROP COLUMN banner;");
+        await customStatement("ALTER TABLE apps DROP COLUMN icon;");
+      }
+      if (from < 7) {
+        await migrator.createTable(launcherSpacers);
+        await migrator.dropColumn(apps, "sideloaded");
+      }
+      if (from < 8) {
+        await migrator.addColumn(apps, apps.lastLaunchedAt);
+      }
+      if (from < 9) {
+        await _mergeTvAndNonTvCategories();
+      }
+      if (from < 10) {
+        await _stripFavoritesFromAllApps();
+      }
+    },
+    beforeOpen: (openingDetails) async {
+      await customStatement('PRAGMA foreign_keys = ON;');
+      await customStatement('PRAGMA journal_mode = WAL;');
+      wasCreated = openingDetails.wasCreated;
+    },
+  );
 
   /// Migration: merge "TV Apps" and "Non-TV Apps" into a single "All Apps" category.
   Future<void> _mergeTvAndNonTvCategories() async {
@@ -154,11 +161,16 @@ class FLauncherDatabase extends _$FLauncherDatabase
     ).get();
 
     final int? tvId = tvRows.isNotEmpty ? tvRows.first.read<int>('id') : null;
-    final int? nonTvId = nonTvRows.isNotEmpty ? nonTvRows.first.read<int>('id') : null;
+    final int? nonTvId = nonTvRows.isNotEmpty
+        ? nonTvRows.first.read<int>('id')
+        : null;
 
     if (tvId != null && nonTvId != null) {
       // Both exist: rename TV Apps -> All Apps, move Non-TV apps into it, delete Non-TV category
-      await customStatement("UPDATE categories SET name = 'All Apps' WHERE id = ?", [tvId]);
+      await customStatement(
+        "UPDATE categories SET name = 'All Apps' WHERE id = ?",
+        [tvId],
+      );
 
       final maxOrderResult = await customSelect(
         "SELECT COALESCE(MAX(\"order\"), -1) + 1 AS next_order FROM apps_categories WHERE category_id = ?",
@@ -180,12 +192,21 @@ class FLauncherDatabase extends _$FLauncherDatabase
         nextOrder++;
       }
 
-      await customStatement("DELETE FROM apps_categories WHERE category_id = ?", [nonTvId]);
+      await customStatement(
+        "DELETE FROM apps_categories WHERE category_id = ?",
+        [nonTvId],
+      );
       await customStatement("DELETE FROM categories WHERE id = ?", [nonTvId]);
     } else if (tvId != null) {
-      await customStatement("UPDATE categories SET name = 'All Apps' WHERE id = ?", [tvId]);
+      await customStatement(
+        "UPDATE categories SET name = 'All Apps' WHERE id = ?",
+        [tvId],
+      );
     } else if (nonTvId != null) {
-      await customStatement("UPDATE categories SET name = 'All Apps' WHERE id = ?", [nonTvId]);
+      await customStatement(
+        "UPDATE categories SET name = 'All Apps' WHERE id = ?",
+        [nonTvId],
+      );
     }
   }
 
@@ -215,80 +236,95 @@ class FLauncherDatabase extends _$FLauncherDatabase
   Future<void> persistApps(Iterable<AppsCompanion> applications) =>
       batch((batch) => batch.insertAllOnConflictUpdate(apps, applications));
 
-  Future<void> updateApp(String packageName, AppsCompanion value) =>
-      (update(apps)..where((tbl) => tbl.packageName.equals(packageName))).write(value);
+  Future<void> updateApp(String packageName, AppsCompanion value) => (update(
+    apps,
+  )..where((tbl) => tbl.packageName.equals(packageName))).write(value);
 
   Future<void> deleteApps(List<String> packageNames) =>
       (delete(apps)..where((tbl) => tbl.packageName.isIn(packageNames))).go();
 
-  Future<int> insertCategory(Insertable<Category> category) => into(categories).insert(category);
+  Future<int> insertCategory(Insertable<Category> category) =>
+      into(categories).insert(category);
 
-  Future<void> deleteCategory(int id) => (delete(categories)..where((tbl) => tbl.id.equals(id))).go();
+  Future<void> deleteCategory(int id) =>
+      (delete(categories)..where((tbl) => tbl.id.equals(id))).go();
 
-  Future<void> updateCategories(List<CategoriesCompanion> values) => batch(
-        (batch) {
-          for (final value in values) {
-            batch.update<$CategoriesTable, Category>(
-              categories,
-              value,
-              where: (table) => (table.id.equals(value.id.value)),
-            );
-          }
-        },
-      );
+  Future<void> updateCategories(List<CategoriesCompanion> values) =>
+      batch((batch) {
+        for (final value in values) {
+          batch.update<$CategoriesTable, Category>(
+            categories,
+            value,
+            where: (table) => (table.id.equals(value.id.value)),
+          );
+        }
+      });
 
   Future<void> updateCategory(int id, CategoriesCompanion value) =>
       (update(categories)..where((tbl) => tbl.id.equals(id))).write(value);
 
-  Future<void> deleteAppCategory(int categoryId, String packageName) => (delete(appsCategories)
-        ..where((tbl) => tbl.categoryId.equals(categoryId) & tbl.appPackageName.equals(packageName)))
-      .go();
+  Future<void> deleteAppCategory(int categoryId, String packageName) =>
+      (delete(appsCategories)..where(
+            (tbl) =>
+                tbl.categoryId.equals(categoryId) &
+                tbl.appPackageName.equals(packageName),
+          ))
+          .go();
 
   Future<void> insertAppsCategories(List<AppsCategoriesCompanion> value) =>
-      batch((batch) => batch.insertAll(appsCategories, value, mode: InsertMode.insertOrIgnore));
+      batch(
+        (batch) => batch.insertAll(
+          appsCategories,
+          value,
+          mode: InsertMode.insertOrIgnore,
+        ),
+      );
 
   Future<void> replaceAppsCategories(List<AppsCategoriesCompanion> value) =>
       batch((batch) => batch.replaceAll(appsCategories, value));
 
-  Future<int> insertSpacer(Insertable<LauncherSpacer> spacer) => into(launcherSpacers).insert(spacer);
+  Future<int> insertSpacer(Insertable<LauncherSpacer> spacer) =>
+      into(launcherSpacers).insert(spacer);
 
-  Future<int> deleteSpacer(int spacerId) => (delete(launcherSpacers)..where(
-          (spacer) => spacer.id.equals(spacerId))).go();
+  Future<int> deleteSpacer(int spacerId) => (delete(
+    launcherSpacers,
+  )..where((spacer) => spacer.id.equals(spacerId))).go();
 
-  Future<int> updateSpacer(int spacerId, Insertable<LauncherSpacer> insertable) => (update(launcherSpacers)..where(
-          (spacer) => spacer.id.equals(spacerId))).write(insertable);
+  Future<int> updateSpacer(
+    int spacerId,
+    Insertable<LauncherSpacer> insertable,
+  ) => (update(
+    launcherSpacers,
+  )..where((spacer) => spacer.id.equals(spacerId))).write(insertable);
 
-  Future<void> updateSpacers(Iterable<LauncherSpacersCompanion> values) => batch(
-        (batch) {
-          for (final value in values) {
-            batch.update<$LauncherSpacersTable, LauncherSpacer>(
-              launcherSpacers,
-              value,
-              where: (table) => (table.id.equals(value.id.value)),
-            );
-          }
+  Future<void> updateSpacers(Iterable<LauncherSpacersCompanion> values) =>
+      batch((batch) {
+        for (final value in values) {
+          batch.update<$LauncherSpacersTable, LauncherSpacer>(
+            launcherSpacers,
+            value,
+            where: (table) => (table.id.equals(value.id.value)),
+          );
         }
-      );
+      });
 
-  Future<List<Category>> getCategories()
-  {
+  Future<List<Category>> getCategories() {
     final query = select(categories);
-    query.orderBy([ (c) => OrderingTerm.asc(c.order) ]);
+    query.orderBy([(c) => OrderingTerm.asc(c.order)]);
 
     return query.get();
   }
 
-  Future<List<LauncherSpacer>> getLauncherSpacers()
-  {
+  Future<List<LauncherSpacer>> getLauncherSpacers() {
     final query = select(launcherSpacers);
-    query.orderBy([ (s) => OrderingTerm.asc(s.order) ]);
+    query.orderBy([(s) => OrderingTerm.asc(s.order)]);
 
     return query.get();
   }
 
   Future<List<AppCategory>> getAppsCategories() {
     final query = select(appsCategories);
-    query.orderBy([ (c) => OrderingTerm.asc(c.appPackageName) ]);
+    query.orderBy([(c) => OrderingTerm.asc(c.appPackageName)]);
 
     return query.get();
   }
@@ -299,16 +335,145 @@ class FLauncherDatabase extends _$FLauncherDatabase
 
   Future<int?> nextAppCategoryOrder(int categoryId) async {
     final query = selectOnly(appsCategories);
-    final maxExpression = coalesce([appsCategories.order.max(), const Constant(-1)]) + const Constant(1);
+    final maxExpression =
+        coalesce([appsCategories.order.max(), const Constant(-1)]) +
+        const Constant(1);
     query.addColumns([maxExpression]);
     query.where(appsCategories.categoryId.equals(categoryId));
     final result = await query.getSingle();
     return result.read(maxExpression);
   }
+
+  Future<Map<String, dynamic>> exportBackupData() async {
+    final applicationRows = await getApplications();
+    final categoryRows = await getCategories();
+    final membershipRows = await getAppsCategories();
+    final spacerRows = await getLauncherSpacers();
+
+    return {
+      'apps': applicationRows
+          .map(
+            (app) => {
+              'packageName': app.packageName,
+              'hidden': app.hidden,
+              'lastLaunchedAt': app.lastLaunchedAt?.toIso8601String(),
+            },
+          )
+          .toList(),
+      'categories': categoryRows
+          .map(
+            (category) => {
+              'id': category.id,
+              'name': category.name,
+              'sort': category.sort.index,
+              'type': category.type.index,
+              'rowHeight': category.rowHeight,
+              'columnsCount': category.columnsCount,
+              'order': category.order,
+            },
+          )
+          .toList(),
+      'memberships': membershipRows
+          .map(
+            (membership) => {
+              'categoryId': membership.categoryId,
+              'packageName': membership.appPackageName,
+              'order': membership.order,
+            },
+          )
+          .toList(),
+      'spacers': spacerRows
+          .map(
+            (spacer) => {
+              'id': spacer.id,
+              'height': spacer.height,
+              'order': spacer.order,
+            },
+          )
+          .toList(),
+    };
+  }
+
+  Future<void> restoreBackupData(Map<String, dynamic> data) => transaction(
+    () async {
+      final installedPackages = (await getApplications())
+          .map((app) => app.packageName)
+          .toSet();
+
+      await delete(appsCategories).go();
+      await delete(categories).go();
+      await delete(launcherSpacers).go();
+
+      for (final value in (data['apps'] as List<dynamic>? ?? const [])) {
+        final row = Map<String, dynamic>.from(value as Map);
+        final packageName = row['packageName'] as String?;
+        if (packageName == null || !installedPackages.contains(packageName))
+          continue;
+        await updateApp(
+          packageName,
+          AppsCompanion(
+            hidden: Value(row['hidden'] as bool? ?? false),
+            lastLaunchedAt: Value(
+              row['lastLaunchedAt'] == null
+                  ? null
+                  : DateTime.tryParse(row['lastLaunchedAt'] as String),
+            ),
+          ),
+        );
+      }
+
+      final restoredCategoryIds = <int>{};
+      for (final value in (data['categories'] as List<dynamic>? ?? const [])) {
+        final row = Map<String, dynamic>.from(value as Map);
+        final id = row['id'] as int;
+        await into(categories).insert(
+          CategoriesCompanion.insert(
+            id: Value(id),
+            name: row['name'] as String,
+            sort: Value(CategorySort.values[row['sort'] as int]),
+            type: Value(CategoryType.values[row['type'] as int]),
+            rowHeight: Value(row['rowHeight'] as int),
+            columnsCount: Value(row['columnsCount'] as int),
+            order: row['order'] as int,
+          ),
+        );
+        restoredCategoryIds.add(id);
+      }
+
+      for (final value in (data['memberships'] as List<dynamic>? ?? const [])) {
+        final row = Map<String, dynamic>.from(value as Map);
+        final categoryId = row['categoryId'] as int;
+        final packageName = row['packageName'] as String;
+        if (!restoredCategoryIds.contains(categoryId) ||
+            !installedPackages.contains(packageName))
+          continue;
+        await into(appsCategories).insert(
+          AppsCategoriesCompanion.insert(
+            categoryId: categoryId,
+            appPackageName: packageName,
+            order: row['order'] as int,
+          ),
+        );
+      }
+
+      for (final value in (data['spacers'] as List<dynamic>? ?? const [])) {
+        final row = Map<String, dynamic>.from(value as Map);
+        await into(launcherSpacers).insert(
+          LauncherSpacersCompanion.insert(
+            id: Value(row['id'] as int),
+            height: row['height'] as int,
+            order: row['order'] as int,
+          ),
+        );
+      }
+    },
+  );
 }
 
 DatabaseConnection connect() => DatabaseConnection.delayed(() async {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      final file = File(path.join(dbFolder.path, 'db.sqlite'));
-      return DatabaseConnection(NativeDatabase(file, logStatements: foundation.kDebugMode));
-    }());
+  final dbFolder = await getApplicationDocumentsDirectory();
+  final file = File(path.join(dbFolder.path, 'db.sqlite'));
+  return DatabaseConnection(
+    NativeDatabase(file, logStatements: foundation.kDebugMode),
+  );
+}());

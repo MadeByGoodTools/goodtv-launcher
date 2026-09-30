@@ -385,4 +385,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkStatus => 'Check Status';
+
+  @override
+  String get backupAndRestore => 'Backup & Restore';
+
+  @override
+  String get createBackup => 'Create backup now';
+
+  @override
+  String get restoreLatestBackup => 'Restore latest backup';
+
+  @override
+  String get noBackups => 'No backups yet';
+
+  @override
+  String get backupDescription =>
+      'Backups include your layout, categories, favourites, hidden apps, settings, custom banners, and image or video wallpapers. The five newest backups are kept on this device.';
+
+  @override
+  String get backupCreated => 'Backup created';
+
+  @override
+  String get backupFailed => 'Could not create the backup';
+
+  @override
+  String get restoreBackupTitle => 'Restore launcher backup?';
+
+  @override
+  String get restoreBackupWarning =>
+      'This replaces the current layout, settings, banners, and wallpapers with the latest backup.';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get backupRestored => 'Backup restored';
+
+  @override
+  String get restoreFailed => 'Could not restore the backup';
 }

@@ -36,7 +36,8 @@ const _showTimeInStatusBar = "show_time_in_status_bar";
 const _timeFormat = "time_format";
 const _wifiUsagePeriod = "wifi_usage_period";
 const _showWifiWidgetInStatusBar = "show_wifi_widget_in_status_bar";
-const String _showNetworkIndicatorInStatusBar = "show_network_indicator_in_status_bar";
+const String _showNetworkIndicatorInStatusBar =
+    "show_network_indicator_in_status_bar";
 const String _accentColor = "accent_color";
 const String _screensaverClockStyle = "screensaver_clock_style";
 const String _dockBackdropFilterDisabled = "dock_backdrop_filter_disabled";
@@ -73,60 +74,113 @@ class SettingsService extends ChangeNotifier {
   static final defaultTimeFormat = "H:mm";
   final SharedPreferences _sharedPreferences;
 
-
   bool get appHighlightAnimationEnabled =>
-      showFocusBorders && (_sharedPreferences.getBool(_appHighlightAnimationEnabledKey) ?? false);
+      showFocusBorders &&
+      (_sharedPreferences.getBool(_appHighlightAnimationEnabledKey) ?? false);
 
-  bool get appKeyClickEnabled => _sharedPreferences.getBool(_appKeyClickEnabledKey) ?? true;
+  bool get appKeyClickEnabled =>
+      _sharedPreferences.getBool(_appKeyClickEnabledKey) ?? true;
 
-  bool get autoHideAppBarEnabled => _sharedPreferences.getBool(_autoHideAppBar) ?? false;
+  bool get autoHideAppBarEnabled =>
+      _sharedPreferences.getBool(_autoHideAppBar) ?? false;
 
-  bool get showCategoryTitles => _sharedPreferences.getBool(_showCategoryTitles) ?? false;
+  bool get showCategoryTitles =>
+      _sharedPreferences.getBool(_showCategoryTitles) ?? false;
 
-  bool get showAppNamesBelowIcons => _sharedPreferences.getBool(_showAppNamesBelowIcons) ?? false;
+  bool get showAppNamesBelowIcons =>
+      _sharedPreferences.getBool(_showAppNamesBelowIcons) ?? false;
 
-  bool get showDateInStatusBar => _sharedPreferences.getBool(_showDateInStatusBar) ?? false;
+  bool get showDateInStatusBar =>
+      _sharedPreferences.getBool(_showDateInStatusBar) ?? false;
 
-  bool get showTimeInStatusBar => _sharedPreferences.getBool(_showTimeInStatusBar) ?? true;
+  bool get showTimeInStatusBar =>
+      _sharedPreferences.getBool(_showTimeInStatusBar) ?? true;
 
   String? get gradientUuid => _sharedPreferences.getString(_gradientUuidKey);
 
-  String get backButtonAction => _sharedPreferences.getString(_backButtonAction) ?? BACK_BUTTON_ACTION_NOTHING;
+  String get backButtonAction =>
+      _sharedPreferences.getString(_backButtonAction) ??
+      BACK_BUTTON_ACTION_NOTHING;
 
-  String get dateFormat => _sharedPreferences.getString(_dateFormat) ?? defaultDateFormat;
+  String get dateFormat =>
+      _sharedPreferences.getString(_dateFormat) ?? defaultDateFormat;
 
-  String get timeFormat => _sharedPreferences.getString(_timeFormat) ?? defaultTimeFormat;
+  String get timeFormat =>
+      _sharedPreferences.getString(_timeFormat) ?? defaultTimeFormat;
 
-  String get wifiUsagePeriod => _sharedPreferences.getString(_wifiUsagePeriod) ?? WIFI_USAGE_DAILY;
+  String get wifiUsagePeriod =>
+      _sharedPreferences.getString(_wifiUsagePeriod) ?? WIFI_USAGE_DAILY;
 
-  bool get showWifiWidgetInStatusBar => _sharedPreferences.getBool(_showWifiWidgetInStatusBar) ?? false;
+  bool get showWifiWidgetInStatusBar =>
+      _sharedPreferences.getBool(_showWifiWidgetInStatusBar) ?? false;
 
-  bool get showNetworkIndicatorInStatusBar => _sharedPreferences.getBool(_showNetworkIndicatorInStatusBar) ?? true;
+  bool get showNetworkIndicatorInStatusBar =>
+      _sharedPreferences.getBool(_showNetworkIndicatorInStatusBar) ?? true;
 
-  String get accentColorHex => _sharedPreferences.getString(_accentColor) ?? ACCENT_COLOR_WHITE;
+  String get accentColorHex =>
+      _sharedPreferences.getString(_accentColor) ?? ACCENT_COLOR_WHITE;
 
-  String get screensaverClockStyle => _sharedPreferences.getString(_screensaverClockStyle) ?? "minimal";
+  String get screensaverClockStyle =>
+      _sharedPreferences.getString(_screensaverClockStyle) ?? "minimal";
 
-  bool get dockBackdropFilterDisabled => _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? false;
+  bool get dockBackdropFilterDisabled =>
+      _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? false;
 
-  bool get backgroundBlurDisabled => _sharedPreferences.getBool(_backgroundBlurDisabled) ?? false;
+  bool get backgroundBlurDisabled =>
+      _sharedPreferences.getBool(_backgroundBlurDisabled) ?? false;
 
-  bool get showWatchNextSection => _sharedPreferences.getBool(_showWatchNextSection) ?? false;
+  bool get showWatchNextSection =>
+      _sharedPreferences.getBool(_showWatchNextSection) ?? false;
 
-  bool get dockDarkBackground => _sharedPreferences.getBool(_dockDarkBackground) ?? false;
+  bool get dockDarkBackground =>
+      _sharedPreferences.getBool(_dockDarkBackground) ?? false;
 
-  bool get dockShadowEnabled => _sharedPreferences.getBool(_dockShadowEnabled) ?? false;
+  bool get dockShadowEnabled =>
+      _sharedPreferences.getBool(_dockShadowEnabled) ?? false;
 
-  bool get showFocusBorders => _sharedPreferences.getBool(_showFocusBorders) ?? true;
+  bool get showFocusBorders =>
+      _sharedPreferences.getBool(_showFocusBorders) ?? true;
 
   Color get accentColor {
     final hex = accentColorHex;
     return Color(int.parse("0xFF$hex"));
   }
 
-  SettingsService(
-    this._sharedPreferences
-  );
+  SettingsService(this._sharedPreferences);
+
+  Map<String, Object> exportSettings() {
+    final values = <String, Object>{};
+    for (final key in _sharedPreferences.getKeys()) {
+      final value = _sharedPreferences.get(key);
+      if (value is bool ||
+          value is int ||
+          value is double ||
+          value is String ||
+          value is List<String>) {
+        values[key] = value as Object;
+      }
+    }
+    return values;
+  }
+
+  Future<void> restoreSettings(Map<String, dynamic> values) async {
+    await _sharedPreferences.clear();
+    for (final entry in values.entries) {
+      final value = entry.value;
+      if (value is bool) {
+        await _sharedPreferences.setBool(entry.key, value);
+      } else if (value is int) {
+        await _sharedPreferences.setInt(entry.key, value);
+      } else if (value is double) {
+        await _sharedPreferences.setDouble(entry.key, value);
+      } else if (value is String) {
+        await _sharedPreferences.setString(entry.key, value);
+      } else if (value is List) {
+        await _sharedPreferences.setStringList(entry.key, value.cast<String>());
+      }
+    }
+    notifyListeners();
+  }
 
   Future<void> set(String key, bool value) async {
     await _sharedPreferences.setBool(key, value);
@@ -158,10 +212,13 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setDateTimeFormat(String dateFormatString, String timeFormatString) async {
+  Future<void> setDateTimeFormat(
+    String dateFormatString,
+    String timeFormatString,
+  ) async {
     await Future.wait([
       _sharedPreferences.setString(_dateFormat, dateFormatString),
-      _sharedPreferences.setString(_timeFormat, timeFormatString)
+      _sharedPreferences.setString(_timeFormat, timeFormatString),
     ]);
     notifyListeners();
   }
@@ -232,7 +289,8 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
-  bool get timeBasedWallpaperEnabled => _sharedPreferences.getBool("time_based_wallpaper_enabled") ?? false;
+  bool get timeBasedWallpaperEnabled =>
+      _sharedPreferences.getBool("time_based_wallpaper_enabled") ?? false;
 
   Future<void> setTimeBasedWallpaperEnabled(bool enabled) async {
     await _sharedPreferences.setBool("time_based_wallpaper_enabled", enabled);

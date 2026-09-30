@@ -174,5 +174,18 @@
     "weekly": "Weekly",
     "monthly": "Monthly",
     "grantPermission": "Grant Permission",
-    "checkStatus": "Check Status"
+    "checkStatus": "Check Status",
+    "backupAndRestore": "Backup & Restore",
+    "createBackup": "Create backup now",
+    "restoreLatestBackup": "Restore latest backup",
+    "noBackups": "No backups yet",
+    "backupDescription": "Backups include your layout, categories, favourites, hidden apps, settings, custom banners, and image or video wallpapers. The five newest backups are kept on this device.",
+    "backupCreated": "Backup created",
+    "backupFailed": "Could not create the backup",
+    "restoreBackupTitle": "Restore launcher backup?",
+    "restoreBackupWarning": "This replaces the current layout, settings, banners, and wallpapers with the latest backup.",
+    "restore": "Restore",
+    "cancel": "Cancel",
+    "backupRestored": "Backup restored",
+    "restoreFailed": "Could not restore the backup"
 }

@@ -27,6 +27,7 @@ import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/providers/brightness_service.dart';
 import 'package:flauncher/providers/wallpaper_service.dart';
 import 'package:flauncher/providers/watch_next_service.dart';
+import 'package:flauncher/providers/backup_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,30 +43,45 @@ Future<void> main() async {
   final fLauncherChannel = FLauncherChannel();
   final fLauncherDatabase = FLauncherDatabase(connect());
 
-  runApp(MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => SettingsService(sharedPreferences),
-            lazy: false),
-        ChangeNotifierProvider(create: (_) => AppsService(fLauncherChannel, fLauncherDatabase)),
+          create: (_) => SettingsService(sharedPreferences),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AppsService(fLauncherChannel, fLauncherDatabase),
+        ),
         ChangeNotifierProvider(create: (_) => LauncherState()),
         ChangeNotifierProvider(create: (_) => NetworkService(fLauncherChannel)),
         ChangeNotifierProvider(
-            create: (context) {
-              SettingsService settingsService = Provider.of(context, listen: false);
-              return WallpaperService(settingsService);
-            }
+          create: (context) {
+            SettingsService settingsService = Provider.of(
+              context,
+              listen: false,
+            );
+            return WallpaperService(settingsService);
+          },
         ),
         ChangeNotifierProvider(
-            create: (_) => BrightnessService(sharedPreferences),
-            lazy: false
+          create: (_) => BrightnessService(sharedPreferences),
+          lazy: false,
         ),
         ChangeNotifierProvider(
-            create: (_) => WatchNextService(fLauncherChannel),
-            lazy: false
+          create: (_) => WatchNextService(fLauncherChannel),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BackupService(
+            fLauncherDatabase,
+            context.read<SettingsService>(),
+            context.read<AppsService>(),
+            context.read<WallpaperService>(),
+          ),
         ),
       ],
-      child: FLauncherApp()
-    )
+      child: FLauncherApp(),
+    ),
   );
 }

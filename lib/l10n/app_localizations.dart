@@ -813,6 +813,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check Status'**
   String get checkStatus;
+
+  /// No description provided for @backupAndRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupAndRestore;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup now'**
+  String get createBackup;
+
+  /// No description provided for @restoreLatestBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore latest backup'**
+  String get restoreLatestBackup;
+
+  /// No description provided for @noBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'No backups yet'**
+  String get noBackups;
+
+  /// No description provided for @backupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups include your layout, categories, favourites, hidden apps, settings, custom banners, and image or video wallpapers. The five newest backups are kept on this device.'**
+  String get backupDescription;
+
+  /// No description provided for @backupCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created'**
+  String get backupCreated;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the backup'**
+  String get backupFailed;
+
+  /// No description provided for @restoreBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore launcher backup?'**
+  String get restoreBackupTitle;
+
+  /// No description provided for @restoreBackupWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This replaces the current layout, settings, banners, and wallpapers with the latest backup.'**
+  String get restoreBackupWarning;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored'**
+  String get backupRestored;
+
+  /// No description provided for @restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore the backup'**
+  String get restoreFailed;
 }
 
 class _AppLocalizationsDelegate
