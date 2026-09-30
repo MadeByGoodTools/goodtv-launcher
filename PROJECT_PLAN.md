@@ -27,7 +27,8 @@ feature set. New work is additive and remains GPL-3.0.
 4. Add deeper card, icon, type, spacing, alignment, and colour controls.
    **In progress:** app-card corner shape, focus zoom, and Tight/Balanced/Roomy
    launcher-density controls are now live.
-5. Add optional PIN-protected settings and parental controls.
+5. Add optional PIN-protected settings and parental controls. **In progress:**
+   settings can now be protected by a salted, hashed 4-8 digit PIN.
 6. Add boot targets, shortcuts, and device-aware input actions where supported.
    **In progress:** Configure This TV now detects Android/Google TV/Fire TV,
    applies a safe performance-aware profile, checks the current Home app, and

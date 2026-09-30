@@ -141,6 +141,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get configureThisTv => 'Configure this TV';
 
   @override
+  String get pinProtection => 'PIN protection';
+
+  @override
+  String get pinProtectionDescription =>
+      'Require a 4-8 digit PIN before opening launcher settings. If you forget it, clearing the app\'s data resets the PIN and launcher configuration.';
+
+  @override
+  String get createPin => 'Create settings PIN';
+
+  @override
+  String get changePin => 'Change settings PIN';
+
+  @override
+  String get disablePin => 'Disable PIN protection';
+
+  @override
+  String get enterNewPin => 'Enter a new 4-8 digit PIN';
+
+  @override
+  String get confirmPin => 'Confirm the new PIN';
+
+  @override
+  String get enterCurrentPin => 'Enter the current PIN';
+
+  @override
+  String get enterPin => 'PIN';
+
+  @override
+  String get pinLengthError => 'Use 4-8 digits';
+
+  @override
+  String get pinsDoNotMatch => 'The PINs do not match';
+
+  @override
+  String get pinEnabled => 'Settings PIN enabled';
+
+  @override
+  String get pinDisabled => 'Settings PIN disabled';
+
+  @override
+  String get incorrectPin => 'Incorrect PIN';
+
+  @override
+  String get settingsLocked => 'Settings are locked';
+
+  @override
+  String get unlockSettings => 'Unlock settings';
+
+  @override
   String get applyRecommendedSetup => 'Apply recommended setup';
 
   @override

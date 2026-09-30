@@ -39,8 +39,13 @@ import 'package:goodtv_launcher/widgets/settings/backup_settings_page.dart';
 import 'package:goodtv_launcher/widgets/settings/display_presets_page.dart';
 import 'package:goodtv_launcher/widgets/settings/app_card_style_page.dart';
 import 'package:goodtv_launcher/widgets/settings/system_setup_page.dart';
+import 'package:goodtv_launcher/widgets/settings/pin_protection_page.dart';
+import 'package:goodtv_launcher/providers/pin_service.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:goodtv_launcher/models/app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SettingsPanel extends StatefulWidget {
   final String? initialRoute;
@@ -53,9 +58,16 @@ class SettingsPanel extends StatefulWidget {
 
 class _SettingsPanelState extends State<SettingsPanel> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  bool _unlocked = false;
 
   @override
   Widget build(BuildContext context) {
+    final pinService = context.watch<PinService>();
+    if (pinService.enabled && !_unlocked) {
+      return _SettingsPinGate(
+        onUnlocked: () => setState(() => _unlocked = true),
+      );
+    }
     return WillPopScope(
       onWillPop: () async => !await _navigatorKey.currentState!.maybePop(),
       child: Scaffold(
@@ -159,6 +171,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                       return _FastPageRoute(
                         builder: (_) => const SystemSetupPage(),
                       );
+                    case PinProtectionPage.routeName:
+                      return _FastPageRoute(
+                        builder: (_) => const PinProtectionPage(),
+                      );
                     case AppDetailsPage.routeName:
                       return _FastPageRoute(
                         builder: (_) => AppDetailsPage(
@@ -179,6 +195,84 @@ class _SettingsPanelState extends State<SettingsPanel> {
         ),
       ),
     );
+  }
+}
+
+class _SettingsPinGate extends StatefulWidget {
+  final VoidCallback onUnlocked;
+
+  const _SettingsPinGate({required this.onUnlocked});
+
+  @override
+  State<_SettingsPinGate> createState() => _SettingsPinGateState();
+}
+
+class _SettingsPinGateState extends State<_SettingsPinGate> {
+  final _controller = TextEditingController();
+  bool _incorrect = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      backgroundColor: Colors.black54,
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(color: Colors.transparent),
+          ),
+          SidePanelDialog(
+            width: 350,
+            isRightSide: false,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.lock_outline, size: 48),
+                  const SizedBox(height: 16),
+                  Text(l10n.settingsLocked),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _controller,
+                    autofocus: true,
+                    obscureText: true,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 8,
+                    onSubmitted: (_) => _unlock(),
+                    decoration: InputDecoration(
+                      labelText: l10n.enterPin,
+                      errorText: _incorrect ? l10n.incorrectPin : null,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton(
+                    onPressed: _unlock,
+                    child: Text(l10n.unlockSettings),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _unlock() {
+    if (context.read<PinService>().verify(_controller.text)) {
+      widget.onUnlocked();
+    } else {
+      setState(() => _incorrect = true);
+    }
   }
 }
 

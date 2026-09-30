@@ -28,6 +28,7 @@ import 'package:goodtv_launcher/providers/brightness_service.dart';
 import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:goodtv_launcher/providers/watch_next_service.dart';
 import 'package:goodtv_launcher/providers/backup_service.dart';
+import 'package:goodtv_launcher/providers/pin_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +49,10 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SettingsService(sharedPreferences),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PinService(sharedPreferences),
           lazy: false,
         ),
         ChangeNotifierProvider(

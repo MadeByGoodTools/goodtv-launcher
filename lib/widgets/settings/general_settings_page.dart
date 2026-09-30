@@ -27,6 +27,7 @@ import 'wifi_usage_period_page.dart';
 import 'screensaver_clock_style_page.dart';
 import 'backup_settings_page.dart';
 import 'system_setup_page.dart';
+import 'pin_protection_page.dart';
 
 class GeneralSettingsPage extends StatelessWidget {
   static const String routeName = "general_settings_panel";
@@ -58,6 +59,16 @@ class GeneralSettingsPage extends StatelessWidget {
                   onPressed: () => Navigator.of(
                     context,
                   ).pushNamed(SystemSetupPage.routeName),
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.lock_outline),
+                  title: Text(
+                    localizations.pinProtection,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(PinProtectionPage.routeName),
                 ),
                 FocusableSettingsTile(
                   leading: const Icon(Icons.brightness_6),

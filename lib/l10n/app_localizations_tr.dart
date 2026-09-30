@@ -141,6 +141,55 @@ class AppLocalizationsTr extends AppLocalizations {
   String get configureThisTv => 'Bu TV\'yi yapılandır';
 
   @override
+  String get pinProtection => 'PIN koruması';
+
+  @override
+  String get pinProtectionDescription =>
+      'Başlatıcı ayarlarını açmadan önce 4-8 haneli PIN isteyin. PIN unutulursa uygulama verilerini temizlemek PIN\'i ve başlatıcı yapılandırmasını sıfırlar.';
+
+  @override
+  String get createPin => 'Ayarlar PIN\'i oluştur';
+
+  @override
+  String get changePin => 'Ayarlar PIN\'ini değiştir';
+
+  @override
+  String get disablePin => 'PIN korumasını kapat';
+
+  @override
+  String get enterNewPin => 'Yeni 4-8 haneli PIN girin';
+
+  @override
+  String get confirmPin => 'Yeni PIN\'i doğrulayın';
+
+  @override
+  String get enterCurrentPin => 'Mevcut PIN\'i girin';
+
+  @override
+  String get enterPin => 'PIN';
+
+  @override
+  String get pinLengthError => '4-8 hane kullanın';
+
+  @override
+  String get pinsDoNotMatch => 'PIN\'ler eşleşmiyor';
+
+  @override
+  String get pinEnabled => 'Ayarlar PIN\'i etkin';
+
+  @override
+  String get pinDisabled => 'Ayarlar PIN\'i devre dışı';
+
+  @override
+  String get incorrectPin => 'Yanlış PIN';
+
+  @override
+  String get settingsLocked => 'Ayarlar kilitli';
+
+  @override
+  String get unlockSettings => 'Ayarların kilidini aç';
+
+  @override
   String get applyRecommendedSetup => 'Önerilen kurulumu uygula';
 
   @override

@@ -141,6 +141,55 @@ class AppLocalizationsEs extends AppLocalizations {
   String get configureThisTv => 'Configurar este televisor';
 
   @override
+  String get pinProtection => 'Protección con PIN';
+
+  @override
+  String get pinProtectionDescription =>
+      'Solicita un PIN de 4 a 8 dígitos antes de abrir los ajustes. Si lo olvidas, borrar los datos de la aplicación restablece el PIN y la configuración.';
+
+  @override
+  String get createPin => 'Crear PIN de ajustes';
+
+  @override
+  String get changePin => 'Cambiar PIN de ajustes';
+
+  @override
+  String get disablePin => 'Desactivar protección con PIN';
+
+  @override
+  String get enterNewPin => 'Introduce un PIN nuevo de 4 a 8 dígitos';
+
+  @override
+  String get confirmPin => 'Confirma el PIN nuevo';
+
+  @override
+  String get enterCurrentPin => 'Introduce el PIN actual';
+
+  @override
+  String get enterPin => 'PIN';
+
+  @override
+  String get pinLengthError => 'Usa de 4 a 8 dígitos';
+
+  @override
+  String get pinsDoNotMatch => 'Los PIN no coinciden';
+
+  @override
+  String get pinEnabled => 'PIN de ajustes activado';
+
+  @override
+  String get pinDisabled => 'PIN de ajustes desactivado';
+
+  @override
+  String get incorrectPin => 'PIN incorrecto';
+
+  @override
+  String get settingsLocked => 'Los ajustes están bloqueados';
+
+  @override
+  String get unlockSettings => 'Desbloquear ajustes';
+
+  @override
   String get applyRecommendedSetup => 'Aplicar configuración recomendada';
 
   @override

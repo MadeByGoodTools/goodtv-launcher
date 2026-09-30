@@ -352,6 +352,102 @@ abstract class AppLocalizations {
   /// **'Configure this TV'**
   String get configureThisTv;
 
+  /// No description provided for @pinProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN protection'**
+  String get pinProtection;
+
+  /// No description provided for @pinProtectionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Require a 4-8 digit PIN before opening launcher settings. If you forget it, clearing the app\'s data resets the PIN and launcher configuration.'**
+  String get pinProtectionDescription;
+
+  /// No description provided for @createPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Create settings PIN'**
+  String get createPin;
+
+  /// No description provided for @changePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change settings PIN'**
+  String get changePin;
+
+  /// No description provided for @disablePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable PIN protection'**
+  String get disablePin;
+
+  /// No description provided for @enterNewPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new 4-8 digit PIN'**
+  String get enterNewPin;
+
+  /// No description provided for @confirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm the new PIN'**
+  String get confirmPin;
+
+  /// No description provided for @enterCurrentPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the current PIN'**
+  String get enterCurrentPin;
+
+  /// No description provided for @enterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN'**
+  String get enterPin;
+
+  /// No description provided for @pinLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 4-8 digits'**
+  String get pinLengthError;
+
+  /// No description provided for @pinsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The PINs do not match'**
+  String get pinsDoNotMatch;
+
+  /// No description provided for @pinEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings PIN enabled'**
+  String get pinEnabled;
+
+  /// No description provided for @pinDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings PIN disabled'**
+  String get pinDisabled;
+
+  /// No description provided for @incorrectPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect PIN'**
+  String get incorrectPin;
+
+  /// No description provided for @settingsLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings are locked'**
+  String get settingsLocked;
+
+  /// No description provided for @unlockSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock settings'**
+  String get unlockSettings;
+
   /// No description provided for @applyRecommendedSetup.
   ///
   /// In en, this message translates to:
