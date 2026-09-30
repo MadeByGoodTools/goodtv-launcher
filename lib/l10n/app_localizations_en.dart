@@ -60,6 +60,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appCardFocusZoomStrong => 'Strong';
 
   @override
+  String get appCardSpacing => 'Card spacing';
+
+  @override
+  String get appCardSpacingTight => 'Tight';
+
+  @override
+  String get appCardSpacingBalanced => 'Balanced';
+
+  @override
+  String get appCardSpacingRoomy => 'Roomy';
+
+  @override
   String get appearanceSettings => 'Appearance';
 
   @override

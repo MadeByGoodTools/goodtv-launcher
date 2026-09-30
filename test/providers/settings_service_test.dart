@@ -111,6 +111,7 @@ void main() async {
       expect(settingsService.accentColorHex, ACCENT_COLOR_GREEN);
       expect(settingsService.appCardCornerStyle, AppCardCornerStyle.rounded);
       expect(settingsService.appCardFocusZoom, AppCardFocusZoom.strong);
+      expect(settingsService.appCardSpacing, AppCardSpacing.roomy);
     });
 
     test("easy read keeps labels and status information visible", () async {
@@ -127,9 +128,12 @@ void main() async {
     test("card style controls persist custom choices", () async {
       await settingsService.setAppCardCornerStyle(AppCardCornerStyle.square);
       await settingsService.setAppCardFocusZoom(AppCardFocusZoom.none);
+      await settingsService.setAppCardSpacing(AppCardSpacing.tight);
 
       expect(settingsService.appCardCornerRadius, 0);
       expect(settingsService.appCardFocusScale, 1);
+      expect(settingsService.appCardHorizontalSpacing, 6);
+      expect(settingsService.appCardVerticalSpacing, 4);
     });
   });
 }

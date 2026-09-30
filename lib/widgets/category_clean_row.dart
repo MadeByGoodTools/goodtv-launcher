@@ -45,9 +45,14 @@ class CategoryCleanRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>(
-      (s) => s.showAppNamesBelowIcons,
-    );
+    final (showAppNames, horizontalSpacing, verticalSpacing) = context
+        .select<SettingsService, (bool, double, double)>(
+          (s) => (
+            s.showAppNamesBelowIcons,
+            s.appCardHorizontalSpacing,
+            s.appCardVerticalSpacing,
+          ),
+        );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
@@ -65,9 +70,9 @@ class CategoryCleanRow extends StatelessWidget {
                   return Expanded(
                     child: Padding(
                       key: ValueKey(applications[index].packageName),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: kAppCardHorizontalPadding,
-                        vertical: kAppCardVerticalPadding,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalSpacing,
+                        vertical: verticalSpacing,
                       ),
                       child: AppCard(
                         category: category,

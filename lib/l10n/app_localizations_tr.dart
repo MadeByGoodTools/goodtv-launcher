@@ -60,6 +60,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appCardFocusZoomStrong => 'Güçlü';
 
   @override
+  String get appCardSpacing => 'Kart aralığı';
+
+  @override
+  String get appCardSpacingTight => 'Sıkı';
+
+  @override
+  String get appCardSpacingBalanced => 'Dengeli';
+
+  @override
+  String get appCardSpacingRoomy => 'Geniş';
+
+  @override
   String get appearanceSettings => 'Görünüm';
 
   @override

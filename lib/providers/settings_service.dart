@@ -49,12 +49,15 @@ const String _showFocusBorders = "show_focus_borders";
 const String _displayPreset = "display_preset";
 const String _appCardCornerStyle = "app_card_corner_style";
 const String _appCardFocusZoom = "app_card_focus_zoom";
+const String _appCardSpacing = "app_card_spacing";
 
 enum DisplayPreset { cinema, compact, easyRead }
 
 enum AppCardCornerStyle { square, soft, rounded }
 
 enum AppCardFocusZoom { none, standard, strong }
+
+enum AppCardSpacing { tight, balanced, roomy }
 
 // WiFi usage period options
 const String WIFI_USAGE_DAILY = "daily";
@@ -184,6 +187,26 @@ class SettingsService extends ChangeNotifier {
     AppCardFocusZoom.none => 1,
     AppCardFocusZoom.standard => 1.07,
     AppCardFocusZoom.strong => 1.12,
+  };
+
+  AppCardSpacing get appCardSpacing {
+    final value = _sharedPreferences.getString(_appCardSpacing);
+    return AppCardSpacing.values.firstWhere(
+      (spacing) => spacing.name == value,
+      orElse: () => AppCardSpacing.balanced,
+    );
+  }
+
+  double get appCardHorizontalSpacing => switch (appCardSpacing) {
+    AppCardSpacing.tight => 6,
+    AppCardSpacing.balanced => 12,
+    AppCardSpacing.roomy => 18,
+  };
+
+  double get appCardVerticalSpacing => switch (appCardSpacing) {
+    AppCardSpacing.tight => 4,
+    AppCardSpacing.balanced => 9,
+    AppCardSpacing.roomy => 14,
   };
 
   Color get accentColor {
@@ -344,6 +367,11 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setAppCardSpacing(AppCardSpacing spacing) async {
+    await _sharedPreferences.setString(_appCardSpacing, spacing.name);
+    notifyListeners();
+  }
+
   Future<void> applyDisplayPreset(DisplayPreset preset) async {
     final values = switch (preset) {
       DisplayPreset.cinema => <String, bool>{
@@ -408,6 +436,11 @@ class SettingsService extends ChangeNotifier {
         DisplayPreset.cinema => AppCardFocusZoom.strong.name,
         DisplayPreset.compact => AppCardFocusZoom.none.name,
         DisplayPreset.easyRead => AppCardFocusZoom.strong.name,
+      }),
+      _sharedPreferences.setString(_appCardSpacing, switch (preset) {
+        DisplayPreset.cinema => AppCardSpacing.roomy.name,
+        DisplayPreset.compact => AppCardSpacing.tight.name,
+        DisplayPreset.easyRead => AppCardSpacing.balanced.name,
       }),
     ]);
     notifyListeners();

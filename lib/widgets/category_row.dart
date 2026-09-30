@@ -45,9 +45,10 @@ class CategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>(
-      (s) => s.showAppNamesBelowIcons,
-    );
+    final (showAppNames, horizontalSpacing) = context
+        .select<SettingsService, (bool, double)>(
+          (s) => (s.showAppNamesBelowIcons, s.appCardHorizontalSpacing),
+        );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
@@ -64,7 +65,7 @@ class CategoryRow extends StatelessWidget {
             findChildIndexCallback: _findChildIndex,
             (context, index) => Padding(
               key: Key(applications[index].packageName),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: horizontalSpacing),
               child: AppCard(
                 category: category,
                 application: applications[index],

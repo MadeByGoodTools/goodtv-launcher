@@ -136,25 +136,33 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
             child: Scaffold(
               backgroundColor: Colors.transparent,
               appBar: FocusAwareAppBar(key: _appBarKey),
-              // (initialized (data.$1), layoutVersion (data.$2), showAppNamesBelowIcons (data.$3))
-              body: Selector2<AppsService, SettingsService, (bool, int, bool)>(
-                selector: (_, appsService, settingsService) => (
-                  appsService.initialized,
-                  appsService.layoutVersion,
-                  settingsService.showAppNamesBelowIcons,
-                ),
-                builder: (context, data, _) {
-                  if (data.$1) {
-                    return _tvOSLayout(
-                      context,
-                      context.read<AppsService>(),
-                      showAppNames: data.$3,
-                    );
-                  } else {
-                    return _emptyState(context);
-                  }
-                },
-              ),
+              body:
+                  Selector2<
+                    AppsService,
+                    SettingsService,
+                    (bool, int, bool, double, double)
+                  >(
+                    selector: (_, appsService, settingsService) => (
+                      appsService.initialized,
+                      appsService.layoutVersion,
+                      settingsService.showAppNamesBelowIcons,
+                      settingsService.appCardHorizontalSpacing,
+                      settingsService.appCardVerticalSpacing,
+                    ),
+                    builder: (context, data, _) {
+                      if (data.$1) {
+                        return _tvOSLayout(
+                          context,
+                          context.read<AppsService>(),
+                          showAppNames: data.$3,
+                          cardHorizontalSpacing: data.$4,
+                          cardVerticalSpacing: data.$5,
+                        );
+                      } else {
+                        return _emptyState(context);
+                      }
+                    },
+                  ),
             ),
           ),
         ],
@@ -179,6 +187,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     BuildContext context,
     AppsService appsService, {
     required bool showAppNames,
+    required double cardHorizontalSpacing,
+    required double cardVerticalSpacing,
   }) {
     final favoritesCategory = appsService.categories.firstWhereOrNull(
       (c) => c.name == 'Favorites',
@@ -243,6 +253,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           otherSections,
           firstCategoryAlreadyFound: favoriteApps.isNotEmpty,
           showAppNames: showAppNames,
+          cardHorizontalSpacing: cardHorizontalSpacing,
+          cardVerticalSpacing: cardVerticalSpacing,
           onFirstSectionFocused: favoriteApps.isNotEmpty
               ? _scrollDockToTop
               : null,
@@ -272,6 +284,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     List<LauncherSection> sections, {
     bool firstCategoryAlreadyFound = false,
     required bool showAppNames,
+    required double cardHorizontalSpacing,
+    required double cardVerticalSpacing,
     VoidCallback? onFirstSectionFocused,
   }) {
     final List<Widget> slivers = [];
@@ -372,7 +386,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: category.columnsCount,
                   childAspectRatio: gridAspectRatio,
-                  mainAxisSpacing: 12,
+                  mainAxisSpacing: cardVerticalSpacing,
                   crossAxisSpacing: 0,
                 ),
                 delegate: SliverChildBuilderDelegate(
@@ -386,9 +400,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   },
                   (context, index) => Padding(
                     key: Key(filteredApps[index].packageName),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kAppCardHorizontalPadding,
-                      vertical: kAppCardVerticalPadding,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: cardHorizontalSpacing,
+                      vertical: cardVerticalSpacing,
                     ),
                     child: AppCard(
                       category: category,

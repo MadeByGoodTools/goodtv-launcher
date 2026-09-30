@@ -43,9 +43,14 @@ class AppsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showAppNames = context.select<SettingsService, bool>(
-      (s) => s.showAppNamesBelowIcons,
-    );
+    final (showAppNames, horizontalSpacing, verticalSpacing) = context
+        .select<SettingsService, (bool, double, double)>(
+          (s) => (
+            s.showAppNamesBelowIcons,
+            s.appCardHorizontalSpacing,
+            s.appCardVerticalSpacing,
+          ),
+        );
     Widget categoryContent;
     if (applications.isEmpty) {
       categoryContent = categoryContainerEmptyState(context);
@@ -64,7 +69,7 @@ class AppsGrid extends StatelessWidget {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: category.columnsCount,
               childAspectRatio: childAspectRatio,
-              mainAxisSpacing: 12,
+              mainAxisSpacing: verticalSpacing,
               crossAxisSpacing: 0,
             ),
             childrenDelegate: SliverChildBuilderDelegate(
@@ -74,9 +79,9 @@ class AppsGrid extends StatelessWidget {
               (context, index) => RepaintBoundary(
                 child: Padding(
                   key: ValueKey<String>(applications[index].packageName),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kAppCardHorizontalPadding,
-                    vertical: kAppCardVerticalPadding,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalSpacing,
+                    vertical: verticalSpacing,
                   ),
                   child: AppCard(
                     category: category,

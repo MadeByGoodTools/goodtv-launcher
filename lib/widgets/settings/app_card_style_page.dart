@@ -62,6 +62,26 @@ class AppCardStylePage extends StatelessWidget {
                 l10n.appCardFocusZoomStrong,
                 settings,
               ),
+              const Divider(),
+              _heading(context, l10n.appCardSpacing),
+              _spacingTile(
+                context,
+                AppCardSpacing.tight,
+                l10n.appCardSpacingTight,
+                settings,
+              ),
+              _spacingTile(
+                context,
+                AppCardSpacing.balanced,
+                l10n.appCardSpacingBalanced,
+                settings,
+              ),
+              _spacingTile(
+                context,
+                AppCardSpacing.roomy,
+                l10n.appCardSpacingRoomy,
+                settings,
+              ),
             ],
           ),
         ),
@@ -104,6 +124,18 @@ class AppCardStylePage extends StatelessWidget {
     title: Text(label),
     trailing: _selection(context, settings.appCardFocusZoom == zoom),
     onPressed: () => settings.setAppCardFocusZoom(zoom),
+  );
+
+  Widget _spacingTile(
+    BuildContext context,
+    AppCardSpacing spacing,
+    String label,
+    SettingsService settings,
+  ) => FocusableSettingsTile(
+    leading: const Icon(Icons.space_bar),
+    title: Text(label),
+    trailing: _selection(context, settings.appCardSpacing == spacing),
+    onPressed: () => settings.setAppCardSpacing(spacing),
   );
 
   Widget _selection(BuildContext context, bool selected) => selected

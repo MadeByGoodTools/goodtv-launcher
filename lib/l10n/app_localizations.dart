@@ -202,6 +202,30 @@ abstract class AppLocalizations {
   /// **'Strong'**
   String get appCardFocusZoomStrong;
 
+  /// No description provided for @appCardSpacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Card spacing'**
+  String get appCardSpacing;
+
+  /// No description provided for @appCardSpacingTight.
+  ///
+  /// In en, this message translates to:
+  /// **'Tight'**
+  String get appCardSpacingTight;
+
+  /// No description provided for @appCardSpacingBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get appCardSpacingBalanced;
+
+  /// No description provided for @appCardSpacingRoomy.
+  ///
+  /// In en, this message translates to:
+  /// **'Roomy'**
+  String get appCardSpacingRoomy;
+
   /// No description provided for @appearanceSettings.
   ///
   /// In en, this message translates to:
