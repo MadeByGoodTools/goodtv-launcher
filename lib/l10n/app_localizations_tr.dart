@@ -578,4 +578,36 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get restoreFailed => 'Yedek geri yüklenemedi';
+
+  @override
+  String get onlineAerialBackgrounds =>
+      'Çevrimiçi ve hava manzaralı arka planlar';
+
+  @override
+  String get onlineWallpaper => 'Çevrimiçi arka planlar';
+
+  @override
+  String get onlineWallpaperDescription =>
+      'Doğrudan resim veya video URL\'si, M3U oynatma listesi ya da Overflight biçiminde JSON akışı bağlayın. GoodTV çok öğeli akışları otomatik değiştirir.';
+
+  @override
+  String get wallpaperFeedUrl => 'Arka plan akışı URL\'si';
+
+  @override
+  String get changeBackgroundEvery => 'Arka planı değiştirme sıklığı';
+
+  @override
+  String get connectWallpaperFeed => 'Arka plan akışını bağla';
+
+  @override
+  String get nextWallpaper => 'Sonraki arka plan';
+
+  @override
+  String get disableOnlineWallpaper => 'Çevrimiçi arka planları kapat';
+
+  @override
+  String get wallpaperFeedConnected => 'Arka plan akışı bağlandı';
+
+  @override
+  String get wallpaperFeedError => 'Bu arka plan akışı yüklenemedi';
 }

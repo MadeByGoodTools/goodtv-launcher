@@ -581,4 +581,35 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get restoreFailed => 'No se pudo restaurar la copia';
+
+  @override
+  String get onlineAerialBackgrounds => 'Fondos en línea y aéreos';
+
+  @override
+  String get onlineWallpaper => 'Fondos en línea';
+
+  @override
+  String get onlineWallpaperDescription =>
+      'Conecta una imagen o video directo, una lista M3U o una fuente JSON tipo Overflight. GoodTV cambia automáticamente entre los elementos.';
+
+  @override
+  String get wallpaperFeedUrl => 'URL de la fuente de fondos';
+
+  @override
+  String get changeBackgroundEvery => 'Cambiar fondo cada';
+
+  @override
+  String get connectWallpaperFeed => 'Conectar fuente de fondos';
+
+  @override
+  String get nextWallpaper => 'Siguiente fondo';
+
+  @override
+  String get disableOnlineWallpaper => 'Desactivar fondos en línea';
+
+  @override
+  String get wallpaperFeedConnected => 'Fuente de fondos conectada';
+
+  @override
+  String get wallpaperFeedError => 'No se pudo cargar esa fuente de fondos';
 }

@@ -240,5 +240,15 @@
     "restore": "Restaurar",
     "cancel": "Cancelar",
     "backupRestored": "Copia restaurada",
-    "restoreFailed": "No se pudo restaurar la copia"
+    "restoreFailed": "No se pudo restaurar la copia",
+    "onlineAerialBackgrounds": "Fondos en línea y aéreos",
+    "onlineWallpaper": "Fondos en línea",
+    "onlineWallpaperDescription": "Conecta una imagen o video directo, una lista M3U o una fuente JSON tipo Overflight. GoodTV cambia automáticamente entre los elementos.",
+    "wallpaperFeedUrl": "URL de la fuente de fondos",
+    "changeBackgroundEvery": "Cambiar fondo cada",
+    "connectWallpaperFeed": "Conectar fuente de fondos",
+    "nextWallpaper": "Siguiente fondo",
+    "disableOnlineWallpaper": "Desactivar fondos en línea",
+    "wallpaperFeedConnected": "Fuente de fondos conectada",
+    "wallpaperFeedError": "No se pudo cargar esa fuente de fondos"
 }

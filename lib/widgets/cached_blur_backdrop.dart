@@ -199,7 +199,8 @@ abstract class _CachedBlurBackgroundState<T extends StatefulWidget>
   Widget build(BuildContext context) {
     final service = context.watch<WallpaperService>();
     // Video wallpapers are not static: keep the live blur.
-    if (service.wallpaperVideoFile != null) {
+    if (service.wallpaperVideoFile != null ||
+        service.wallpaperVideoUrl != null) {
       return buildLiveBlur();
     }
 

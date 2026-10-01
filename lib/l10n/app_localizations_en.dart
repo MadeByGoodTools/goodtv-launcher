@@ -576,4 +576,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreFailed => 'Could not restore the backup';
+
+  @override
+  String get onlineAerialBackgrounds => 'Online & aerial backgrounds';
+
+  @override
+  String get onlineWallpaper => 'Online backgrounds';
+
+  @override
+  String get onlineWallpaperDescription =>
+      'Connect a direct image or video URL, an M3U playlist, or an Overflight-style JSON feed. GoodTV rotates multi-item feeds automatically.';
+
+  @override
+  String get wallpaperFeedUrl => 'Background feed URL';
+
+  @override
+  String get changeBackgroundEvery => 'Change background every';
+
+  @override
+  String get connectWallpaperFeed => 'Connect background feed';
+
+  @override
+  String get nextWallpaper => 'Next background';
+
+  @override
+  String get disableOnlineWallpaper => 'Turn off online backgrounds';
+
+  @override
+  String get wallpaperFeedConnected => 'Background feed connected';
+
+  @override
+  String get wallpaperFeedError => 'Could not load that background feed';
 }

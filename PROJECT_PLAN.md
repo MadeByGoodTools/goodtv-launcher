@@ -33,7 +33,10 @@ feature set. New work is additive and remains GPL-3.0.
    **In progress:** Configure This TV now detects Android/Google TV/Fire TV,
    applies a safe performance-aware profile, checks the current Home app, and
    opens the system-owned default-launcher approval screen.
-7. Add wallpaper providers and polished media-source management.
+7. Add wallpaper providers and polished media-source management. **In
+   progress:** GoodTV now streams direct image/video backgrounds and rotates
+   M3U or Overflight-style JSON feeds, with TV controls for timing, skipping,
+   connecting, and disconnecting sources.
 8. Complete accessibility, performance, migration, and device-compatibility QA.
 
 ## Baseline verification note

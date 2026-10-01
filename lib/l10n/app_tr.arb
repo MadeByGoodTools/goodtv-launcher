@@ -183,5 +183,15 @@
     "restore": "Geri yükle",
     "cancel": "İptal",
     "backupRestored": "Yedek geri yüklendi",
-    "restoreFailed": "Yedek geri yüklenemedi"
+    "restoreFailed": "Yedek geri yüklenemedi",
+    "onlineAerialBackgrounds": "Çevrimiçi ve hava manzaralı arka planlar",
+    "onlineWallpaper": "Çevrimiçi arka planlar",
+    "onlineWallpaperDescription": "Doğrudan resim veya video URL'si, M3U oynatma listesi ya da Overflight biçiminde JSON akışı bağlayın. GoodTV çok öğeli akışları otomatik değiştirir.",
+    "wallpaperFeedUrl": "Arka plan akışı URL'si",
+    "changeBackgroundEvery": "Arka planı değiştirme sıklığı",
+    "connectWallpaperFeed": "Arka plan akışını bağla",
+    "nextWallpaper": "Sonraki arka plan",
+    "disableOnlineWallpaper": "Çevrimiçi arka planları kapat",
+    "wallpaperFeedConnected": "Arka plan akışı bağlandı",
+    "wallpaperFeedError": "Bu arka plan akışı yüklenemedi"
 }

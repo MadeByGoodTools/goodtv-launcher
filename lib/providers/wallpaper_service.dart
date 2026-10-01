@@ -19,12 +19,81 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/gradients.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+
+class RemoteWallpaperItem {
+  final Uri uri;
+  final bool isVideo;
+  final String? title;
+
+  const RemoteWallpaperItem({
+    required this.uri,
+    required this.isVideo,
+    this.title,
+  });
+}
+
+List<RemoteWallpaperItem> parseWallpaperFeed(String body, Uri source) {
+  final trimmed = body.trim();
+  if (trimmed.startsWith('[')) {
+    final decoded = jsonDecode(trimmed) as List<dynamic>;
+    return decoded
+        .whereType<Map>()
+        .map((rawItem) {
+          final item = Map<String, dynamic>.from(rawItem);
+          final url =
+              [
+                item['url_1080p'],
+                item['url_4k'],
+                item['url_1080p_hdr'],
+                item['url_4k_hdr'],
+                item['url_img'],
+                item['url'],
+              ].whereType<String>().firstWhere(
+                (value) => value.trim().isNotEmpty,
+                orElse: () => '',
+              );
+          if (url.isEmpty) return null;
+          final uri = source.resolve(url);
+          return RemoteWallpaperItem(
+            uri: uri,
+            isVideo: _isVideoUri(uri),
+            title: item['title']?.toString(),
+          );
+        })
+        .whereType<RemoteWallpaperItem>()
+        .toList();
+  }
+
+  if (trimmed.startsWith('#EXTM3U') || trimmed.contains('\n')) {
+    return const LineSplitter()
+        .convert(trimmed)
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty && !line.startsWith('#'))
+        .map(source.resolve)
+        .map((uri) => RemoteWallpaperItem(uri: uri, isVideo: _isVideoUri(uri)))
+        .toList();
+  }
+
+  final uri = source.resolve(trimmed);
+  return [RemoteWallpaperItem(uri: uri, isVideo: _isVideoUri(uri))];
+}
+
+bool _isVideoUri(Uri uri) {
+  final path = uri.path.toLowerCase();
+  return path.endsWith('.mp4') ||
+      path.endsWith('.m3u8') ||
+      path.endsWith('.webm') ||
+      path.endsWith('.mkv') ||
+      path.endsWith('.mov');
+}
 
 class WallpaperService extends ChangeNotifier {
   final SettingsService _settingsService;
@@ -38,12 +107,28 @@ class WallpaperService extends ChangeNotifier {
   late File _wallpaperNightVideoFile;
   bool _initialized = false;
   Timer? _timer;
+  Timer? _feedTimer;
   int _wallpaperRevision = 0;
+  List<RemoteWallpaperItem> _remoteItems = const [];
+  int _remoteIndex = 0;
+  String? _lastFeedUrl;
 
   ImageProvider? _wallpaper;
   int get wallpaperRevision => _wallpaperRevision;
 
   ImageProvider? get wallpaper => _wallpaper;
+
+  String? get wallpaperVideoUrl {
+    if (_remoteItems.isEmpty) return null;
+    final item = _remoteItems[_remoteIndex % _remoteItems.length];
+    return item.isVideo ? item.uri.toString() : null;
+  }
+
+  bool get remoteFeedEnabled => _settingsService.wallpaperFeedUrl != null;
+
+  String? get remoteWallpaperTitle => _remoteItems.isEmpty
+      ? null
+      : _remoteItems[_remoteIndex % _remoteItems.length].title;
 
   File? get wallpaperVideoFile {
     final f = _resolveActiveVideoFile();
@@ -69,12 +154,19 @@ class WallpaperService extends ChangeNotifier {
       _updateTimerState();
       _updateWallpaper();
     }
+    final feedUrl = _settingsService.wallpaperFeedUrl;
+    if (feedUrl != _lastFeedUrl) {
+      _loadRemoteFeed().catchError((Object error) {
+        debugPrint('Wallpaper feed refresh failed: $error');
+      });
+    }
   }
 
   @override
   void dispose() {
     _settingsService.removeListener(_onSettingsChanged);
     _timer?.cancel();
+    _feedTimer?.cancel();
     super.dispose();
   }
 
@@ -91,6 +183,12 @@ class WallpaperService extends ChangeNotifier {
     _lastTimeBasedEnabled = _settingsService.timeBasedWallpaperEnabled;
     _updateWallpaper();
     _updateTimerState();
+    try {
+      await _loadRemoteFeed();
+    } catch (error) {
+      debugPrint('Saved wallpaper feed could not be loaded: $error');
+      _updateWallpaper(force: true);
+    }
   }
 
   Future<void> reloadFromStorage() async {
@@ -114,6 +212,92 @@ class WallpaperService extends ChangeNotifier {
       _timer?.cancel();
       _timer = null;
     }
+  }
+
+  Future<void> configureRemoteFeed(String url, int intervalMinutes) async {
+    final normalizedUrl = url.trim();
+    final uri = Uri.tryParse(normalizedUrl);
+    if (uri == null ||
+        !uri.hasScheme ||
+        !{'http', 'https'}.contains(uri.scheme)) {
+      throw const FormatException('Use a valid HTTP or HTTPS URL');
+    }
+    final items = await _fetchRemoteItems(uri);
+    if (items.isEmpty) throw StateError('No wallpapers found');
+
+    _lastFeedUrl = normalizedUrl;
+    _remoteItems = items;
+    _remoteIndex = 0;
+    await _settingsService.setWallpaperFeed(normalizedUrl, intervalMinutes);
+    _startFeedTimer();
+    _updateWallpaper(force: true);
+  }
+
+  Future<void> disableRemoteFeed() async {
+    _feedTimer?.cancel();
+    _feedTimer = null;
+    _remoteItems = const [];
+    _remoteIndex = 0;
+    await _settingsService.setWallpaperFeed(null, 15);
+    _updateWallpaper(force: true);
+  }
+
+  Future<void> nextRemoteWallpaper() async {
+    if (_remoteItems.length < 2) return;
+    _remoteIndex = (_remoteIndex + 1) % _remoteItems.length;
+    _updateWallpaper(force: true);
+  }
+
+  Future<void> _loadRemoteFeed({bool force = false}) async {
+    final feedUrl = _settingsService.wallpaperFeedUrl;
+    if (!force && feedUrl == _lastFeedUrl) return;
+    _lastFeedUrl = feedUrl;
+    _feedTimer?.cancel();
+    _feedTimer = null;
+    _remoteItems = const [];
+    _remoteIndex = 0;
+    if (feedUrl == null || feedUrl.isEmpty) {
+      _updateWallpaper(force: true);
+      return;
+    }
+
+    final source = Uri.parse(feedUrl);
+    _remoteItems = await _fetchRemoteItems(source);
+    _startFeedTimer();
+    _updateWallpaper(force: true);
+  }
+
+  Future<List<RemoteWallpaperItem>> _fetchRemoteItems(Uri source) async {
+    if (_isVideoUri(source) || _isImageUri(source)) {
+      return [RemoteWallpaperItem(uri: source, isVideo: _isVideoUri(source))];
+    }
+    final response = await http
+        .get(source)
+        .timeout(const Duration(seconds: 15));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw HttpException('Wallpaper feed returned ${response.statusCode}');
+    }
+    return parseWallpaperFeed(response.body, source);
+  }
+
+  void _startFeedTimer() {
+    _feedTimer?.cancel();
+    _feedTimer = null;
+    if (_remoteItems.length > 1) {
+      _feedTimer = Timer.periodic(
+        Duration(minutes: _settingsService.wallpaperFeedIntervalMinutes),
+        (_) => nextRemoteWallpaper(),
+      );
+    }
+  }
+
+  static bool _isImageUri(Uri uri) {
+    final path = uri.path.toLowerCase();
+    return path.endsWith('.jpg') ||
+        path.endsWith('.jpeg') ||
+        path.endsWith('.png') ||
+        path.endsWith('.webp') ||
+        path.endsWith('.gif');
   }
 
   File? _resolveActiveVideoFile() {
@@ -147,10 +331,17 @@ class WallpaperService extends ChangeNotifier {
     final enabled = _settingsService.timeBasedWallpaperEnabled;
 
     final videoFile = _resolveActiveVideoFile();
+    final remoteItem = _remoteItems.isEmpty
+        ? null
+        : _remoteItems[_remoteIndex % _remoteItems.length];
 
     ImageProvider? newWallpaper;
 
-    if (videoFile != null) {
+    if (remoteItem != null && remoteItem.isVideo) {
+      newWallpaper = null;
+    } else if (remoteItem != null) {
+      newWallpaper = NetworkImage(remoteItem.uri.toString());
+    } else if (videoFile != null) {
       newWallpaper = null;
     } else if (enabled) {
       if (isDay && _wallpaperDayFile.existsSync()) {
@@ -164,7 +355,10 @@ class WallpaperService extends ChangeNotifier {
       newWallpaper = FileImage(_wallpaperFile);
     }
 
-    if (_wallpaper != newWallpaper || videoFile != null || force) {
+    if (_wallpaper != newWallpaper ||
+        videoFile != null ||
+        remoteItem?.isVideo == true ||
+        force) {
       _wallpaper = newWallpaper;
       _wallpaperRevision++;
       notifyListeners();
@@ -172,10 +366,12 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> pickWallpaper(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveImage(sourceFile, _wallpaperFile);
   }
 
   Future<void> pickWallpaperFromUri(String sourceUri) async {
+    await disableRemoteFeed();
     await _saveImageBytes(
       await _channel.loadContentUriImage(sourceUri),
       _wallpaperFile,
@@ -183,10 +379,12 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> pickWallpaperDay(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveImage(sourceFile, _wallpaperDayFile);
   }
 
   Future<void> pickWallpaperDayFromUri(String sourceUri) async {
+    await disableRemoteFeed();
     await _saveImageBytes(
       await _channel.loadContentUriImage(sourceUri),
       _wallpaperDayFile,
@@ -194,10 +392,12 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> pickWallpaperNight(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveImage(sourceFile, _wallpaperNightFile);
   }
 
   Future<void> pickWallpaperNightFromUri(String sourceUri) async {
+    await disableRemoteFeed();
     await _saveImageBytes(
       await _channel.loadContentUriImage(sourceUri),
       _wallpaperNightFile,
@@ -205,14 +405,17 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> pickVideoWallpaper(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveVideo(sourceFile, _wallpaperVideoFile);
   }
 
   Future<void> pickVideoWallpaperDay(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveVideo(sourceFile, _wallpaperDayVideoFile);
   }
 
   Future<void> pickVideoWallpaperNight(File sourceFile) async {
+    await disableRemoteFeed();
     await _saveVideo(sourceFile, _wallpaperNightVideoFile);
   }
 
@@ -275,6 +478,7 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> setGradient(FLauncherGradient fLauncherGradient) async {
+    await disableRemoteFeed();
     await cleanImageWallpaperFiles();
     await cleanVideoWallpaperFiles();
 

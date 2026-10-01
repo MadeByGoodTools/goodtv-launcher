@@ -1167,6 +1167,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not restore the backup'**
   String get restoreFailed;
+
+  /// No description provided for @onlineAerialBackgrounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Online & aerial backgrounds'**
+  String get onlineAerialBackgrounds;
+
+  /// No description provided for @onlineWallpaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Online backgrounds'**
+  String get onlineWallpaper;
+
+  /// No description provided for @onlineWallpaperDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect a direct image or video URL, an M3U playlist, or an Overflight-style JSON feed. GoodTV rotates multi-item feeds automatically.'**
+  String get onlineWallpaperDescription;
+
+  /// No description provided for @wallpaperFeedUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Background feed URL'**
+  String get wallpaperFeedUrl;
+
+  /// No description provided for @changeBackgroundEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Change background every'**
+  String get changeBackgroundEvery;
+
+  /// No description provided for @connectWallpaperFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect background feed'**
+  String get connectWallpaperFeed;
+
+  /// No description provided for @nextWallpaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Next background'**
+  String get nextWallpaper;
+
+  /// No description provided for @disableOnlineWallpaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off online backgrounds'**
+  String get disableOnlineWallpaper;
+
+  /// No description provided for @wallpaperFeedConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Background feed connected'**
+  String get wallpaperFeedConnected;
+
+  /// No description provided for @wallpaperFeedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load that background feed'**
+  String get wallpaperFeedError;
 }
 
 class _AppLocalizationsDelegate

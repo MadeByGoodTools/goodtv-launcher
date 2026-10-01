@@ -24,6 +24,7 @@ import 'package:goodtv_launcher/widgets/settings/launcher_section_panel_page.dar
 import 'package:goodtv_launcher/widgets/settings/settings_panel_page.dart';
 import 'package:goodtv_launcher/widgets/settings/status_bar_panel_page.dart';
 import 'package:goodtv_launcher/widgets/settings/wallpaper_panel_page.dart';
+import 'package:goodtv_launcher/widgets/settings/online_wallpaper_page.dart';
 import 'package:goodtv_launcher/widgets/settings/wifi_usage_period_page.dart';
 import 'package:goodtv_launcher/widgets/settings/back_button_action_page.dart';
 import 'package:goodtv_launcher/widgets/settings/date_time_format_page.dart';
@@ -104,6 +105,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     case WallpaperPanelPage.routeName:
                       return _FastPageRoute(
                         builder: (_) => WallpaperPanelPage(),
+                      );
+                    case OnlineWallpaperPage.routeName:
+                      return _FastPageRoute(
+                        builder: (_) => const OnlineWallpaperPage(),
                       );
                     case StatusBarPanelPage.routeName:
                       return _FastPageRoute(

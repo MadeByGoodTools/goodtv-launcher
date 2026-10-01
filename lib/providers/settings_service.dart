@@ -50,6 +50,8 @@ const String _displayPreset = "display_preset";
 const String _appCardCornerStyle = "app_card_corner_style";
 const String _appCardFocusZoom = "app_card_focus_zoom";
 const String _appCardSpacing = "app_card_spacing";
+const String _wallpaperFeedUrl = "wallpaper_feed_url";
+const String _wallpaperFeedIntervalMinutes = "wallpaper_feed_interval_minutes";
 
 enum DisplayPreset { cinema, compact, easyRead }
 
@@ -208,6 +210,12 @@ class SettingsService extends ChangeNotifier {
     AppCardSpacing.balanced => 9,
     AppCardSpacing.roomy => 14,
   };
+
+  String? get wallpaperFeedUrl =>
+      _sharedPreferences.getString(_wallpaperFeedUrl);
+
+  int get wallpaperFeedIntervalMinutes =>
+      _sharedPreferences.getInt(_wallpaperFeedIntervalMinutes) ?? 15;
 
   Color get accentColor {
     final hex = accentColorHex;
@@ -369,6 +377,19 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setAppCardSpacing(AppCardSpacing spacing) async {
     await _sharedPreferences.setString(_appCardSpacing, spacing.name);
+    notifyListeners();
+  }
+
+  Future<void> setWallpaperFeed(String? url, int intervalMinutes) async {
+    if (url == null || url.trim().isEmpty) {
+      await _sharedPreferences.remove(_wallpaperFeedUrl);
+    } else {
+      await _sharedPreferences.setString(_wallpaperFeedUrl, url.trim());
+    }
+    await _sharedPreferences.setInt(
+      _wallpaperFeedIntervalMinutes,
+      intervalMinutes.clamp(1, 1440),
+    );
     notifyListeners();
   }
 

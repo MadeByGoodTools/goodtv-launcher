@@ -22,6 +22,7 @@ import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:goodtv_launcher/widgets/settings/focusable_settings_tile.dart';
 import 'package:goodtv_launcher/widgets/settings/gradient_panel_page.dart';
+import 'package:goodtv_launcher/widgets/settings/online_wallpaper_page.dart';
 import 'package:goodtv_launcher/widgets/tv_media_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,14 @@ class WallpaperPanelPage extends StatelessWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         Divider(),
+        FocusableSettingsTile(
+          autofocus: true,
+          leading: const Icon(Icons.public),
+          title: Text(localizations.onlineAerialBackgrounds),
+          trailing: const Icon(Icons.chevron_right),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(OnlineWallpaperPage.routeName),
+        ),
         Consumer<SettingsService>(
           builder: (_, settings, __) {
             return RoundedSwitchListTile(
@@ -101,7 +110,6 @@ class WallpaperPanelPage extends StatelessWidget {
               return Column(
                 children: [
                   FocusableSettingsTile(
-                    autofocus: true,
                     leading: Icon(Icons.gradient),
                     title: Text(
                       localizations.gradient,

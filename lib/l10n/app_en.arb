@@ -240,5 +240,15 @@
     "restore": "Restore",
     "cancel": "Cancel",
     "backupRestored": "Backup restored",
-    "restoreFailed": "Could not restore the backup"
+    "restoreFailed": "Could not restore the backup",
+    "onlineAerialBackgrounds": "Online & aerial backgrounds",
+    "onlineWallpaper": "Online backgrounds",
+    "onlineWallpaperDescription": "Connect a direct image or video URL, an M3U playlist, or an Overflight-style JSON feed. GoodTV rotates multi-item feeds automatically.",
+    "wallpaperFeedUrl": "Background feed URL",
+    "changeBackgroundEvery": "Change background every",
+    "connectWallpaperFeed": "Connect background feed",
+    "nextWallpaper": "Next background",
+    "disableOnlineWallpaper": "Turn off online backgrounds",
+    "wallpaperFeedConnected": "Background feed connected",
+    "wallpaperFeedError": "Could not load that background feed"
 }

@@ -108,7 +108,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
             selector: (_, launcherState, settings, wallpaperService) => (
               launcherState.appGridFocused,
               settings.backgroundBlurDisabled,
-              wallpaperService.wallpaperVideoFile != null,
+              wallpaperService.wallpaperVideoFile != null ||
+                  wallpaperService.wallpaperVideoUrl != null,
             ),
             builder: (_, data, __) {
               final (appGridFocused, blurDisabled, hasVideoWallpaper) = data;
@@ -591,16 +592,29 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   Widget _wallpaper(BuildContext context, WallpaperService wallpaperService) {
     final screenSize = MediaQuery.sizeOf(context);
     final dpr = MediaQuery.devicePixelRatioOf(context);
+    final videoUrl = wallpaperService.wallpaperVideoUrl;
+    if (videoUrl != null) {
+      return SizedBox(
+        width: screenSize.width,
+        height: screenSize.height,
+        child: WallpaperVideoBackground.network(
+          videoUrl,
+          key: ValueKey(
+            "background_network_video_${wallpaperService.wallpaperRevision}",
+          ),
+        ),
+      );
+    }
     final videoFile = wallpaperService.wallpaperVideoFile;
     if (videoFile != null) {
       return SizedBox(
         width: screenSize.width,
         height: screenSize.height,
-        child: WallpaperVideoBackground(
+        child: WallpaperVideoBackground.file(
+          videoFile,
           key: ValueKey(
             "background_video_${wallpaperService.wallpaperRevision}",
           ),
-          file: videoFile,
         ),
       );
     }
