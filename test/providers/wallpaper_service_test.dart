@@ -41,8 +41,7 @@ void main() {
 
   test("pickWallpaper saves source file", () async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    final settingsService = MockSettingsService();
-    when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+    final settingsService = _mockSettingsService();
     final wallpaperService = WallpaperService(settingsService);
     await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
 
@@ -73,8 +72,7 @@ void main() {
     });
     addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
 
-    final settingsService = MockSettingsService();
-    when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+    final settingsService = _mockSettingsService();
     final wallpaperService = WallpaperService(settingsService);
     await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
     addTearDown(() async {
@@ -90,8 +88,7 @@ void main() {
   });
 
   test("setGradient", () async {
-    final settingsService = MockSettingsService();
-    when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+    final settingsService = _mockSettingsService();
     final wallpaperService = WallpaperService(settingsService);
 
     await untilCalled(pathProviderPlatform.getApplicationDocumentsPath());
@@ -103,8 +100,7 @@ void main() {
 
   group("getGradient", () {
     test("without uuid from settings", () async {
-      final settingsService = MockSettingsService();
-      when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+      final settingsService = _mockSettingsService();
       final wallpaperService = WallpaperService(settingsService);
       when(settingsService.gradientUuid).thenReturn(null);
 
@@ -115,8 +111,7 @@ void main() {
     });
 
     test("with uuid from settings", () async {
-      final settingsService = MockSettingsService();
-      when(settingsService.timeBasedWallpaperEnabled).thenReturn(false);
+      final settingsService = _mockSettingsService();
       final wallpaperService = WallpaperService(settingsService);
       when(
         settingsService.gradientUuid,
@@ -128,6 +123,13 @@ void main() {
       expect(gradient, FLauncherGradients.grassShampoo);
     });
   });
+}
+
+MockSettingsService _mockSettingsService() {
+  final settings = MockSettingsService();
+  when(settings.timeBasedWallpaperEnabled).thenReturn(false);
+  when(settings.wallpaperFeedUrl).thenReturn(null);
+  return settings;
 }
 
 class _MockPathProviderPlatform extends Mock

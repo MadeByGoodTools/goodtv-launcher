@@ -234,11 +234,14 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> disableRemoteFeed() async {
+    final wasEnabled = _settingsService.wallpaperFeedUrl != null;
     _feedTimer?.cancel();
     _feedTimer = null;
     _remoteItems = const [];
     _remoteIndex = 0;
-    await _settingsService.setWallpaperFeed(null, 15);
+    if (wasEnabled) {
+      await _settingsService.setWallpaperFeed(null, 15);
+    }
     _updateWallpaper(force: true);
   }
 
