@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:goodtv_launcher/flauncher_channel.dart';
 
 import '../providers/launcher_state.dart';
+import '../providers/network_service.dart';
 import '../providers/settings_service.dart';
 import '../models/category.dart';
 import 'daily_wifi_usage_widget.dart';
@@ -55,15 +56,26 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
   Widget build(BuildContext context) {
     return Selector<SettingsService, bool>(
       selector: (_, settings) => settings.autoHideAppBarEnabled,
-      builder: (context, autoHide, widget) {
+      builder: (context, autoHide, appBar) {
         if (autoHide) {
           return Focus(
             canRequestFocus: false,
-            child: AnimatedContainer(
-              curve: Curves.decelerate,
-              duration: Duration(milliseconds: 150),
-              height: focused ? kToolbarHeight : 0,
-              child: widget!,
+            child: SizedBox(
+              // Keep the toolbar's layout extent fixed. Only its pixels move,
+              // so Watch Next and the Dock never jump when it auto-hides.
+              height: kToolbarHeight,
+              child: ClipRect(
+                child: AnimatedSlide(
+                  offset: focused ? Offset.zero : const Offset(0, -1),
+                  curve: Curves.decelerate,
+                  duration: const Duration(milliseconds: 150),
+                  child: AnimatedOpacity(
+                    opacity: focused ? 1 : 0,
+                    duration: const Duration(milliseconds: 120),
+                    child: appBar!,
+                  ),
+                ),
+              ),
             ),
             onFocusChange: (hasFocus) {
               if (hasFocus) {
@@ -76,7 +88,7 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
           );
         }
 
-        return widget!;
+        return appBar!;
       },
       child: RepaintBoundary(
         child: AppBar(
@@ -220,128 +232,24 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
 }
 
 Future<void> _showAppSearch(BuildContext context) async {
-  var typedQuery = '';
-  const keys = <String>[
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z',
-    '0',
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-  ];
-  final query = await showDialog<String>(
-    context: context,
-    builder: (dialogContext) => StatefulBuilder(
-      builder: (context, setDialogState) => AlertDialog(
-        title: const Text('Search apps'),
-        content: SizedBox(
-          width: 620,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  typedQuery.isEmpty ? 'Choose letters below' : typedQuery,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: typedQuery.isEmpty ? Colors.white54 : Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              FocusTraversalGroup(
-                policy: ReadingOrderTraversalPolicy(),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (var index = 0; index < keys.length; index++)
-                      SizedBox(
-                        width: 52,
-                        height: 42,
-                        child: FilledButton.tonal(
-                          autofocus: index == 0,
-                          onPressed: () =>
-                              setDialogState(() => typedQuery += keys[index]),
-                          child: Text(keys[index]),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+  try {
+    final opened = await FLauncherChannel().searchAppstore('');
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No compatible app store was found on this device.'),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton.icon(
-            onPressed: typedQuery.isEmpty
-                ? null
-                : () => setDialogState(() {
-                    typedQuery = typedQuery.substring(0, typedQuery.length - 1);
-                  }),
-            icon: const Icon(Icons.backspace_outlined),
-            label: const Text('Delete'),
-          ),
-          TextButton(
-            onPressed: () => setDialogState(() => typedQuery += ' '),
-            child: const Text('Space'),
-          ),
-          FilledButton.icon(
-            onPressed: typedQuery.trim().isEmpty
-                ? null
-                : () => Navigator.of(dialogContext).pop(typedQuery.trim()),
-            icon: const Icon(Icons.storefront_outlined),
-            label: const Text('Find & install'),
-          ),
-        ],
-      ),
-    ),
-  );
-  if (query == null || query.isEmpty) return;
-  await FLauncherChannel().searchAppstore(query);
+      );
+    }
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Search could not open. Please try again.'),
+        ),
+      );
+    }
+  }
 }
 
 class _CategoryButton extends StatelessWidget {
@@ -465,33 +373,44 @@ class _FocusableNetworkWidgetState extends State<_FocusableNetworkWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onFocusChange: (hasFocus) {
-        if (hasFocus) {
-          context.read<LauncherState>().setAppGridFocused(false);
-        }
-        setState(() => _focused = hasFocus);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: _focused
-              ? Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
-                )
-              : null,
-          boxShadow: _focused
-              ? const [
-                  BoxShadow(
-                    color: Colors.black54,
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
+    void openNetworks() => context.read<NetworkService>().openWifiSettings();
+    return Actions(
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) => openNetworks(),
         ),
-        child: const NetworkWidget(),
+        ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+          onInvoke: (_) => openNetworks(),
+        ),
+      },
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          if (hasFocus) {
+            context.read<LauncherState>().setAppGridFocused(false);
+          }
+          setState(() => _focused = hasFocus);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: _focused
+                ? Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  )
+                : null,
+            boxShadow: _focused
+                ? const [
+                    BoxShadow(
+                      color: Colors.black54,
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+          child: NetworkWidget(onPressed: openNetworks),
+        ),
       ),
     );
   }

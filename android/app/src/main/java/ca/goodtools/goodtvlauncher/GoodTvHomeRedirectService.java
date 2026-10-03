@@ -12,6 +12,7 @@ import android.view.accessibility.AccessibilityEvent;
 public class GoodTvHomeRedirectService extends AccessibilityService {
     static final String PREFS = "goodtv_home_redirect";
     static final String ENABLED = "enabled";
+    static final String BYPASS_UNTIL = "bypass_until";
     private static final long ESCAPE_WINDOW_MS = 1600;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private long lastRedirectAt;
@@ -41,6 +42,9 @@ public class GoodTvHomeRedirectService extends AccessibilityService {
                 (pkg.equals("com.amazon.tv.launcher") && (cls.contains("HomeActivity") || cls.contains("NavigationActivity")));
         if (!amazonHome) return;
         long now = System.currentTimeMillis();
+        if (now < getSharedPreferences(PREFS, MODE_PRIVATE).getLong(BYPASS_UNTIL, 0)) {
+            return;
+        }
         if (now - lastRedirectAt <= ESCAPE_WINDOW_MS) {
             lastRedirectAt = 0;
             return;

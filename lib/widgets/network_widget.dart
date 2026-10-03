@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class NetworkWidget extends StatelessWidget {
-  const NetworkWidget({super.key});
+  final VoidCallback? onPressed;
+
+  const NetworkWidget({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +81,7 @@ class NetworkWidget extends StatelessWidget {
         }
 
         return InkWell(
-          onTap: () => networkService.openWifiSettings(),
+          onTap: onPressed ?? () => networkService.openWifiSettings(),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.all(4.0),

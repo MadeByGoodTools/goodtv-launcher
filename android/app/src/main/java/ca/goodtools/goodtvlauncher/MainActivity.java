@@ -447,17 +447,53 @@ public class MainActivity extends FlutterActivity {
 
     private boolean searchAppstore(String query) {
         String normalized = query == null ? "" : query.trim();
-        if (normalized.isEmpty()) {
-            return launchApp("cm.aptoidetv.pt");
+
+        // Aptoide TV exposes a dedicated TV search activity and avoids routing
+        // through Fire OS Home (which crashes on some Fire OS 8 builds).
+        if (!normalized.isEmpty()) {
+            Intent aptoideSearch = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("aptoidesearch://" + Uri.encode(normalized))
+            ).setPackage("cm.aptoidetv.pt").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (tryStartActivity(aptoideSearch)) {
+                return true;
+            }
+        } else {
+            Intent aptoideHome = getPackageManager()
+                    .getLeanbackLaunchIntentForPackage("cm.aptoidetv.pt");
+            if (aptoideHome != null) {
+                aptoideHome.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                if (tryStartActivity(aptoideHome)) {
+                    return true;
+                }
+            }
         }
-        Intent searchIntent = new Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("aptoidesearch://" + Uri.encode(normalized))
-        ).setPackage("cm.aptoidetv.pt").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (tryStartActivity(searchIntent)) {
-            return true;
+
+        boolean isFireTv = Build.MANUFACTURER != null
+                && Build.MANUFACTURER.equalsIgnoreCase("Amazon");
+        if (isFireTv) {
+            // Amazon routes Appstore search through a launcher-owned activity.
+            // Briefly exempt that intentional navigation from our Home redirect.
+            getSharedPreferences(GoodTvHomeRedirectService.PREFS, MODE_PRIVATE)
+                    .edit()
+                    .putLong(GoodTvHomeRedirectService.BYPASS_UNTIL,
+                            System.currentTimeMillis() + 8000)
+                    .apply();
+            Intent amazonSearch = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("amzn://apps/android?s=" + Uri.encode(normalized))
+            ).setPackage("com.amazon.venezia").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (tryStartActivity(amazonSearch)) {
+                return true;
+            }
+            if (launchApp("com.amazon.venezia")) {
+                return true;
+            }
         }
-        return launchApp("cm.aptoidetv.pt");
+
+        return false;
     }
 
     private boolean openSettings() {
@@ -782,7 +818,16 @@ public class MainActivity extends FlutterActivity {
     }
 
     private boolean openWifiSettings() {
-        // 1. Try Android Q+ WiFi panel
+        // Fire OS resolves the Android Wi-Fi panel action to a no-op CTS
+        // activity. Open its real TV network picker instead.
+        boolean isFireTv = Build.MANUFACTURER != null
+                && Build.MANUFACTURER.equalsIgnoreCase("Amazon");
+        if (isFireTv) {
+            Intent fireTvWifi = new Intent(Settings.ACTION_WIFI_SETTINGS);
+            if (tryStartActivity(fireTvWifi)) return true;
+        }
+
+        // Standard Android Q+ Wi-Fi panel keeps the picker over the launcher.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
             if (tryStartActivity(panelIntent)) {

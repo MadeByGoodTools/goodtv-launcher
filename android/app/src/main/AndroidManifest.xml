@@ -51,6 +51,7 @@
 
     <queries>
         <package android:name="cm.aptoidetv.pt" />
+        <package android:name="com.amazon.venezia" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
         </intent>
