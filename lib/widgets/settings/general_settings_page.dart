@@ -17,7 +17,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import 'focusable_settings_tile.dart';
 import 'brightness_settings_page.dart';
@@ -86,14 +85,6 @@ class GeneralSettingsPage extends StatelessWidget {
                     localizations.screensaverSettings,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  onPressed: () => _openScreensaverSettings(),
-                ),
-                FocusableSettingsTile(
-                  leading: const Icon(Icons.watch_later_outlined),
-                  title: Text(
-                    localizations.screensaverClockStyle,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
                   onPressed: () => Navigator.of(
                     context,
                   ).pushNamed(ScreensaverClockStylePage.routeName),
@@ -144,10 +135,5 @@ class GeneralSettingsPage extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Future<void> _openScreensaverSettings() async {
-    const platform = MethodChannel('me.efesser.flauncher/method');
-    platform.invokeMethod('openScreensaverSettings');
   }
 }

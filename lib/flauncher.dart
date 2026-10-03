@@ -99,6 +99,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   _wallpaper(context, wallpaperService),
             ),
           ),
+          const Positioned.fill(
+            child: IgnorePointer(child: ColoredBox(color: Color(0x66000000))),
+          ),
           Selector3<
             LauncherState,
             SettingsService,
@@ -453,8 +456,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
 
     await _scrollController.animateTo(
       targetOffset,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeInOutCubic,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
     );
   }
 

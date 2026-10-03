@@ -393,6 +393,9 @@ public class MainActivity extends FlutterActivity {
         appMap.put("packageName", activityInfo.packageName);
         appMap.put("version", applicationVersionName);
         appMap.put("sideloaded", sideloaded);
+        int appFlags = activityInfo.applicationInfo.flags;
+        appMap.put("systemApp", (appFlags & (ApplicationInfo.FLAG_SYSTEM |
+                ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0);
 
         if (action != null) {
             appMap.put("action", action);
@@ -585,46 +588,16 @@ public class MainActivity extends FlutterActivity {
     }
 
     private long getDailyWifiUsage() {
-        if (!checkUsageStatsPermission()) {
-            return -1;
-        }
-
-        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
-        if (networkStatsManager == null)
-            return 0;
-
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
         calendar.set(java.util.Calendar.MINUTE, 0);
         calendar.set(java.util.Calendar.SECOND, 0);
         calendar.set(java.util.Calendar.MILLISECOND, 0);
         long startTime = calendar.getTimeInMillis();
-        long endTime = System.currentTimeMillis();
-
-        long totalBytes = 0;
-        try {
-            NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
-                    NetworkCapabilities.TRANSPORT_WIFI,
-                    "",
-                    startTime,
-                    endTime);
-            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        return totalBytes;
+        return getWifiUsageSince(startTime);
     }
 
     private long getWeeklyWifiUsage() {
-        if (!checkUsageStatsPermission()) {
-            return -1;
-        }
-
-        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
-        if (networkStatsManager == null)
-            return 0;
-
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.set(java.util.Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
         calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
@@ -632,32 +605,10 @@ public class MainActivity extends FlutterActivity {
         calendar.set(java.util.Calendar.SECOND, 0);
         calendar.set(java.util.Calendar.MILLISECOND, 0);
         long startTime = calendar.getTimeInMillis();
-        long endTime = System.currentTimeMillis();
-
-        long totalBytes = 0;
-        try {
-            NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
-                    NetworkCapabilities.TRANSPORT_WIFI,
-                    "",
-                    startTime,
-                    endTime);
-            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        return totalBytes;
+        return getWifiUsageSince(startTime);
     }
 
     private long getMonthlyWifiUsage() {
-        if (!checkUsageStatsPermission()) {
-            return -1;
-        }
-
-        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
-        if (networkStatsManager == null)
-            return 0;
-
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.set(java.util.Calendar.DAY_OF_MONTH, 1);
         calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
@@ -665,28 +616,45 @@ public class MainActivity extends FlutterActivity {
         calendar.set(java.util.Calendar.SECOND, 0);
         calendar.set(java.util.Calendar.MILLISECOND, 0);
         long startTime = calendar.getTimeInMillis();
-        long endTime = System.currentTimeMillis();
+        return getWifiUsageSince(startTime);
+    }
 
-        long totalBytes = 0;
+    private long getWifiUsageSince(long startTime) {
         try {
+            if (!hasDetailedUsageStatsPermission()) return getTrafficSinceBoot();
+            NetworkStatsManager networkStatsManager =
+                    (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
+            if (networkStatsManager == null) return getTrafficSinceBoot();
             NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
-                    NetworkCapabilities.TRANSPORT_WIFI,
-                    "",
+                    android.net.ConnectivityManager.TYPE_WIFI,
+                    null,
                     startTime,
-                    endTime);
-            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+                    System.currentTimeMillis());
+            return bucket.getRxBytes() + bucket.getTxBytes();
+        } catch (Exception error) {
+            android.util.Log.w("MainActivity", "Using network total since restart", error);
+            return getTrafficSinceBoot();
         }
-
-        return totalBytes;
     }
 
     private boolean checkUsageStatsPermission() {
+        return hasDetailedUsageStatsPermission() || getTrafficSinceBoot() >= 0;
+    }
+
+    private boolean hasDetailedUsageStatsPermission() {
         AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+        if (appOps == null) return false;
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+    private long getTrafficSinceBoot() {
+        long received = android.net.TrafficStats.getTotalRxBytes();
+        long sent = android.net.TrafficStats.getTotalTxBytes();
+        if (received == android.net.TrafficStats.UNSUPPORTED ||
+                sent == android.net.TrafficStats.UNSUPPORTED) return -1;
+        return received + sent;
     }
 
     private void requestUsageStatsPermission() {

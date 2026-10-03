@@ -15,6 +15,12 @@ class OnlineWallpaperPage extends StatefulWidget {
 }
 
 class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
+  static const _redditPresets = <String, String>{
+    'Earth & landscapes': 'EarthPorn',
+    'Space': 'spaceporn',
+    'City views': 'CityPorn',
+    'Cozy rooms': 'CozyPlaces',
+  };
   late final TextEditingController _urlController;
   late int _intervalMinutes;
   bool _saving = false;
@@ -45,6 +51,25 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
           child: Text(l.onlineWallpaperDescription),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: _redditPresets.entries
+                .map(
+                  (preset) => ActionChip(
+                    avatar: const Icon(Icons.reddit, size: 20),
+                    label: Text('Reddit: ${preset.key}'),
+                    onPressed: () {
+                      _urlController.text =
+                          'https://www.reddit.com/r/${preset.value}/.rss?limit=50';
+                    },
+                  ),
+                )
+                .toList(),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

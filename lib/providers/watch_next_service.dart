@@ -17,14 +17,17 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/models/watch_next_item.dart';
+import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:http/http.dart' as http;
 
 class WatchNextService extends ChangeNotifier {
   final FLauncherChannel _fLauncherChannel;
+  final SettingsService _settingsService;
 
   List<WatchNextItem> _items = [];
   bool _isLoading = false;
@@ -43,7 +46,7 @@ class WatchNextService extends ChangeNotifier {
   bool get hasVisibleSection =>
       !_isLoading && (!_hasPermission || _items.isNotEmpty);
 
-  WatchNextService(this._fLauncherChannel) {
+  WatchNextService(this._fLauncherChannel, this._settingsService) {
     _init();
   }
 
@@ -81,7 +84,9 @@ class WatchNextService extends ChangeNotifier {
 
   Future<void> refreshPermissionAndItems() async {
     await checkPermission();
-    if (_hasPermission) {
+    if (_hasPermission ||
+        _settingsService.jellyfinConfigured ||
+        _settingsService.continueWatchingFeedUrl != null) {
       await refreshItems();
     } else {
       _items = [];
@@ -92,7 +97,9 @@ class WatchNextService extends ChangeNotifier {
   Future<void> refreshItems() async {
     if (_isLoading) return;
 
-    if (!_hasPermission) {
+    if (!_hasPermission &&
+        !_settingsService.jellyfinConfigured &&
+        _settingsService.continueWatchingFeedUrl == null) {
       await checkPermission();
       if (!_hasPermission) {
         _items = [];
@@ -105,8 +112,29 @@ class WatchNextService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await _fLauncherChannel.getWatchNextItems();
-      _items = results.map((map) => WatchNextItem.fromMap(map)).toList();
+      final nativeFuture = _hasPermission
+          ? _fLauncherChannel.getWatchNextItems()
+          : Future.value(<Map<dynamic, dynamic>>[]);
+      final jellyfinFuture = _loadJellyfinResumeItems();
+      final feedFuture = _loadContinueWatchingFeed();
+      final results = await Future.wait([
+        nativeFuture,
+        jellyfinFuture,
+        feedFuture,
+      ]);
+      final nativeItems = (results[0] as List).map(
+        (map) => WatchNextItem.fromMap(map as Map<dynamic, dynamic>),
+      );
+      final jellyfinItems = results[1] as List<WatchNextItem>;
+      final feedItems = results[2] as List<WatchNextItem>;
+      final seen = <String>{};
+      _items = [...jellyfinItems, ...feedItems, ...nativeItems]
+          .where(
+            (item) =>
+                seen.add('${item.packageName}:${item.contentId}:${item.title}'),
+          )
+          .take(20)
+          .toList(growable: false);
 
       unawaited(_preloadInitialPosters());
     } catch (e) {
@@ -116,6 +144,111 @@ class WatchNextService extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<List<WatchNextItem>> _loadContinueWatchingFeed() async {
+    final feedUrl = _settingsService.continueWatchingFeedUrl;
+    if (feedUrl == null) return const [];
+    try {
+      final response = await http
+          .get(Uri.parse(feedUrl))
+          .timeout(const Duration(seconds: 7));
+      if (response.statusCode != 200) return const [];
+      final payload = jsonDecode(response.body);
+      final entries = payload is List
+          ? payload
+          : payload is Map && payload['items'] is List
+          ? payload['items'] as List
+          : const [];
+      return entries
+          .whereType<Map>()
+          .map((item) => WatchNextItem.fromMap(item))
+          .where((item) => item.title.isNotEmpty)
+          .toList(growable: false);
+    } catch (error) {
+      debugPrint('WatchNext: provider feed refresh failed: $error');
+      return const [];
+    }
+  }
+
+  Future<List<WatchNextItem>> _loadJellyfinResumeItems() async {
+    final serverUrl = _settingsService.jellyfinServerUrl;
+    final token = _settingsService.jellyfinApiToken;
+    if (serverUrl == null || token == null) return const [];
+
+    try {
+      final headers = {'X-Emby-Token': token, 'Accept': 'application/json'};
+      final meResponse = await http
+          .get(Uri.parse('$serverUrl/Users/Me'), headers: headers)
+          .timeout(const Duration(seconds: 5));
+      if (meResponse.statusCode != 200) return const [];
+      final userId = (jsonDecode(meResponse.body) as Map)['Id']?.toString();
+      if (userId == null || userId.isEmpty) return const [];
+
+      final uri = Uri.parse('$serverUrl/Users/$userId/Items/Resume').replace(
+        queryParameters: const {
+          'Limit': '20',
+          'Fields': 'Overview,PrimaryImageAspectRatio',
+          'MediaTypes': 'Movie,Episode',
+          'EnableImageTypes': 'Primary,Backdrop',
+        },
+      );
+      final response = await http
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 7));
+      if (response.statusCode != 200) return const [];
+      return parseJellyfinResumeItems(
+        jsonDecode(response.body),
+        serverUrl: serverUrl,
+        token: token,
+      );
+    } catch (error) {
+      debugPrint('WatchNext: Jellyfin refresh failed: $error');
+      return const [];
+    }
+  }
+
+  @visibleForTesting
+  static List<WatchNextItem> parseJellyfinResumeItems(
+    dynamic payload, {
+    required String serverUrl,
+    required String token,
+  }) {
+    if (payload is! Map || payload['Items'] is! List) return const [];
+    return (payload['Items'] as List)
+        .whereType<Map>()
+        .map((item) {
+          final id = item['Id']?.toString() ?? '';
+          final userData = item['UserData'] is Map
+              ? item['UserData'] as Map
+              : const {};
+          final seriesName = item['SeriesName']?.toString();
+          final name = item['Name']?.toString() ?? 'Continue watching';
+          final title = seriesName == null || seriesName.isEmpty
+              ? name
+              : '$seriesName — $name';
+          final imageUri = Uri.parse('$serverUrl/Items/$id/Images/Primary')
+              .replace(
+                queryParameters: {
+                  'maxWidth': '640',
+                  'quality': '85',
+                  'api_key': token,
+                },
+              );
+          return WatchNextItem(
+            id: id.hashCode,
+            title: title,
+            description: item['Overview']?.toString(),
+            posterUri: imageUri.toString(),
+            packageName: 'org.jellyfin.androidtv',
+            contentId: id,
+            progressPercent: (userData['PlayedPercentage'] as num?)?.round(),
+            intentUri: null,
+            aspectRatio: item['PrimaryImageAspectRatio']?.toString(),
+          );
+        })
+        .where((item) => item.contentId!.isNotEmpty)
+        .toList(growable: false);
   }
 
   Future<void> _preloadInitialPosters() async {

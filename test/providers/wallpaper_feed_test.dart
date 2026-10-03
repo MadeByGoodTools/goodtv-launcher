@@ -43,5 +43,32 @@ void main() {
       expect(items.single.uri.toString(), 'https://media.example/forest.webp');
       expect(items.single.isVideo, isFalse);
     });
+
+    test('reads the Apple TV aerial manifest', () {
+      final items = parseWallpaperFeed(
+        '{"assets":[{"url-1080-SDR":"https://example.com/aerial.mov",'
+        '"accessibilityLabel":"Coast"}]}',
+        Uri.parse('https://sylvan.apple.com/Aerials/2x/entries.json'),
+      );
+
+      expect(items, hasLength(1));
+      expect(items.single.uri.toString(), 'https://example.com/aerial.mov');
+      expect(items.single.isVideo, isTrue);
+      expect(items.single.title, 'Coast');
+    });
+
+    test('reads full-resolution Reddit images from an RSS feed', () {
+      final items = parseWallpaperFeed(
+        '<?xml version="1.0"?><feed><entry><content>'
+        '&lt;a href="https://i.redd.it/mountain123.jpeg"&gt;image&lt;/a&gt;'
+        '&lt;img src="https://preview.redd.it/mountain123.jpeg?width=640"/&gt;'
+        '</content></entry></feed>',
+        Uri.parse('https://www.reddit.com/r/EarthPorn/.rss'),
+      );
+
+      expect(items, hasLength(1));
+      expect(items.single.uri.toString(), 'https://i.redd.it/mountain123.jpeg');
+      expect(items.single.isVideo, isFalse);
+    });
   });
 }

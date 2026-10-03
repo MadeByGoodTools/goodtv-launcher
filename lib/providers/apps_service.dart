@@ -32,6 +32,7 @@ import '../models/app.dart';
 import '../models/category.dart';
 
 class AppsService extends ChangeNotifier {
+  static const _nativeAppsDefaultAppliedKey = 'native_apps_default_applied';
   final FLauncherChannel _fLauncherChannel;
   final FLauncherDatabase _database;
 
@@ -242,8 +243,9 @@ class AppsService extends ChangeNotifier {
   }
 
   Future<void> _initDefaultCategories() {
+    final nativeApps = _applications.values.where((app) => app.systemApp);
     final allApps = _applications.values.where(
-      (application) => !application.hidden,
+      (application) => !application.hidden && !application.systemApp,
     );
     final defaultFavoriteLauncherPackageNames = [
       'ca.goodtools.goodtvlauncher',
@@ -251,6 +253,13 @@ class AppsService extends ChangeNotifier {
     ];
 
     return _database.transaction(() async {
+      for (final app in nativeApps) {
+        app.hidden = true;
+        await _database.updateApp(
+          app.packageName,
+          const AppsCompanion(hidden: Value(true)),
+        );
+      }
       if (allApps.isNotEmpty) {
         int categoryId = await addCategory(
           "All Apps",
@@ -359,6 +368,10 @@ class AppsService extends ChangeNotifier {
     _launcherSections.addAll(spacers);
     _launcherSections.sort((ls0, ls1) => ls0.order.compareTo(ls1.order));
 
+    final prefs = await _prefsAsync;
+    final applyNativeAppDefaults =
+        !(prefs.getBool(_nativeAppsDefaultAppliedKey) ?? false);
+
     for (App application in _applications.values) {
       Map? applicationFromSystem =
           appsFromSystemByPackageName[application.packageName]?.$1;
@@ -369,6 +382,14 @@ class AppsService extends ChangeNotifier {
         }
         if (applicationFromSystem.containsKey('sideloaded')) {
           application.sideloaded = applicationFromSystem['sideloaded'];
+        }
+        application.systemApp = applicationFromSystem['systemApp'] == true;
+        if (applyNativeAppDefaults && application.systemApp) {
+          application.hidden = true;
+          await _database.updateApp(
+            application.packageName,
+            const AppsCompanion(hidden: Value(true)),
+          );
         }
       }
 
@@ -387,6 +408,10 @@ class AppsService extends ChangeNotifier {
           }
         }
       }
+    }
+
+    if (applyNativeAppDefaults) {
+      await prefs.setBool(_nativeAppsDefaultAppliedKey, true);
     }
 
     for (Category category in _categoriesById.values) {

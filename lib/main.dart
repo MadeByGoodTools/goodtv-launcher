@@ -74,7 +74,10 @@ Future<void> main() async {
           lazy: false,
         ),
         ChangeNotifierProvider(
-          create: (_) => WatchNextService(fLauncherChannel),
+          create: (context) => WatchNextService(
+            fLauncherChannel,
+            context.read<SettingsService>(),
+          ),
           lazy: false,
         ),
         ChangeNotifierProvider(

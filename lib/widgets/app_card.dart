@@ -110,7 +110,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   late final AnimationController _animation;
 
   late final CurvedAnimation _curvedAnimation;
-  static const Duration _focusAnimationDuration = Duration(milliseconds: 180);
+  static const Duration _focusAnimationDuration = Duration(milliseconds: 90);
 
   @override
   void initState() {
@@ -517,7 +517,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         position.animateTo(
           topTargetOffset,
           curve: Curves.easeInOut,
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 100),
         );
         return;
       }
@@ -533,7 +533,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       position.animateTo(
         bottomTargetOffset,
         curve: Curves.easeInOut,
-        duration: const Duration(milliseconds: 220),
+        duration: const Duration(milliseconds: 100),
       );
       return;
     }
@@ -549,7 +549,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       context,
       alignment: alignment,
       curve: Curves.easeInOut,
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 100),
     );
   }
 

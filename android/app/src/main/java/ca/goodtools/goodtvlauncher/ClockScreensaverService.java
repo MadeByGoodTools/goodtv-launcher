@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
+import android.media.MediaPlayer;
 import android.service.dreams.DreamService;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -18,6 +19,16 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +46,10 @@ public class ClockScreensaverService extends DreamService {
     private Random random;
     private int screenWidth;
     private int screenHeight;
+    private MediaPlayer mediaPlayer;
+    private SurfaceView aerialSurface;
+    private static final String AERIAL_MANIFEST =
+            "https://sylvan.apple.com/Aerials/2x/entries.json";
 
     private List<TextView> timeCharViews = new ArrayList<>();
     private List<TextView> dateCharViews = new ArrayList<>();
@@ -62,6 +77,11 @@ public class ClockScreensaverService extends DreamService {
         container = new FrameLayout(this);
         container.setBackgroundColor(Color.BLACK);
         setContentView(container);
+
+        SharedPreferences backgroundPrefs = getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE);
+        if ("aerial".equals(backgroundPrefs.getString("flutter.screensaver_background", "aerial"))) {
+            startAerialBackground();
+        }
 
         handler = new Handler(Looper.getMainLooper());
         random = new Random();
@@ -96,6 +116,65 @@ public class ClockScreensaverService extends DreamService {
         // Start handlers with initial delay
         handler.postDelayed(moveClockRunnable, 30000);
         handler.post(updateTimeRunnable);
+    }
+
+    private void startAerialBackground() {
+        aerialSurface = new SurfaceView(this);
+        container.addView(aerialSurface, 0, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        aerialSurface.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override public void surfaceCreated(SurfaceHolder holder) {
+                new Thread(() -> prepareRandomAerial(holder)).start();
+            }
+            @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+            @Override public void surfaceDestroyed(SurfaceHolder holder) { releaseMediaPlayer(); }
+        });
+    }
+
+    private void prepareRandomAerial(SurfaceHolder holder) {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL(AERIAL_MANIFEST).openConnection();
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
+            connection.setRequestProperty("User-Agent", "GoodTVLauncher/1.0");
+            StringBuilder json = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) json.append(line);
+            }
+            JSONArray assets = new JSONObject(json.toString()).getJSONArray("assets");
+            JSONObject asset = assets.getJSONObject(new Random().nextInt(assets.length()));
+            String videoUrl = asset.getString("url-1080-SDR");
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    releaseMediaPlayer();
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setDisplay(holder);
+                    mediaPlayer.setDataSource(videoUrl);
+                    mediaPlayer.setLooping(true);
+                    mediaPlayer.setVolume(0f, 0f);
+                    mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+                    mediaPlayer.prepareAsync();
+                } catch (Exception error) {
+                    android.util.Log.w("GoodTVScreensaver", "Unable to prepare aerial", error);
+                }
+            });
+        } catch (Exception error) {
+            android.util.Log.w("GoodTVScreensaver", "Unable to load aerial feed", error);
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
+
+    private void releaseMediaPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.reset();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     private void createCharacterViews() {
@@ -441,6 +520,7 @@ public class ClockScreensaverService extends DreamService {
 
     @Override
     public void onDetachedFromWindow() {
+        releaseMediaPlayer();
         super.onDetachedFromWindow();
 
         if (handler != null) {

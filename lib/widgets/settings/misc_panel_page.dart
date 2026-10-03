@@ -1,6 +1,7 @@
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/providers/watch_next_service.dart';
 import 'package:goodtv_launcher/widgets/rounded_switch_list_tile.dart';
+import 'package:goodtv_launcher/widgets/settings/focusable_settings_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:goodtv_launcher/l10n/app_localizations.dart';
@@ -145,10 +146,159 @@ class MiscPanelPage extends StatelessWidget {
                     );
                   },
                 ),
+              FocusableSettingsTile(
+                leading: const Icon(Icons.video_library_outlined),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Jellyfin Continue Watching'),
+                    Text(
+                      settingsService.jellyfinConfigured
+                          ? 'Connected • refreshes automatically at startup'
+                          : 'Connect Jellyfin to fill Watch Next automatically',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onPressed: () => _showJellyfinSetup(context),
+              ),
+              FocusableSettingsTile(
+                leading: const Icon(Icons.hub_outlined),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Other streaming service'),
+                    Text(
+                      settingsService.continueWatchingFeedUrl == null
+                          ? 'Connect a compatible Continue Watching feed'
+                          : 'Custom feed connected',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onPressed: () => _showProviderFeedSetup(context),
+              ),
             ],
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _showJellyfinSetup(BuildContext context) async {
+    final settings = context.read<SettingsService>();
+    final serverController = TextEditingController(
+      text: settings.jellyfinServerUrl,
+    );
+    final tokenController = TextEditingController(
+      text: settings.jellyfinApiToken,
+    );
+    final save = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Connect Jellyfin'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: serverController,
+              autofocus: true,
+              keyboardType: TextInputType.url,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                labelText: 'Server address',
+                hintText: 'http://192.168.1.20:8096',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: tokenController,
+              obscureText: true,
+              autocorrect: false,
+              decoration: const InputDecoration(labelText: 'API token'),
+            ),
+          ],
+        ),
+        actions: [
+          if (settings.jellyfinConfigured)
+            TextButton(
+              onPressed: () async {
+                await settings.clearJellyfinConnection();
+                if (dialogContext.mounted) Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Disconnect'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Connect'),
+          ),
+        ],
+      ),
+    );
+    if (save == true && context.mounted) {
+      await settings.setJellyfinConnection(
+        serverController.text,
+        tokenController.text,
+      );
+      if (context.mounted) {
+        await context.read<WatchNextService>().refreshPermissionAndItems();
+      }
+    }
+    serverController.dispose();
+    tokenController.dispose();
+  }
+
+  Future<void> _showProviderFeedSetup(BuildContext context) async {
+    final settings = context.read<SettingsService>();
+    final controller = TextEditingController(
+      text: settings.continueWatchingFeedUrl,
+    );
+    final save = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Connect streaming service'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'Continue Watching feed URL',
+            hintText: 'https://example.com/watch-next.json',
+          ),
+        ),
+        actions: [
+          if (settings.continueWatchingFeedUrl != null)
+            TextButton(
+              onPressed: () async {
+                await settings.setContinueWatchingFeed(null);
+                if (dialogContext.mounted) Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Disconnect'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Connect'),
+          ),
+        ],
+      ),
+    );
+    if (save == true && context.mounted) {
+      await settings.setContinueWatchingFeed(controller.text);
+      if (context.mounted) {
+        await context.read<WatchNextService>().refreshPermissionAndItems();
+      }
+    }
+    controller.dispose();
   }
 }

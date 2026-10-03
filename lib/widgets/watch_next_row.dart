@@ -78,7 +78,7 @@ class WatchNextRow extends StatelessWidget {
         final localizations = AppLocalizations.of(context)!;
         final watchNextService = context.read<WatchNextService>();
 
-        if (!data.hasPermission) {
+        if (!data.hasPermission && data.items.isEmpty) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

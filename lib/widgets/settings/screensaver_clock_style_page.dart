@@ -29,10 +29,9 @@ class ScreensaverClockStylePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<SettingsService, String>(
-      selector: (_, settingsService) => settingsService.screensaverClockStyle,
-      builder: (context, currentStyle, _) {
-        final settingsService = context.read<SettingsService>();
+    return Consumer<SettingsService>(
+      builder: (context, settingsService, _) {
+        final currentStyle = settingsService.screensaverClockStyle;
 
         return Column(
           children: [
@@ -46,13 +45,34 @@ class ScreensaverClockStylePage extends StatelessWidget {
                 child: Column(
                   children: [
                     _StyleRadioTile(
+                      title: 'Aerial video background',
+                      subtitle: 'Apple TV-style moving landscapes (Default)',
+                      value: 'aerial',
+                      groupValue: settingsService.screensaverBackground,
+                      onChanged: (value) =>
+                          settingsService.setScreensaverBackground(value!),
+                      autofocus:
+                          settingsService.screensaverBackground == 'aerial',
+                    ),
+                    _StyleRadioTile(
+                      title: 'Plain black background',
+                      subtitle: 'Clock only, with no network video',
+                      value: 'black',
+                      groupValue: settingsService.screensaverBackground,
+                      onChanged: (value) =>
+                          settingsService.setScreensaverBackground(value!),
+                      autofocus:
+                          settingsService.screensaverBackground == 'black',
+                    ),
+                    const Divider(),
+                    _StyleRadioTile(
                       title: 'Minimal',
                       subtitle: 'Thin, elegant font (Default)',
                       value: 'minimal',
                       groupValue: currentStyle,
                       onChanged: (value) =>
                           settingsService.setScreensaverClockStyle(value!),
-                      autofocus: currentStyle == 'minimal',
+                      autofocus: false,
                     ),
                     _StyleRadioTile(
                       title: 'Bold',

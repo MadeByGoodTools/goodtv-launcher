@@ -19,19 +19,7 @@ class DailyWifiUsageWidget extends StatelessWidget {
         }
 
         final period = settingsService.wifiUsagePeriod;
-        String label;
-        switch (period) {
-          case 'weekly':
-            label = 'Weekly: ';
-            break;
-          case 'monthly':
-            label = 'Monthly: ';
-            break;
-          case 'daily':
-          default:
-            label = 'Daily: ';
-            break;
-        }
+        const label = 'Network: ';
 
         return FutureBuilder<int>(
           future: networkService.getWifiUsageForPeriod(period),

@@ -40,9 +40,13 @@ const String _showNetworkIndicatorInStatusBar =
     "show_network_indicator_in_status_bar";
 const String _accentColor = "accent_color";
 const String _screensaverClockStyle = "screensaver_clock_style";
+const String _screensaverBackground = "screensaver_background";
 const String _dockBackdropFilterDisabled = "dock_backdrop_filter_disabled";
 const String _backgroundBlurDisabled = "background_blur_disabled";
 const String _showWatchNextSection = "show_watch_next_section";
+const String _jellyfinServerUrl = "jellyfin_server_url";
+const String _jellyfinApiToken = "jellyfin_api_token";
+const String _continueWatchingFeedUrl = "continue_watching_feed_url";
 const String _dockDarkBackground = "dock_dark_background";
 const String _dockShadowEnabled = "dock_shadow_enabled";
 const String _showFocusBorders = "show_focus_borders";
@@ -52,6 +56,8 @@ const String _appCardFocusZoom = "app_card_focus_zoom";
 const String _appCardSpacing = "app_card_spacing";
 const String _wallpaperFeedUrl = "wallpaper_feed_url";
 const String _wallpaperFeedIntervalMinutes = "wallpaper_feed_interval_minutes";
+const String _defaultAerialFeedUrl =
+    'https://sylvan.apple.com/Aerials/2x/entries.json';
 
 enum DisplayPreset { cinema, compact, easyRead }
 
@@ -136,18 +142,40 @@ class SettingsService extends ChangeNotifier {
 
   String get screensaverClockStyle =>
       _sharedPreferences.getString(_screensaverClockStyle) ?? "minimal";
+  String get screensaverBackground =>
+      _sharedPreferences.getString(_screensaverBackground) ?? "aerial";
 
   bool get dockBackdropFilterDisabled =>
-      _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? false;
+      _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? true;
 
   bool get backgroundBlurDisabled =>
-      _sharedPreferences.getBool(_backgroundBlurDisabled) ?? false;
+      _sharedPreferences.getBool(_backgroundBlurDisabled) ?? true;
 
   bool get showWatchNextSection =>
-      _sharedPreferences.getBool(_showWatchNextSection) ?? false;
+      _sharedPreferences.getBool(_showWatchNextSection) ?? true;
+
+  String? get jellyfinServerUrl {
+    final value = _sharedPreferences.getString(_jellyfinServerUrl)?.trim();
+    return value == null || value.isEmpty ? null : value;
+  }
+
+  String? get jellyfinApiToken {
+    final value = _sharedPreferences.getString(_jellyfinApiToken)?.trim();
+    return value == null || value.isEmpty ? null : value;
+  }
+
+  bool get jellyfinConfigured =>
+      jellyfinServerUrl != null && jellyfinApiToken != null;
+
+  String? get continueWatchingFeedUrl {
+    final value = _sharedPreferences
+        .getString(_continueWatchingFeedUrl)
+        ?.trim();
+    return value == null || value.isEmpty ? null : value;
+  }
 
   bool get dockDarkBackground =>
-      _sharedPreferences.getBool(_dockDarkBackground) ?? false;
+      _sharedPreferences.getBool(_dockDarkBackground) ?? true;
 
   bool get dockShadowEnabled =>
       _sharedPreferences.getBool(_dockShadowEnabled) ?? false;
@@ -187,7 +215,7 @@ class SettingsService extends ChangeNotifier {
 
   double get appCardFocusScale => switch (appCardFocusZoom) {
     AppCardFocusZoom.none => 1,
-    AppCardFocusZoom.standard => 1.07,
+    AppCardFocusZoom.standard => 1.05,
     AppCardFocusZoom.strong => 1.12,
   };
 
@@ -211,8 +239,13 @@ class SettingsService extends ChangeNotifier {
     AppCardSpacing.roomy => 14,
   };
 
-  String? get wallpaperFeedUrl =>
-      _sharedPreferences.getString(_wallpaperFeedUrl);
+  String? get wallpaperFeedUrl {
+    if (!_sharedPreferences.containsKey(_wallpaperFeedUrl)) {
+      return _defaultAerialFeedUrl;
+    }
+    final value = _sharedPreferences.getString(_wallpaperFeedUrl);
+    return value == null || value.isEmpty ? null : value;
+  }
 
   int get wallpaperFeedIntervalMinutes =>
       _sharedPreferences.getInt(_wallpaperFeedIntervalMinutes) ?? 15;
@@ -338,6 +371,11 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setScreensaverBackground(String background) async {
+    await _sharedPreferences.setString(_screensaverBackground, background);
+    notifyListeners();
+  }
+
   Future<void> setDockBackdropFilterDisabled(bool value) async {
     return set(_dockBackdropFilterDisabled, value);
   }
@@ -348,6 +386,29 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setShowWatchNextSection(bool value) async {
     return set(_showWatchNextSection, value);
+  }
+
+  Future<void> setJellyfinConnection(String serverUrl, String apiToken) async {
+    final normalizedUrl = serverUrl.trim().replaceFirst(RegExp(r'/+$'), '');
+    await _sharedPreferences.setString(_jellyfinServerUrl, normalizedUrl);
+    await _sharedPreferences.setString(_jellyfinApiToken, apiToken.trim());
+    notifyListeners();
+  }
+
+  Future<void> clearJellyfinConnection() async {
+    await _sharedPreferences.remove(_jellyfinServerUrl);
+    await _sharedPreferences.remove(_jellyfinApiToken);
+    notifyListeners();
+  }
+
+  Future<void> setContinueWatchingFeed(String? url) async {
+    final value = url?.trim() ?? '';
+    if (value.isEmpty) {
+      await _sharedPreferences.remove(_continueWatchingFeedUrl);
+    } else {
+      await _sharedPreferences.setString(_continueWatchingFeedUrl, value);
+    }
+    notifyListeners();
   }
 
   Future<void> setDockDarkBackground(bool value) async {
@@ -382,7 +443,7 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setWallpaperFeed(String? url, int intervalMinutes) async {
     if (url == null || url.trim().isEmpty) {
-      await _sharedPreferences.remove(_wallpaperFeedUrl);
+      await _sharedPreferences.setString(_wallpaperFeedUrl, '');
     } else {
       await _sharedPreferences.setString(_wallpaperFeedUrl, url.trim());
     }

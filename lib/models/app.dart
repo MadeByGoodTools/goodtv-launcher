@@ -27,6 +27,8 @@ class App {
 
   bool sideloaded;
 
+  bool systemApp;
+
   Map<int, int> categoryOrders;
 
   String? action;
@@ -40,7 +42,8 @@ class App {
     required this.hidden,
     this.action = null,
   }) : categoryOrders = Map(),
-       sideloaded = false;
+       sideloaded = false,
+       systemApp = false;
 
   App.fromSystem(Map<dynamic, dynamic> data)
     : packageName = data['packageName'],
@@ -48,6 +51,7 @@ class App {
       version = data['version'],
       hidden = false,
       sideloaded = data['sideloaded'],
+      systemApp = data['systemApp'] == true,
       categoryOrders = Map() {
     if (data.containsKey('action')) {
       action = data['action'];

@@ -42,14 +42,35 @@ class RemoteWallpaperItem {
 
 List<RemoteWallpaperItem> parseWallpaperFeed(String body, Uri source) {
   final trimmed = body.trim();
-  if (trimmed.startsWith('[')) {
-    final decoded = jsonDecode(trimmed) as List<dynamic>;
-    return decoded
+  if (trimmed.startsWith('<?xml') || trimmed.contains('<feed')) {
+    final decoded = trimmed.replaceAll('&amp;', '&').replaceAll('&#38;', '&');
+    final matches = RegExp(
+      r'https://i\.redd\.it/[A-Za-z0-9_-]+\.(?:jpg|jpeg|png|webp)',
+      caseSensitive: false,
+    ).allMatches(decoded);
+    final seen = <String>{};
+    return matches
+        .map((match) => match.group(0))
+        .whereType<String>()
+        .where(seen.add)
+        .map(Uri.parse)
+        .map((uri) => RemoteWallpaperItem(uri: uri, isVideo: false))
+        .toList(growable: false);
+  }
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    final decoded = jsonDecode(trimmed);
+    final rawItems = decoded is List
+        ? decoded
+        : decoded is Map && decoded['assets'] is List
+        ? decoded['assets'] as List
+        : const <dynamic>[];
+    return rawItems
         .whereType<Map>()
         .map((rawItem) {
           final item = Map<String, dynamic>.from(rawItem);
           final url =
               [
+                item['url-1080-SDR'],
                 item['url_1080p'],
                 item['url_4k'],
                 item['url_1080p_hdr'],
@@ -65,7 +86,9 @@ List<RemoteWallpaperItem> parseWallpaperFeed(String body, Uri source) {
           return RemoteWallpaperItem(
             uri: uri,
             isVideo: _isVideoUri(uri),
-            title: item['title']?.toString(),
+            title:
+                item['title']?.toString() ??
+                item['accessibilityLabel']?.toString(),
           );
         })
         .whereType<RemoteWallpaperItem>()
@@ -275,7 +298,12 @@ class WallpaperService extends ChangeNotifier {
       return [RemoteWallpaperItem(uri: source, isVideo: _isVideoUri(source))];
     }
     final response = await http
-        .get(source)
+        .get(
+          source,
+          headers: const {
+            'User-Agent': 'GoodTVLauncher/1.0 (Android TV background feed)',
+          },
+        )
         .timeout(const Duration(seconds: 15));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw HttpException('Wallpaper feed returned ${response.statusCode}');
