@@ -463,8 +463,10 @@ public class MainActivity extends FlutterActivity {
             Intent aptoideHome = getPackageManager()
                     .getLeanbackLaunchIntentForPackage("cm.aptoidetv.pt");
             if (aptoideHome != null) {
-                aptoideHome.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                // Keep Aptoide above the existing GoodTV activity. Pressing
+                // Back then reveals the warm launcher instead of creating a
+                // second launcher task and showing its startup screen again.
+                aptoideHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 if (tryStartActivity(aptoideHome)) {
                     return true;

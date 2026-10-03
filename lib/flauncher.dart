@@ -69,6 +69,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   int? _selectedCategoryId;
   Timer? _idleTimer;
   bool _idleBackgroundOnly = false;
+  bool _wasPaused = false;
 
   @override
   void initState() {
@@ -108,9 +109,17 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      context.read<WatchNextService>().refreshPermissionAndItems();
+      if (_wasPaused) {
+        _wasPaused = false;
+        // Refresh in place after returning from a launched app. Keeping the
+        // existing widget tree visible avoids a splash/loading flash while
+        // still picking up changed apps and Watch Next progress.
+        unawaited(context.read<AppsService>().reloadFromStorage());
+        unawaited(context.read<WatchNextService>().refreshPermissionAndItems());
+      }
       _wakeFromIdle();
     } else if (state == AppLifecycleState.paused) {
+      _wasPaused = true;
       _idleTimer?.cancel();
     }
   }
