@@ -230,7 +230,13 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                     backgroundColor: Colors.transparent,
                     appBar: FocusAwareAppBar(
                       key: _appBarKey,
-                      categories: context.watch<AppsService>().categories,
+                      categories: context
+                          .watch<AppsService>()
+                          .categories
+                          .where(
+                            (category) => !AppsService.isDockCategory(category),
+                          )
+                          .toList(growable: false),
                       selectedCategoryId: _selectedCategoryId,
                       onCategorySelected: (categoryId) {
                         setState(() => _selectedCategoryId = categoryId);
@@ -395,24 +401,23 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
               ),
             ),
           for (final indexedDock in homeDocks.indexed)
-            if (indexedDock.$2.$2.isNotEmpty)
-              SliverToBoxAdapter(
-                child: KeyedSubtree(
-                  key: indexedDock.$1 == 0 ? _dockKey : null,
-                  child: Padding(
-                    padding: _kDockOuterPadding,
-                    child: _dock(
-                      context,
-                      indexedDock.$2.$1,
-                      indexedDock.$2.$2,
-                      appsService,
-                      showTitle: homeDocks.length > 1,
-                      handleUpNavigationToSettings:
-                          indexedDock.$1 == 0 && !reserveWatchNextSpace,
-                    ),
+            SliverToBoxAdapter(
+              child: KeyedSubtree(
+                key: indexedDock.$1 == 0 ? _dockKey : null,
+                child: Padding(
+                  padding: _kDockOuterPadding,
+                  child: _dock(
+                    context,
+                    indexedDock.$2.$1,
+                    indexedDock.$2.$2,
+                    appsService,
+                    showTitle: homeDocks.length > 1,
+                    handleUpNavigationToSettings:
+                        indexedDock.$1 == 0 && !reserveWatchNextSpace,
                   ),
                 ),
               ),
+            ),
           if (showingHome && homeDocks.every((dock) => dock.$2.isEmpty))
             SliverToBoxAdapter(child: _emptyDockPrompt(context)),
         ],
@@ -750,13 +755,45 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           width: 1.5,
         ),
       ),
-      child: CategoryRow(
-        category: category,
-        applications: apps,
-        evenlyDistribute: true,
-        isFirstSection: handleUpNavigationToSettings,
-        showTitle: showTitle,
-        onAppFocused: _onHomeSectionFocused,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (showTitle)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
+              child: Text(
+                appsService.dockDisplayName(category),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          if (apps.isEmpty)
+            SizedBox(
+              height: category.rowHeight.toDouble(),
+              child: Center(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.add_circle_outline),
+                  label: Text(
+                    'Add apps to ${appsService.dockDisplayName(category)}',
+                  ),
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (_) => const SettingsPanel(
+                      initialRoute: ApplicationsPanelPage.dockRouteName,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else
+            CategoryRow(
+              category: category,
+              applications: apps,
+              evenlyDistribute: true,
+              isFirstSection: handleUpNavigationToSettings,
+              showTitle: false,
+              onAppFocused: _onHomeSectionFocused,
+            ),
+        ],
       ),
     );
 

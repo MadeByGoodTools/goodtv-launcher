@@ -349,6 +349,17 @@ class _DocksTab extends StatelessWidget {
               const ListTile(title: Text('No apps in this dock')),
             for (final app in dock.applications.where((app) => !app.hidden))
               _AppListItem(app),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add_circle_outline),
+                label: Text('Add apps to ${appsService.dockDisplayName(dock)}'),
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => _DockAppsDialog(dock: dock),
+                ),
+              ),
+            ),
           ],
           Padding(
             padding: const EdgeInsets.all(12),
@@ -390,6 +401,46 @@ class _DocksTab extends StatelessWidget {
     );
     if (shouldDelete == true) await appsService.deleteDock(dock);
   }
+}
+
+class _DockAppsDialog extends StatelessWidget {
+  final Category dock;
+
+  const _DockAppsDialog({required this.dock});
+
+  @override
+  Widget build(BuildContext context) => Consumer<AppsService>(
+    builder: (context, appsService, _) {
+      final applications = appsService.applications
+          .where((app) => !app.hidden)
+          .toList(growable: false);
+      return AlertDialog(
+        title: Text('Apps in ${appsService.dockDisplayName(dock)}'),
+        content: SizedBox(
+          width: 520,
+          height: 440,
+          child: ListView.builder(
+            itemCount: applications.length,
+            itemBuilder: (context, index) {
+              final app = applications[index];
+              return CheckboxListTile(
+                title: Text(app.name),
+                value: appsService.isAppInDock(app, dock),
+                onChanged: (included) =>
+                    appsService.setAppInDock(app, dock, included ?? false),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Done'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class _HiddenTab extends StatelessWidget {
