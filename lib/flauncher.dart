@@ -393,9 +393,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   child: WatchNextRow(
                     isFirstSection: false,
                     isAboveDock: true,
-                    onItemFocused: showingHome
-                        ? _onHomeSectionFocused
-                        : _onWatchNextFocused,
+                    onItemFocused: _onWatchNextFocused,
                   ),
                 ),
               ),
