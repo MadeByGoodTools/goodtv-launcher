@@ -737,6 +737,9 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     final shadowEnabled = context.select<SettingsService, bool>(
       (s) => s.dockShadowEnabled,
     );
+    final showDockTitle =
+        showTitle &&
+        context.select<SettingsService, bool>((s) => s.showCategoryTitles);
 
     const dockBorderRadius = 24.0;
     final borderRadius = BorderRadius.circular(dockBorderRadius);
@@ -758,7 +761,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (showTitle)
+          if (showDockTitle)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
               child: Text(
