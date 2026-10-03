@@ -73,11 +73,11 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
 
-      // The second tab controls the Home dock.
+      // The second tab controls the dock.
       expect(
-        find.text("Home dock"),
+        find.text("Dock"),
         findsNWidgets(2),
-        reason: "Should switch to Home dock after Right Arrow",
+        reason: "Should switch to Dock after Right Arrow",
       );
 
       // Simulate Left Arrow

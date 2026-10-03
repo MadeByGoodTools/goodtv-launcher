@@ -99,6 +99,9 @@ class _HomeLauncherToggle extends StatefulWidget {
 
 class _HomeLauncherToggleState extends State<_HomeLauncherToggle> {
   bool _isDefault = false;
+  bool _isFireTv = false;
+  bool _redirectEnabled = false;
+  bool _canEnableDirectly = false;
   bool _checking = true;
 
   @override
@@ -108,31 +111,49 @@ class _HomeLauncherToggleState extends State<_HomeLauncherToggle> {
   }
 
   Future<void> _refresh() async {
-    final isDefault = await FLauncherChannel().isDefaultLauncher();
+    final channel = FLauncherChannel();
+    final profile = await channel.getSystemProfile();
+    final redirect = await channel.getHomeRedirectStatus();
     if (!mounted) return;
     setState(() {
-      _isDefault = isDefault;
+      _isDefault = profile['isDefaultLauncher'] == true;
+      _isFireTv = profile['isFireTv'] == true;
+      _redirectEnabled =
+          redirect['enabled'] == true && redirect['serviceEnabled'] == true;
+      _canEnableDirectly = redirect['canEnableDirectly'] == true;
       _checking = false;
     });
   }
 
-  Future<void> _changeDefault(bool _) async {
-    await FLauncherChannel().openHomeSettings();
+  Future<void> _changeDefault(bool enabled) async {
+    if (_isFireTv) {
+      await FLauncherChannel().setHomeRedirectEnabled(enabled);
+    } else {
+      await FLauncherChannel().openHomeSettings();
+    }
     await _refresh();
   }
 
   @override
   Widget build(BuildContext context) => SwitchListTile(
     secondary: const Icon(Icons.home_outlined),
-    title: const Text('Use GoodTV as main launcher'),
+    title: Text(
+      _isFireTv
+          ? 'Override Fire TV Home button'
+          : 'Use GoodTV as main launcher',
+    ),
     subtitle: Text(
       _checking
           ? 'Checking the current Home launcher…'
-          : _isDefault
+          : (_isDefault || _redirectEnabled)
           ? 'Home button returns to GoodTV'
-          : 'Select GoodTV in the Fire TV Home launcher step',
+          : _isFireTv
+          ? _canEnableDirectly
+                ? 'Press to make Home return to GoodTV'
+                : 'One-time setup permission is required'
+          : 'Select GoodTV as the Home app',
     ),
-    value: _isDefault,
+    value: _isDefault || _redirectEnabled,
     onChanged: _checking ? null : _changeDefault,
   );
 }

@@ -44,7 +44,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
 
   final List<_TabData> _tabs = [
     _TabData(0, Icons.apps, (l) => l.allApplications),
-    _TabData(1, Icons.view_carousel_outlined, (_) => 'Home dock'),
+    _TabData(1, Icons.view_carousel_outlined, (_) => 'Dock'),
     _TabData(2, Icons.visibility_off_outlined, (l) => l.hiddenApplications),
   ];
 
@@ -324,7 +324,7 @@ class _FavoritesTab extends StatelessWidget {
     builder: (context, applications, _) {
       if (applications.isEmpty) {
         return const _EmptyListPlaceholder(
-          "No applications found",
+          "Add apps to the dock in Settings",
           autofocus: true,
         );
       }
@@ -591,8 +591,8 @@ class _AppListItemState extends State<_AppListItem> {
                                     );
                                     return IconButton(
                                       tooltip: inDock
-                                          ? 'Remove from home dock'
-                                          : 'Add to home dock',
+                                          ? 'Remove from dock'
+                                          : 'Add to dock',
                                       icon: Icon(
                                         inDock ? Icons.star : Icons.star_border,
                                       ),

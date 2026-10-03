@@ -220,37 +220,126 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
 }
 
 Future<void> _showAppSearch(BuildContext context) async {
-  final controller = TextEditingController();
+  var typedQuery = '';
+  const keys = <String>[
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+  ];
   final query = await showDialog<String>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('Search apps'),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        textInputAction: TextInputAction.search,
-        decoration: const InputDecoration(
-          hintText: 'App name',
-          prefixIcon: Icon(Icons.search),
+    builder: (dialogContext) => StatefulBuilder(
+      builder: (context, setDialogState) => AlertDialog(
+        title: const Text('Search apps'),
+        content: SizedBox(
+          width: 620,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  typedQuery.isEmpty ? 'Choose letters below' : typedQuery,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: typedQuery.isEmpty ? Colors.white54 : Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              FocusTraversalGroup(
+                policy: ReadingOrderTraversalPolicy(),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (var index = 0; index < keys.length; index++)
+                      SizedBox(
+                        width: 52,
+                        height: 42,
+                        child: FilledButton.tonal(
+                          autofocus: index == 0,
+                          onPressed: () =>
+                              setDialogState(() => typedQuery += keys[index]),
+                          child: Text(keys[index]),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        onSubmitted: (value) => Navigator.of(dialogContext).pop(value.trim()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton.icon(
+            onPressed: typedQuery.isEmpty
+                ? null
+                : () => setDialogState(() {
+                    typedQuery = typedQuery.substring(0, typedQuery.length - 1);
+                  }),
+            icon: const Icon(Icons.backspace_outlined),
+            label: const Text('Delete'),
+          ),
+          TextButton(
+            onPressed: () => setDialogState(() => typedQuery += ' '),
+            child: const Text('Space'),
+          ),
+          FilledButton.icon(
+            onPressed: typedQuery.trim().isEmpty
+                ? null
+                : () => Navigator.of(dialogContext).pop(typedQuery.trim()),
+            icon: const Icon(Icons.storefront_outlined),
+            label: const Text('Find & install'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton.icon(
-          autofocus: true,
-          onPressed: () =>
-              Navigator.of(dialogContext).pop(controller.text.trim()),
-          icon: const Icon(Icons.storefront_outlined),
-          label: const Text('Find & install'),
-        ),
-      ],
     ),
   );
-  controller.dispose();
   if (query == null || query.isEmpty) return;
   await FLauncherChannel().searchAppstore(query);
 }

@@ -578,6 +578,13 @@ class AppsService extends ChangeNotifier {
     Category category, {
     bool shouldNotifyListeners = true,
   }) async {
+    final categoryFound = _categoriesById[category.id];
+    if (categoryFound != null &&
+        categoryFound.applications.any(
+          (existing) => existing.packageName == app.packageName,
+        )) {
+      return;
+    }
     int index = await _database.nextAppCategoryOrder(category.id) ?? 0;
     await _database.insertAppsCategories([
       AppsCategoriesCompanion.insert(
@@ -804,7 +811,14 @@ class AppsService extends ChangeNotifier {
     App application = applications.removeAt(oldIndex);
     applications.insert(newIndex, application);
 
+    for (int i = 0; i < applications.length; i++) {
+      applications[i].categoryOrders[categoryFound.id] = i;
+    }
+
     notifyListeners();
+    // Persist every remote-button move immediately. This avoids losing the
+    // order if focus is rebuilt before the user presses Select to finish.
+    saveApplicationOrderInCategory(categoryFound);
   }
 
   Future<int> addCategory(

@@ -75,6 +75,13 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     HardwareKeyboard.instance.addHandler(_handleHardwareKey);
     FLauncherChannel().setHomePressedHandler(_handleHomePressed);
     _resetIdleTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(const Duration(milliseconds: 100), () {
+        if (!mounted) return;
+        _appBarKey.currentState?.focusSettings();
+        if (_scrollController.hasClients) _scrollController.jumpTo(0);
+      });
+    });
   }
 
   @override
@@ -291,34 +298,26 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       (c) => c.name == 'Favorites',
     );
     final showingHome = _selectedCategoryId == null;
+    final showingFavorites =
+        favoritesCategory != null &&
+        _selectedCategoryId == favoritesCategory.id;
     final configuredFavorites =
         favoritesCategory?.applications
             .where((app) => !app.hidden && !_isThisLauncher(app.packageName))
             .toList(growable: false) ??
         const <App>[];
-    // A fresh install may have no manually chosen favorites yet. In that case
-    // the Apple TV-style dock is immediately useful as a horizontal scroller
-    // for every visible app instead of showing an empty bar.
-    final favoriteApps = showingHome
-        ? (configuredFavorites.isNotEmpty
-              ? configuredFavorites
-              : appsService.applications
-                    .where(
-                      (app) => !app.hidden && !_isThisLauncher(app.packageName),
-                    )
-                    .toList(growable: false))
-        : const <App>[];
+    // Only real Dock members are rendered here. Showing All Apps as a visual
+    // fallback makes the menu and reorder controls operate on the wrong list.
+    final favoriteApps = showingHome ? configuredFavorites : const <App>[];
 
     final otherSections = appsService.launcherSections.where((section) {
-      if (section is Category && section.name == 'Favorites') return false;
-      // Home has one intentional app surface: the horizontal dock. Keep the
-      // complete grid available from the All Apps tab without duplicating it
-      // underneath the dock on Home.
-      if (showingHome && section is Category && section.name == 'All Apps') {
-        return false;
+      // Home is a fixed, single-screen composition: header, Watch Next and
+      // Dock. Additional categories remain available from their top tabs.
+      if (showingHome) return false;
+      if (section is Category && section.name == 'Favorites') {
+        return showingFavorites;
       }
-      return _selectedCategoryId == null ||
-          (section is Category && section.id == _selectedCategoryId);
+      return section is Category && section.id == _selectedCategoryId;
     }).toList();
 
     final showWatchNextSection =
@@ -329,13 +328,21 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     );
     final reserveWatchNextSpace = showWatchNextSection && watchNextVisible;
 
-    if (favoriteApps.isEmpty && otherSections.isEmpty)
-      return _emptyState(context);
+    if (otherSections.isEmpty && !showingHome) {
+      return showingFavorites
+          ? _emptyState(context, message: 'Add favorites in Settings')
+          : _emptyState(context);
+    }
+
+    final hasRowsBelowDock = otherSections.isNotEmpty;
 
     return CustomScrollView(
       controller: _scrollController,
+      physics: showingHome
+          ? const NeverScrollableScrollPhysics()
+          : const ClampingScrollPhysics(),
       slivers: [
-        if (favoriteApps.isNotEmpty || showWatchNextSection) ...[
+        if (showingHome || favoriteApps.isNotEmpty || showWatchNextSection) ...[
           SliverToBoxAdapter(
             child: SizedBox(
               height:
@@ -352,9 +359,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 18),
                   child: WatchNextRow(
-                    isFirstSection: reserveWatchNextSpace,
+                    isFirstSection: false,
                     isAboveDock: true,
-                    onItemFocused: _onWatchNextFocused,
+                    onItemFocused: showingHome
+                        ? _onHomeSectionFocused
+                        : _onWatchNextFocused,
                   ),
                 ),
               ),
@@ -382,29 +391,13 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           showAppNames: showAppNames,
           cardHorizontalSpacing: cardHorizontalSpacing,
           cardVerticalSpacing: cardVerticalSpacing,
-          onFirstSectionFocused: favoriteApps.isNotEmpty
+          onFirstSectionFocused: !showingHome && favoriteApps.isNotEmpty
               ? _scrollDockToTop
               : null,
         ),
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: _bottomScrollPadding(
-              context,
-              hasDock: favoriteApps.isNotEmpty,
-            ),
-          ),
-        ),
+        SliverToBoxAdapter(child: SizedBox(height: hasRowsBelowDock ? 48 : 0)),
       ],
     );
-  }
-
-  double _bottomScrollPadding(BuildContext context, {required bool hasDock}) {
-    if (!hasDock) {
-      return 64;
-    }
-    return MediaQuery.of(context).size.height -
-        MediaQuery.of(context).padding.top -
-        kToolbarHeight;
   }
 
   List<Widget> _buildSectionSlivers(
@@ -791,16 +784,19 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     }
   }
 
-  Widget _emptyState(BuildContext context) {
+  Widget _emptyState(BuildContext context, {String? message}) {
     final localizations = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 16),
+          if (message == null) const CircularProgressIndicator(),
+          if (message == null) const SizedBox(height: 16),
+          if (message != null)
+            const Icon(Icons.star_border, size: 54, color: Colors.white70),
+          if (message != null) const SizedBox(height: 16),
           Text(
-            localizations.loading,
+            message ?? localizations.loading,
             style: Theme.of(context).textTheme.titleLarge,
           ),
         ],

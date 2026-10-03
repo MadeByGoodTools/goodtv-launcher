@@ -67,6 +67,8 @@ class _SystemSetupPageState extends State<SystemSetupPage>
               }
               final profile = snapshot.data!;
               final isDefault = profile['isDefaultLauncher'] == true;
+              final isFireTv = profile['isFireTv'] == true;
+              final redirectEnabled = profile['homeRedirectEnabled'] == true;
               final device = [
                 profile['manufacturer'],
                 profile['model'],
@@ -89,15 +91,25 @@ class _SystemSetupPageState extends State<SystemSetupPage>
                   ),
                   FocusableSettingsTile(
                     leading: Icon(
-                      isDefault ? Icons.check_circle : Icons.home_outlined,
-                      color: isDefault ? Colors.greenAccent : null,
+                      isDefault || redirectEnabled
+                          ? Icons.check_circle
+                          : Icons.home_outlined,
+                      color: isDefault || redirectEnabled
+                          ? Colors.greenAccent
+                          : null,
                     ),
                     title: Text(
-                      isDefault
+                      isDefault || redirectEnabled
                           ? l10n.goodTvIsDefaultLauncher
+                          : isFireTv
+                          ? 'Override Fire TV Home button'
                           : l10n.chooseDefaultLauncher,
                     ),
-                    onPressed: isDefault ? _refreshStatus : _openHomeSettings,
+                    onPressed: isDefault
+                        ? _refreshStatus
+                        : isFireTv
+                        ? () => _setFireRedirect(!redirectEnabled)
+                        : _openHomeSettings,
                   ),
                   const Divider(),
                   ListTile(
@@ -142,6 +154,11 @@ class _SystemSetupPageState extends State<SystemSetupPage>
 
   Future<void> _openHomeSettings() async {
     await _service.openHomeSettings();
+  }
+
+  Future<void> _setFireRedirect(bool enabled) async {
+    await FLauncherChannel().setHomeRedirectEnabled(enabled);
+    if (mounted) setState(_refresh);
   }
 
   void _refreshStatus() => setState(_refresh);

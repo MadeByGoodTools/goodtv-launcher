@@ -133,8 +133,13 @@ class CategoryRow extends StatelessWidget {
 
     final appsService = context.read<AppsService>();
     final movingApp = applications[index];
-    final realOldIndex = category.applications.indexOf(movingApp);
-    final realNewIndex = category.applications.indexOf(applications[newIndex]);
+    final realOldIndex = category.applications.indexWhere(
+      (app) => app.packageName == movingApp.packageName,
+    );
+    final targetPackage = applications[newIndex].packageName;
+    final realNewIndex = category.applications.indexWhere(
+      (app) => app.packageName == targetPackage,
+    );
     if (realOldIndex >= 0 && realNewIndex >= 0) {
       appsService.reorderApplication(category, realOldIndex, realNewIndex);
       // Set pending focus so the app at the new position will request focus

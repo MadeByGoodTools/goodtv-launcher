@@ -110,6 +110,11 @@ public class MainActivity extends FlutterActivity {
                 case "isDefaultLauncher" -> result.success(isDefaultLauncher());
                 case "getSystemProfile" -> result.success(getSystemProfile());
                 case "openHomeSettings" -> result.success(openHomeSettings());
+                case "getHomeRedirectStatus" -> result.success(getHomeRedirectStatus());
+                case "setHomeRedirectEnabled" -> {
+                    Boolean enabled = call.argument("enabled");
+                    result.success(setHomeRedirectEnabled(Boolean.TRUE.equals(enabled)));
+                }
                 case "checkForGetContentAvailability" -> result.success(checkForGetContentAvailability());
                 case "startAmbientMode" -> result.success(startAmbientMode());
                 case "getActiveNetworkInformation" -> result.success(getActiveNetworkInformation());
@@ -544,6 +549,10 @@ public class MainActivity extends FlutterActivity {
         profile.put("isGoogleTv", isGoogleTv);
         profile.put("isAndroidTv", isAndroidTv);
         profile.put("isDefaultLauncher", isDefaultLauncher());
+        profile.put("homeRedirectEnabled", getSharedPreferences(
+                GoodTvHomeRedirectService.PREFS, MODE_PRIVATE)
+                .getBoolean(GoodTvHomeRedirectService.ENABLED, false)
+                && GoodTvAccessibilityHelper.isEnabled(this));
         profile.put("homeAppCount", homeApps.size());
         profile.put("currentLauncherPackage",
                 currentHome != null && currentHome.activityInfo != null
@@ -581,6 +590,27 @@ public class MainActivity extends FlutterActivity {
             return true;
         }
         return openSettings();
+    }
+
+    private Map<String, Object> getHomeRedirectStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("enabled", getSharedPreferences(
+                GoodTvHomeRedirectService.PREFS, MODE_PRIVATE)
+                .getBoolean(GoodTvHomeRedirectService.ENABLED,
+                        GoodTvAccessibilityHelper.isEnabled(this)));
+        status.put("serviceEnabled", GoodTvAccessibilityHelper.isEnabled(this));
+        status.put("canEnableDirectly", GoodTvAccessibilityHelper.hasSecureSettings(this));
+        return status;
+    }
+
+    private Map<String, Object> setHomeRedirectEnabled(boolean enabled) {
+        getSharedPreferences(GoodTvHomeRedirectService.PREFS, MODE_PRIVATE)
+                .edit().putBoolean(GoodTvHomeRedirectService.ENABLED, enabled).apply();
+        boolean changed = GoodTvAccessibilityHelper.setEnabled(this, enabled);
+        if (!changed && enabled) {
+            tryStartActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        }
+        return getHomeRedirectStatus();
     }
 
     private boolean startAmbientMode() {

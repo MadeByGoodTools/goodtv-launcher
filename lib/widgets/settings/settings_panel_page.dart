@@ -61,7 +61,7 @@ class SettingsPanelPage extends StatelessWidget {
                 ),
                 FocusableSettingsTile(
                   leading: const Icon(Icons.apps),
-                  title: const Text('Apps, home dock & hidden apps'),
+                  title: const Text('Apps, dock & hidden apps'),
                   onPressed: () => Navigator.of(
                     context,
                   ).pushNamed(ApplicationsPanelPage.routeName),

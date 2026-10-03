@@ -175,8 +175,8 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel> {
                             Flexible(
                               child: Text(
                                 isInFavorites
-                                    ? 'Remove from home dock'
-                                    : 'Add to home dock',
+                                    ? 'Remove from dock'
+                                    : 'Add to dock',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 overflow: TextOverflow.ellipsis,
                               ),

@@ -100,6 +100,21 @@ class FLauncherChannel {
   Future<bool> openHomeSettings() async =>
       await _methodChannel.invokeMethod('openHomeSettings') ?? false;
 
+  Future<Map<String, dynamic>> getHomeRedirectStatus() async {
+    final status = await _methodChannel.invokeMapMethod<dynamic, dynamic>(
+      'getHomeRedirectStatus',
+    );
+    return Map<String, dynamic>.from(status ?? const {});
+  }
+
+  Future<Map<String, dynamic>> setHomeRedirectEnabled(bool enabled) async {
+    final status = await _methodChannel.invokeMapMethod<dynamic, dynamic>(
+      'setHomeRedirectEnabled',
+      {'enabled': enabled},
+    );
+    return Map<String, dynamic>.from(status ?? const {});
+  }
+
   Future<bool> checkForGetContentAvailability() async =>
       await _methodChannel.invokeMethod("checkForGetContentAvailability");
 

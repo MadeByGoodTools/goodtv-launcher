@@ -76,8 +76,8 @@ class AppDetailsPage extends StatelessWidget {
                     ? Icons.star
                     : Icons.star_border,
                 title: appsService.isAppInFavorites(application)
-                    ? 'Remove from Fav'
-                    : 'Add to Fav',
+                    ? 'Remove from dock'
+                    : 'Add to dock',
                 onTap: () => appsService.toggleFavorite(application),
               ),
               _buildListTile(
