@@ -12,6 +12,10 @@ class SystemSetupService {
   Future<DisplayPreset> applyRecommended(Map<String, dynamic> profile) async {
     final preset = recommendedDisplayPreset(profile);
     await _settings.applyDisplayPreset(preset);
+    await _settings.applyGoodTvRecommendedDefaults();
+    if (profile['isFireTv'] == true) {
+      await _channel.setHomeRedirectEnabled(true);
+    }
     return preset;
   }
 

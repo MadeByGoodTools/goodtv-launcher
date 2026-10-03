@@ -125,6 +125,23 @@ void main() async {
       expect(settingsService.accentColorHex, ACCENT_COLOR_YELLOW);
     });
 
+    test("compact matches the Fire TV GoodTV recommended layout", () async {
+      await settingsService.applyDisplayPreset(DisplayPreset.compact);
+      await settingsService.applyGoodTvRecommendedDefaults();
+
+      expect(settingsService.autoHideAppBarEnabled, isTrue);
+      expect(settingsService.showWatchNextSection, isTrue);
+      expect(settingsService.showDateInStatusBar, isTrue);
+      expect(settingsService.showTimeInStatusBar, isTrue);
+      expect(settingsService.showNetworkIndicatorInStatusBar, isTrue);
+      expect(settingsService.idleFadeEnabled, isTrue);
+      expect(settingsService.wallpaperFeedUrl, contains('apple.com/Aerials'));
+      expect(settingsService.accentColorHex, ACCENT_COLOR_GREEN);
+      expect(settingsService.appCardCornerStyle, AppCardCornerStyle.rounded);
+      expect(settingsService.appCardFocusZoom, AppCardFocusZoom.standard);
+      expect(settingsService.appCardSpacing, AppCardSpacing.balanced);
+    });
+
     test("card style controls persist custom choices", () async {
       await settingsService.setAppCardCornerStyle(AppCardCornerStyle.square);
       await settingsService.setAppCardFocusZoom(AppCardFocusZoom.none);

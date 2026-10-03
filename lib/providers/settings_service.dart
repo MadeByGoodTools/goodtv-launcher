@@ -487,15 +487,15 @@ class SettingsService extends ChangeNotifier {
         _appHighlightAnimationEnabledKey: true,
       },
       DisplayPreset.compact => <String, bool>{
-        _autoHideAppBar: false,
+        _autoHideAppBar: true,
         _showCategoryTitles: true,
         _showAppNamesBelowIcons: false,
-        _showDateInStatusBar: false,
+        _showDateInStatusBar: true,
         _showTimeInStatusBar: true,
-        _showWatchNextSection: false,
+        _showWatchNextSection: true,
         _dockBackdropFilterDisabled: true,
         _backgroundBlurDisabled: true,
-        _dockDarkBackground: false,
+        _dockDarkBackground: true,
         _dockShadowEnabled: false,
         _showFocusBorders: true,
         _appHighlightAnimationEnabledKey: false,
@@ -522,24 +522,38 @@ class SettingsService extends ChangeNotifier {
       _sharedPreferences.setString(_displayPreset, preset.name),
       _sharedPreferences.setString(_accentColor, switch (preset) {
         DisplayPreset.cinema => ACCENT_COLOR_GREEN,
-        DisplayPreset.compact => ACCENT_COLOR_WHITE,
+        DisplayPreset.compact => ACCENT_COLOR_GREEN,
         DisplayPreset.easyRead => ACCENT_COLOR_YELLOW,
       }),
       _sharedPreferences.setString(_appCardCornerStyle, switch (preset) {
         DisplayPreset.cinema => AppCardCornerStyle.rounded.name,
-        DisplayPreset.compact => AppCardCornerStyle.square.name,
+        DisplayPreset.compact => AppCardCornerStyle.rounded.name,
         DisplayPreset.easyRead => AppCardCornerStyle.soft.name,
       }),
       _sharedPreferences.setString(_appCardFocusZoom, switch (preset) {
         DisplayPreset.cinema => AppCardFocusZoom.strong.name,
-        DisplayPreset.compact => AppCardFocusZoom.none.name,
+        DisplayPreset.compact => AppCardFocusZoom.standard.name,
         DisplayPreset.easyRead => AppCardFocusZoom.strong.name,
       }),
       _sharedPreferences.setString(_appCardSpacing, switch (preset) {
         DisplayPreset.cinema => AppCardSpacing.roomy.name,
-        DisplayPreset.compact => AppCardSpacing.tight.name,
+        DisplayPreset.compact => AppCardSpacing.balanced.name,
         DisplayPreset.easyRead => AppCardSpacing.balanced.name,
       }),
+    ]);
+    notifyListeners();
+  }
+
+  Future<void> applyGoodTvRecommendedDefaults() async {
+    await Future.wait([
+      _sharedPreferences.setBool(_idleFadeEnabled, true),
+      _sharedPreferences.setBool(_wakeConsumesFirstPress, true),
+      _sharedPreferences.setBool(_showNetworkIndicatorInStatusBar, true),
+      _sharedPreferences.setBool(_showWifiWidgetInStatusBar, false),
+      _sharedPreferences.setBool(_appKeyClickEnabledKey, true),
+      _sharedPreferences.setString(_screensaverBackground, 'launcher'),
+      _sharedPreferences.setString(_wallpaperFeedUrl, _defaultAerialFeedUrl),
+      _sharedPreferences.setInt(_wallpaperFeedIntervalMinutes, 15),
     ]);
     notifyListeners();
   }

@@ -149,7 +149,10 @@ class _SystemSetupPageState extends State<SystemSetupPage>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.recommendedSetupApplied(presetName))),
     );
-    if (profile['isDefaultLauncher'] != true) await _openHomeSettings();
+    if (profile['isFireTv'] != true && profile['isDefaultLauncher'] != true) {
+      await _openHomeSettings();
+    }
+    if (mounted) setState(_refresh);
   }
 
   Future<void> _openHomeSettings() async {
