@@ -111,10 +111,10 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       if (_wasPaused) {
         _wasPaused = false;
-        // Refresh in place after returning from a launched app. Keeping the
-        // existing widget tree visible avoids a splash/loading flash while
-        // still picking up changed apps and Watch Next progress.
-        unawaited(context.read<AppsService>().reloadFromStorage());
+        // Keep the existing launcher tree, scroll position and focus alive
+        // when returning from an app. Package broadcasts already update the
+        // app list, so a full storage reload here only causes a visible Home
+        // rebuild. Watch Next can refresh quietly without replacing the UI.
         unawaited(context.read<WatchNextService>().refreshPermissionAndItems());
       }
       _wakeFromIdle();
