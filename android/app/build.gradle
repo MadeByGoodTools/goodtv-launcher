@@ -113,7 +113,7 @@ android {
         abi {
             // https://stackoverflow.com/a/39950584/21037183
             enable gradle.startParameter.taskNames.any {
-                it.startsWith("assemble") && it.endsWith("Release")
+                it.startsWith("assemble")
             }
             reset()
             // CI publishes arm-only APKs; local release builds keep x86 for emulators.

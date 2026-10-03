@@ -394,13 +394,22 @@ public class MainActivity extends FlutterActivity {
         appMap.put("version", applicationVersionName);
         appMap.put("sideloaded", sideloaded);
         int appFlags = activityInfo.applicationInfo.flags;
-        appMap.put("systemApp", (appFlags & (ApplicationInfo.FLAG_SYSTEM |
-                ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0);
+        boolean systemFlag = (appFlags & (ApplicationInfo.FLAG_SYSTEM |
+                ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
+        appMap.put("systemApp", systemFlag || isNativePlatformPackage(activityInfo.packageName));
 
         if (action != null) {
             appMap.put("action", action);
         }
         return appMap;
+    }
+
+    private boolean isNativePlatformPackage(String packageName) {
+        return packageName.startsWith("com.amazon.") ||
+                packageName.startsWith("com.android.") ||
+                packageName.startsWith("com.google.android.") ||
+                packageName.startsWith("com.mediatek.") ||
+                packageName.equals("amazon.fireos");
     }
 
     private boolean launchActivityFromAction(String action) {
