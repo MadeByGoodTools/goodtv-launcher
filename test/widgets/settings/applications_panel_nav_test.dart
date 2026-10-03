@@ -38,6 +38,7 @@ void main() {
       ]);
       // Mock category for favorites (even if empty)
       when(appsService.categories).thenReturn([]);
+      when(appsService.isAppInFavorites(any)).thenReturn(false);
 
       await tester.pumpWidget(
         MultiProvider(

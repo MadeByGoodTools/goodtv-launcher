@@ -51,6 +51,7 @@ import java.io.File;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.app.AppOpsManager;
+import android.app.role.RoleManager;
 import android.os.RemoteException;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -552,8 +553,24 @@ public class MainActivity extends FlutterActivity {
     }
 
     private boolean openHomeSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            RoleManager roleManager = (RoleManager) getSystemService(Context.ROLE_SERVICE);
+            if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) {
+                if (roleManager.isRoleHeld(RoleManager.ROLE_HOME)) {
+                    return true;
+                }
+                if (tryStartActivity(roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME))) {
+                    return true;
+                }
+            }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (tryStartActivity(new Intent(Settings.ACTION_HOME_SETTINGS))) {
+            Intent stockHomeSettings = new Intent(Settings.ACTION_HOME_SETTINGS)
+                    .setClassName(
+                            "com.android.permissioncontroller",
+                            "com.android.permissioncontroller.role.ui.HomeSettingsActivity"
+                    );
+            if (tryStartActivity(stockHomeSettings)) {
                 return true;
             }
         }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/widgets/settings/back_button_action_page.dart';
-import 'package:goodtv_launcher/widgets/settings/system_setup_page.dart';
 import 'package:provider/provider.dart';
 
 class AccessibilitySettingsPage extends StatelessWidget {
@@ -118,7 +117,7 @@ class _HomeLauncherToggleState extends State<_HomeLauncherToggle> {
   }
 
   Future<void> _changeDefault(bool _) async {
-    await Navigator.of(context).pushNamed(SystemSetupPage.routeName);
+    await FLauncherChannel().openHomeSettings();
     await _refresh();
   }
 

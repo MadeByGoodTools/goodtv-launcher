@@ -301,6 +301,7 @@ class _AllAppsTab extends StatelessWidget {
                   entry.value,
                   autofocus: entry.key == 0,
                   isFirst: entry.key == 0,
+                  showDockToggle: true,
                 ),
               ),
             )
@@ -338,6 +339,7 @@ class _FavoritesTab extends StatelessWidget {
                   entry.value,
                   autofocus: entry.key == 0,
                   isFirst: entry.key == 0,
+                  showDockToggle: true,
                 ),
               ),
             )
@@ -370,6 +372,7 @@ class _HiddenTab extends StatelessWidget {
                   entry.value,
                   autofocus: entry.key == 0,
                   isFirst: entry.key == 0,
+                  showUnhide: true,
                 ),
               ),
             )
@@ -432,11 +435,15 @@ class _AppListItem extends StatefulWidget {
   final App application;
   final bool autofocus;
   final bool isFirst;
+  final bool showDockToggle;
+  final bool showUnhide;
 
   const _AppListItem(
     this.application, {
     this.autofocus = false,
     this.isFirst = false,
+    this.showDockToggle = false,
+    this.showUnhide = false,
   });
 
   @override
@@ -571,10 +578,43 @@ class _AppListItemState extends State<_AppListItem> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           leading: appIcon,
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            size: 20,
-                            color: focused ? primaryColor : Colors.white30,
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.showDockToggle)
+                                Builder(
+                                  builder: (context) {
+                                    final appsService = context
+                                        .watch<AppsService>();
+                                    final inDock = appsService.isAppInFavorites(
+                                      widget.application,
+                                    );
+                                    return IconButton(
+                                      tooltip: inDock
+                                          ? 'Remove from home dock'
+                                          : 'Add to home dock',
+                                      icon: Icon(
+                                        inDock ? Icons.star : Icons.star_border,
+                                      ),
+                                      onPressed: () => appsService
+                                          .toggleFavorite(widget.application),
+                                    );
+                                  },
+                                ),
+                              if (widget.showUnhide)
+                                IconButton(
+                                  tooltip: 'Unhide app',
+                                  icon: const Icon(Icons.visibility_outlined),
+                                  onPressed: () => context
+                                      .read<AppsService>()
+                                      .showApplication(widget.application),
+                                ),
+                              Icon(
+                                Icons.chevron_right,
+                                size: 20,
+                                color: focused ? primaryColor : Colors.white30,
+                              ),
+                            ],
                           ),
                         );
                       },

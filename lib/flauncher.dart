@@ -311,6 +311,12 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
 
     final otherSections = appsService.launcherSections.where((section) {
       if (section is Category && section.name == 'Favorites') return false;
+      // Home has one intentional app surface: the horizontal dock. Keep the
+      // complete grid available from the All Apps tab without duplicating it
+      // underneath the dock on Home.
+      if (showingHome && section is Category && section.name == 'All Apps') {
+        return false;
+      }
       return _selectedCategoryId == null ||
           (section is Category && section.id == _selectedCategoryId);
     }).toList();
