@@ -233,7 +233,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
       case 0:
         return _AllAppsTab();
       case 1:
-        return _FavoritesTab();
+        return const _DocksTab();
       case 2:
         return _HiddenTab();
       default:
@@ -314,42 +314,82 @@ class _AllAppsTab extends StatelessWidget {
   );
 }
 
-class _FavoritesTab extends StatelessWidget {
+class _DocksTab extends StatelessWidget {
+  const _DocksTab();
+
   @override
-  Widget build(BuildContext context) => Selector<AppsService, List<App>>(
-    selector: (_, appsService) {
-      final favorites = appsService.categories.firstWhere(
-        (category) => category.name == 'Favorites',
-        orElse: () => Category(name: 'Favorites'),
-      );
-      return favorites.applications.where((app) => !app.hidden).toList();
-    },
-    builder: (context, applications, _) {
-      if (applications.isEmpty) {
-        return const _EmptyListPlaceholder(
-          "Add apps to the dock in Settings",
-          autofocus: true,
-        );
-      }
+  Widget build(BuildContext context) => Consumer<AppsService>(
+    builder: (context, appsService, _) {
+      final docks = appsService.dockCategories;
       return ListView(
-        children: applications
-            .asMap()
-            .entries
-            .map(
-              (entry) => EnsureVisible(
-                alignment: 0.5,
-                child: _AppListItem(
-                  entry.value,
-                  autofocus: entry.key == 0,
-                  isFirst: entry.key == 0,
-                  showDockToggle: true,
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        children: [
+          for (final dock in docks) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      appsService.dockDisplayName(dock),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  if (appsService.dockNumber(dock) > 1)
+                    IconButton(
+                      tooltip: 'Delete ${appsService.dockDisplayName(dock)}',
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () =>
+                          _confirmDeleteDock(context, appsService, dock),
+                    ),
+                ],
               ),
-            )
-            .toList(),
+            ),
+            if (dock.applications.where((app) => !app.hidden).isEmpty)
+              const ListTile(title: Text('No apps in this dock')),
+            for (final app in dock.applications.where((app) => !app.hidden))
+              _AppListItem(app),
+          ],
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: FilledButton.icon(
+              autofocus: docks.isEmpty,
+              icon: const Icon(Icons.add_circle_outline),
+              label: const Text('Add Dock'),
+              onPressed: () => appsService.createDock(),
+            ),
+          ),
+        ],
       );
     },
   );
+
+  Future<void> _confirmDeleteDock(
+    BuildContext context,
+    AppsService appsService,
+    Category dock,
+  ) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Delete ${appsService.dockDisplayName(dock)}?'),
+        content: const Text(
+          'The apps will stay installed and remain available in All Apps.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete Dock'),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete == true) await appsService.deleteDock(dock);
+  }
 }
 
 class _HiddenTab extends StatelessWidget {

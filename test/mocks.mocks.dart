@@ -631,6 +631,14 @@ class MockAppsService extends _i1.Mock implements _i15.AppsService {
           as List<_i3.Category>);
 
   @override
+  List<_i3.Category> get dockCategories =>
+      (super.noSuchMethod(
+            Invocation.getter(#dockCategories),
+            returnValue: <_i3.Category>[],
+          )
+          as List<_i3.Category>);
+
+  @override
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);

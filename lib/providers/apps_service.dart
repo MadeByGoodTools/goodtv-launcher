@@ -97,6 +97,60 @@ class AppsService extends ChangeNotifier {
       .map((category) => category.unmodifiable())
       .toList(growable: false);
 
+  /// Home-screen docks. `Favorites` is the legacy name of the first dock and
+  /// remains supported so existing installs keep their configured apps.
+  List<Category> get dockCategories => _categoriesById.values
+      .where((category) => isDockCategory(category))
+      .sortedBy(dockNumber)
+      .toList(growable: false);
+
+  static bool isDockCategory(Category category) =>
+      category.name == 'Favorites' ||
+      category.name == 'Dock' ||
+      RegExp(r'^Dock \d+$').hasMatch(category.name);
+
+  String dockDisplayName(Category category) {
+    if (category.name == 'Favorites' || category.name == 'Dock') {
+      return 'Dock 1';
+    }
+    return category.name;
+  }
+
+  int dockNumber(Category category) {
+    if (category.name == 'Favorites' || category.name == 'Dock') return 1;
+    return int.tryParse(category.name.substring('Dock '.length)) ?? 999;
+  }
+
+  Future<Category> createDock() async {
+    final usedNames = dockCategories.map(dockDisplayName).toSet();
+    var number = 1;
+    while (usedNames.contains('Dock $number')) {
+      number++;
+    }
+    final id = await addCategory('Dock $number');
+    return _categoriesById[id]!;
+  }
+
+  Future<void> deleteDock(Category dock) async {
+    if (dockNumber(dock) == 1) return;
+    final sectionIndex = _launcherSections.indexWhere(
+      (section) => section is Category && section.id == dock.id,
+    );
+    if (sectionIndex >= 0) await deleteSection(sectionIndex);
+  }
+
+  bool isAppInDock(App app, Category dock) => dock.applications.any(
+    (candidate) => candidate.packageName == app.packageName,
+  );
+
+  Future<void> setAppInDock(App app, Category dock, bool included) async {
+    if (included && !isAppInDock(app, dock)) {
+      await addToCategory(app, dock);
+    } else if (!included && isAppInDock(app, dock)) {
+      await removeFromCategory(app, dock);
+    }
+  }
+
   Future<void> reloadFromStorage() => _refreshState();
 
   AppsService(this._fLauncherChannel, this._database) {

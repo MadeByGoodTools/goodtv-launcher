@@ -27,6 +27,7 @@ import '../models/category.dart';
 import '../providers/settings_service.dart';
 
 class CategoryRow extends StatelessWidget {
+  static const double _maxEvenDockTileWidth = 230;
   final Category category;
   final List<App> applications;
 
@@ -60,28 +61,42 @@ class CategoryRow extends StatelessWidget {
             category.rowHeight.toDouble() +
             (showAppNames ? kAppNameLabelHeight : 0),
         child: evenlyDistribute && applications.length <= Category.ColumnsCount
-            ? Row(
-                children: List.generate(applications.length, (index) {
-                  return Expanded(
-                    child: Padding(
-                      key: ValueKey(applications[index].packageName),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalSpacing,
-                      ),
-                      child: AppCard(
-                        category: category,
-                        application: applications[index],
-                        autofocus: index == 0,
-                        enforceAspectRatio: false,
-                        handleUpNavigationToSettings: isFirstSection,
-                        onFocused: onAppFocused,
-                        onMove: (direction) =>
-                            _onMove(context, direction, index),
-                        onMoveEnd: () => _onMoveEnd(context),
+            ? LayoutBuilder(
+                builder: (context, constraints) {
+                  final cappedWidth =
+                      (applications.length * _maxEvenDockTileWidth).clamp(
+                        0.0,
+                        constraints.maxWidth,
+                      );
+                  return Center(
+                    child: SizedBox(
+                      width: cappedWidth,
+                      child: Row(
+                        children: List.generate(applications.length, (index) {
+                          return Expanded(
+                            child: Padding(
+                              key: ValueKey(applications[index].packageName),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: horizontalSpacing,
+                              ),
+                              child: AppCard(
+                                category: category,
+                                application: applications[index],
+                                autofocus: index == 0,
+                                enforceAspectRatio: false,
+                                handleUpNavigationToSettings: isFirstSection,
+                                onFocused: onAppFocused,
+                                onMove: (direction) =>
+                                    _onMove(context, direction, index),
+                                onMoveEnd: () => _onMoveEnd(context),
+                              ),
+                            ),
+                          );
+                        }),
                       ),
                     ),
                   );
-                }),
+                },
               )
             : ListView.custom(
                 padding: const EdgeInsets.all(8),

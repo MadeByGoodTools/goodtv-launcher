@@ -127,7 +127,7 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
                       ),
                       ...widget.categories.map(
                         (category) => _CategoryButton(
-                          label: category.name,
+                          label: _categoryLabel(category),
                           selected: widget.selectedCategoryId == category.id,
                           onPressed: () =>
                               widget.onCategorySelected?.call(category.id),
@@ -228,6 +228,13 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
         ),
       ),
     );
+  }
+
+  String _categoryLabel(Category category) {
+    if (category.name == 'Favorites' || category.name == 'Dock') {
+      return 'Dock 1';
+    }
+    return category.name;
   }
 }
 

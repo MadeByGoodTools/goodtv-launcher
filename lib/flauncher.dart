@@ -212,8 +212,12 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
             ),
             AnimatedOpacity(
               opacity: _idleBackgroundOnly ? 0 : 1,
-              duration: const Duration(milliseconds: 900),
-              curve: Curves.easeOutCubic,
+              duration: _idleBackgroundOnly
+                  ? const Duration(milliseconds: 1200)
+                  : const Duration(milliseconds: 550),
+              curve: _idleBackgroundOnly
+                  ? Curves.easeInOutCubic
+                  : Curves.easeOutCubic,
               child: IgnorePointer(
                 ignoring: _idleBackgroundOnly,
                 child: Consumer<LauncherState>(
@@ -305,20 +309,31 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     required double cardHorizontalSpacing,
     required double cardVerticalSpacing,
   }) {
-    final favoritesCategory = appsService.categories.firstWhereOrNull(
-      (c) => c.name == 'Favorites',
-    );
+    final dockCategories = appsService.dockCategories;
+    final favoritesCategory = dockCategories.firstOrNull;
     final showingHome = _selectedCategoryId == null;
     final showingFavorites =
         favoritesCategory != null &&
         _selectedCategoryId == favoritesCategory.id;
+    final configuredDocks = dockCategories
+        .map(
+          (dock) => (
+            dock,
+            dock.applications
+                .where(
+                  (app) => !app.hidden && !_isThisLauncher(app.packageName),
+                )
+                .toList(growable: false),
+          ),
+        )
+        .toList(growable: false);
     final configuredFavorites =
-        favoritesCategory?.applications
-            .where((app) => !app.hidden && !_isThisLauncher(app.packageName))
-            .toList(growable: false) ??
-        const <App>[];
+        configuredDocks.firstOrNull?.$2 ?? const <App>[];
     // Only real Dock members are rendered here. Showing All Apps as a visual
     // fallback makes the menu and reorder controls operate on the wrong list.
+    final homeDocks = showingHome
+        ? configuredDocks
+        : const <(Category, List<App>)>[];
     final favoriteApps = showingHome ? configuredFavorites : const <App>[];
 
     final otherSections = appsService.launcherSections.where((section) {
@@ -345,11 +360,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           : _emptyState(context);
     }
 
-    final hasRowsBelowDock = otherSections.isNotEmpty;
+    final hasRowsBelowDock = otherSections.isNotEmpty || homeDocks.length > 1;
 
     return CustomScrollView(
       controller: _scrollController,
-      physics: showingHome
+      physics: showingHome && !hasRowsBelowDock
           ? const NeverScrollableScrollPhysics()
           : const ClampingScrollPhysics(),
       slivers: [
@@ -379,23 +394,26 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                 ),
               ),
             ),
-          if (favoriteApps.isNotEmpty)
-            SliverToBoxAdapter(
-              child: KeyedSubtree(
-                key: _dockKey,
-                child: Padding(
-                  padding: _kDockOuterPadding,
-                  child: _dock(
-                    context,
-                    favoritesCategory!,
-                    favoriteApps,
-                    appsService,
-                    handleUpNavigationToSettings: !reserveWatchNextSpace,
+          for (final indexedDock in homeDocks.indexed)
+            if (indexedDock.$2.$2.isNotEmpty)
+              SliverToBoxAdapter(
+                child: KeyedSubtree(
+                  key: indexedDock.$1 == 0 ? _dockKey : null,
+                  child: Padding(
+                    padding: _kDockOuterPadding,
+                    child: _dock(
+                      context,
+                      indexedDock.$2.$1,
+                      indexedDock.$2.$2,
+                      appsService,
+                      showTitle: homeDocks.length > 1,
+                      handleUpNavigationToSettings:
+                          indexedDock.$1 == 0 && !reserveWatchNextSpace,
+                    ),
                   ),
                 ),
               ),
-            ),
-          if (showingHome && favoriteApps.isEmpty)
+          if (showingHome && homeDocks.every((dock) => dock.$2.isEmpty))
             SliverToBoxAdapter(child: _emptyDockPrompt(context)),
         ],
         ..._buildSectionSlivers(
@@ -703,6 +721,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     List<App> apps,
     AppsService appsService, {
     required bool handleUpNavigationToSettings,
+    bool showTitle = false,
   }) {
     final backdropDisabled = context.select<SettingsService, bool>(
       (s) => s.dockBackdropFilterDisabled,
@@ -736,7 +755,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
         applications: apps,
         evenlyDistribute: true,
         isFirstSection: handleUpNavigationToSettings,
-        showTitle: false,
+        showTitle: showTitle,
         onAppFocused: _onHomeSectionFocused,
       ),
     );

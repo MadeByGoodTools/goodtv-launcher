@@ -72,13 +72,12 @@ class AppDetailsPage extends StatelessWidget {
               ),
               _buildListTile(
                 context,
-                icon: appsService.isAppInFavorites(application)
-                    ? Icons.star
-                    : Icons.star_border,
-                title: appsService.isAppInFavorites(application)
-                    ? 'Remove from dock'
-                    : 'Add to dock',
-                onTap: () => appsService.toggleFavorite(application),
+                icon: Icons.view_carousel_outlined,
+                title: 'Manage docks',
+                onTap: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => _ManageDocksDialog(application: application),
+                ),
               ),
               _buildListTile(
                 context,
@@ -144,4 +143,46 @@ class AppDetailsPage extends StatelessWidget {
       // We can enhance it later if the user requests specific aesthetics for these details too.
     );
   }
+}
+
+class _ManageDocksDialog extends StatelessWidget {
+  final App application;
+
+  const _ManageDocksDialog({required this.application});
+
+  @override
+  Widget build(BuildContext context) => Consumer<AppsService>(
+    builder: (context, appsService, _) => AlertDialog(
+      title: const Text('Choose docks'),
+      content: SizedBox(
+        width: 480,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final dock in appsService.dockCategories)
+              SwitchListTile(
+                title: Text(appsService.dockDisplayName(dock)),
+                value: appsService.isAppInDock(application, dock),
+                onChanged: (value) =>
+                    appsService.setAppInDock(application, dock, value),
+              ),
+            ListTile(
+              leading: const Icon(Icons.add_circle_outline),
+              title: const Text('Add Dock'),
+              onTap: () async {
+                final dock = await appsService.createDock();
+                await appsService.setAppInDock(application, dock, true);
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Done'),
+        ),
+      ],
+    ),
+  );
 }

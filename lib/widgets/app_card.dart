@@ -363,7 +363,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     if (_loadedImage != null) {
       final (type, image) = _loadedImage!;
       if (type == AppImageType.Banner) {
-        return Ink.image(image: image, fit: BoxFit.cover);
+        // Use the entire card surface. Unlike `cover`, this keeps every edge
+        // of wide launcher artwork visible instead of clipping wordmarks.
+        return Ink.image(image: image, fit: BoxFit.fill);
       } else {
         return Padding(
           padding: const EdgeInsets.all(8),
@@ -371,7 +373,11 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
             children: [
               Expanded(
                 flex: 2,
-                child: Ink.image(image: image, height: double.maxFinite),
+                child: Ink.image(
+                  image: image,
+                  height: double.maxFinite,
+                  fit: BoxFit.contain,
+                ),
               ),
               Flexible(
                 flex: 3,
