@@ -15,13 +15,14 @@ class OnlineWallpaperPage extends StatefulWidget {
 }
 
 class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
+  static const _appleAerialFeed =
+      'https://sylvan.apple.com/Aerials/2x/entries.json';
   static const _redditPresets = <String, String>{
     'Earth & landscapes': 'EarthPorn',
     'Space': 'spaceporn',
     'City views': 'CityPorn',
     'Cozy rooms': 'CozyPlaces',
   };
-  late final TextEditingController _urlController;
   late int _intervalMinutes;
   bool _saving = false;
 
@@ -29,14 +30,7 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
   void initState() {
     super.initState();
     final settings = context.read<SettingsService>();
-    _urlController = TextEditingController(text: settings.wallpaperFeedUrl);
     _intervalMinutes = settings.wallpaperFeedIntervalMinutes;
-  }
-
-  @override
-  void dispose() {
-    _urlController.dispose();
-    super.dispose();
   }
 
   @override
@@ -52,36 +46,23 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
           child: Text(l.onlineWallpaperDescription),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: _redditPresets.entries
-                .map(
-                  (preset) => ActionChip(
-                    avatar: const Icon(Icons.reddit, size: 20),
-                    label: Text('Reddit: ${preset.key}'),
-                    onPressed: () {
-                      _urlController.text =
-                          'https://www.reddit.com/r/${preset.value}/.rss?limit=50';
-                    },
-                  ),
-                )
-                .toList(),
-          ),
+        FocusableSettingsTile(
+          autofocus: true,
+          leading: const Icon(Icons.airplay_rounded),
+          title: const Text('Apple TV Aerials'),
+          trailing: const Text('Use background'),
+          onPressed: _saving ? null : () => _applyPreset(_appleAerialFeed),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: TextField(
-            controller: _urlController,
-            decoration: InputDecoration(
-              labelText: l.wallpaperFeedUrl,
-              hintText: 'https://example.com/aerials.json',
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.url,
-            autocorrect: false,
+        ..._redditPresets.entries.map(
+          (preset) => FocusableSettingsTile(
+            leading: const Icon(Icons.reddit),
+            title: Text('Reddit: ${preset.key}'),
+            trailing: const Text('Use background'),
+            onPressed: _saving
+                ? null
+                : () => _applyPreset(
+                    'https://www.reddit.com/r/${preset.value}/.rss?limit=50',
+                  ),
           ),
         ),
         Padding(
@@ -106,15 +87,10 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
           ),
         ),
         FocusableSettingsTile(
-          autofocus: true,
-          leading: _saving
-              ? const SizedBox.square(
-                  dimension: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.cloud_download_outlined),
-          title: Text(l.connectWallpaperFeed),
-          onPressed: _saving ? null : _save,
+          leading: const Icon(Icons.link),
+          title: const Text('Custom background feed URL'),
+          trailing: const Text('Advanced'),
+          onPressed: _saving ? null : _showCustomFeedDialog,
         ),
         if (wallpaper.remoteFeedEnabled) ...[
           FocusableSettingsTile(
@@ -127,7 +103,6 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
             title: Text(l.disableOnlineWallpaper),
             onPressed: () async {
               await wallpaper.disableRemoteFeed();
-              if (mounted) _urlController.clear();
             },
           ),
         ],
@@ -135,12 +110,12 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
     );
   }
 
-  Future<void> _save() async {
+  Future<void> _applyPreset(String url) async {
     final l = AppLocalizations.of(context)!;
     setState(() => _saving = true);
     try {
       await context.read<WallpaperService>().configureRemoteFeed(
-        _urlController.text,
+        url,
         _intervalMinutes,
       );
       if (mounted) {
@@ -156,6 +131,42 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
       }
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _showCustomFeedDialog() async {
+    final controller = TextEditingController(
+      text: context.read<SettingsService>().wallpaperFeedUrl,
+    );
+    final url = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Custom background feed'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'Feed URL',
+            hintText: 'https://example.com/backgrounds.json',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Connect'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (url != null && url.trim().isNotEmpty && mounted) {
+      await _applyPreset(url);
     }
   }
 }

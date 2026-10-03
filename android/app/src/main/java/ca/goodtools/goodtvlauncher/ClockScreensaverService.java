@@ -7,6 +7,8 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +21,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -27,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -37,6 +41,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ClockScreensaverService extends DreamService {
     private FrameLayout container;
@@ -48,6 +54,7 @@ public class ClockScreensaverService extends DreamService {
     private int screenHeight;
     private MediaPlayer mediaPlayer;
     private SurfaceView aerialSurface;
+    private ImageView remoteImageView;
     private static final String AERIAL_MANIFEST =
             "https://sylvan.apple.com/Aerials/2x/entries.json";
 
@@ -79,8 +86,14 @@ public class ClockScreensaverService extends DreamService {
         setContentView(container);
 
         SharedPreferences backgroundPrefs = getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE);
-        if ("aerial".equals(backgroundPrefs.getString("flutter.screensaver_background", "aerial"))) {
-            startAerialBackground();
+        String backgroundMode = backgroundPrefs.getString(
+                "flutter.screensaver_background", "launcher");
+        if ("launcher".equals(backgroundMode)) {
+            String feed = backgroundPrefs.getString(
+                    "flutter.wallpaper_feed_url", AERIAL_MANIFEST);
+            startConfiguredBackground(feed == null || feed.isEmpty() ? AERIAL_MANIFEST : feed);
+        } else if ("aerial".equals(backgroundMode)) {
+            startConfiguredBackground(AERIAL_MANIFEST);
         }
 
         handler = new Handler(Looper.getMainLooper());
@@ -116,6 +129,76 @@ public class ClockScreensaverService extends DreamService {
         // Start handlers with initial delay
         handler.postDelayed(moveClockRunnable, 30000);
         handler.post(updateTimeRunnable);
+    }
+
+    private void startConfiguredBackground(String source) {
+        String lower = source.toLowerCase(Locale.US);
+        if (lower.contains("reddit.com/") || lower.endsWith(".rss") || lower.contains(".rss?")) {
+            startRedditBackground(source);
+        } else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
+                lower.endsWith(".png") || lower.endsWith(".webp")) {
+            showRemoteImage(source);
+        } else {
+            startAerialBackground();
+        }
+    }
+
+    private void startRedditBackground(String feedUrl) {
+        remoteImageView = new ImageView(this);
+        remoteImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        container.addView(remoteImageView, 0, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        new Thread(() -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(feedUrl).openConnection();
+                connection.setConnectTimeout(8000);
+                connection.setReadTimeout(8000);
+                connection.setRequestProperty("User-Agent", "GoodTVLauncher/1.0");
+                StringBuilder xml = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) xml.append(line);
+                }
+                Matcher matcher = Pattern.compile(
+                        "https://i\\.redd\\.it/[A-Za-z0-9_-]+\\.(?:jpg|jpeg|png|webp)",
+                        Pattern.CASE_INSENSITIVE).matcher(xml.toString().replace("&amp;", "&"));
+                List<String> images = new ArrayList<>();
+                while (matcher.find() && images.size() < 50) {
+                    String image = matcher.group();
+                    if (!images.contains(image)) images.add(image);
+                }
+                if (!images.isEmpty()) showRemoteImage(images.get(new Random().nextInt(images.size())));
+            } catch (Exception error) {
+                android.util.Log.w("GoodTVScreensaver", "Unable to load Reddit background", error);
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        }).start();
+    }
+
+    private void showRemoteImage(String imageUrl) {
+        new Thread(() -> {
+            try (InputStream stream = new URL(imageUrl).openStream()) {
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                if (bitmap != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        if (remoteImageView == null) {
+                            remoteImageView = new ImageView(this);
+                            remoteImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                            container.addView(remoteImageView, 0, new FrameLayout.LayoutParams(
+                                    FrameLayout.LayoutParams.MATCH_PARENT,
+                                    FrameLayout.LayoutParams.MATCH_PARENT));
+                        }
+                        remoteImageView.setImageBitmap(bitmap);
+                    });
+                }
+            } catch (Exception error) {
+                android.util.Log.w("GoodTVScreensaver", "Unable to load background image", error);
+            }
+        }).start();
     }
 
     private void startAerialBackground() {

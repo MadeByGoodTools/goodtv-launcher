@@ -143,7 +143,7 @@ class SettingsService extends ChangeNotifier {
   String get screensaverClockStyle =>
       _sharedPreferences.getString(_screensaverClockStyle) ?? "minimal";
   String get screensaverBackground =>
-      _sharedPreferences.getString(_screensaverBackground) ?? "aerial";
+      _sharedPreferences.getString(_screensaverBackground) ?? "launcher";
 
   bool get dockBackdropFilterDisabled =>
       _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? true;

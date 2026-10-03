@@ -45,14 +45,23 @@ class ScreensaverClockStylePage extends StatelessWidget {
                 child: Column(
                   children: [
                     _StyleRadioTile(
-                      title: 'Aerial video background',
-                      subtitle: 'Apple TV-style moving landscapes (Default)',
-                      value: 'aerial',
+                      title: 'Use my launcher background',
+                      subtitle: 'Use the selected Aerial or Reddit collection',
+                      value: 'launcher',
                       groupValue: settingsService.screensaverBackground,
                       onChanged: (value) =>
                           settingsService.setScreensaverBackground(value!),
                       autofocus:
-                          settingsService.screensaverBackground == 'aerial',
+                          settingsService.screensaverBackground == 'launcher',
+                    ),
+                    _StyleRadioTile(
+                      title: 'Aerial video background',
+                      subtitle: 'Always use Apple TV-style moving landscapes',
+                      value: 'aerial',
+                      groupValue: settingsService.screensaverBackground,
+                      onChanged: (value) =>
+                          settingsService.setScreensaverBackground(value!),
+                      autofocus: false,
                     ),
                     _StyleRadioTile(
                       title: 'Plain black background',

@@ -119,6 +119,25 @@ bool _isVideoUri(Uri uri) {
 }
 
 class WallpaperService extends ChangeNotifier {
+  static final List<RemoteWallpaperItem> _builtInAppleAerials =
+      [
+            'LA_A006_C008_2K_SDR_HEVC.mov',
+            'LW_L001_C006_2K_SDR_HEVC.mov',
+            'DB_D008_C010_2K_SDR_HEVC.mov',
+            'LA_A009_C009_2K_SDR_HEVC.mov',
+            'HK_B005_C011_2K_SDR_HEVC.mov',
+            'DB_D001_C001_2K_SDR_HEVC.mov',
+          ]
+          .map(
+            (name) => RemoteWallpaperItem(
+              uri: Uri.parse(
+                'https://sylvan.apple.com/Aerials/2x/Videos/$name',
+              ),
+              isVideo: true,
+              title: 'Apple TV Aerial',
+            ),
+          )
+          .toList(growable: false);
   final SettingsService _settingsService;
   final FLauncherChannel _channel = FLauncherChannel();
 
@@ -297,14 +316,23 @@ class WallpaperService extends ChangeNotifier {
     if (_isVideoUri(source) || _isImageUri(source)) {
       return [RemoteWallpaperItem(uri: source, isVideo: _isVideoUri(source))];
     }
-    final response = await http
-        .get(
-          source,
-          headers: const {
-            'User-Agent': 'GoodTVLauncher/1.0 (Android TV background feed)',
-          },
-        )
-        .timeout(const Duration(seconds: 15));
+    late http.Response response;
+    try {
+      response = await http
+          .get(
+            source,
+            headers: const {
+              'User-Agent': 'GoodTVLauncher/1.0 (Android TV background feed)',
+            },
+          )
+          .timeout(const Duration(seconds: 15));
+    } catch (_) {
+      if (source.host == 'sylvan.apple.com' &&
+          source.path.endsWith('/entries.json')) {
+        return _builtInAppleAerials;
+      }
+      rethrow;
+    }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw HttpException('Wallpaper feed returned ${response.statusCode}');
     }
