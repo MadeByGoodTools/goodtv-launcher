@@ -33,19 +33,6 @@ class FLauncherApp extends StatelessWidget {
     orderedIntents: [DismissIntent(), BackIntent()],
   );
 
-  static const MaterialColor _swatch = MaterialColor(0xFF011526, <int, Color>{
-    50: Color(0xFF36A0FA),
-    100: Color(0xFF067BDE),
-    200: Color(0xFF045CA7),
-    300: Color(0xFF033662),
-    400: Color(0xFF022544),
-    500: Color(0xFF011526),
-    600: Color(0xFF000508),
-    700: Color(0xFF000000),
-    800: Color(0xFF000000),
-    900: Color(0xFF000000),
-  });
-
   const FLauncherApp();
 
   @override

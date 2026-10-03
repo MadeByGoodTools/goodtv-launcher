@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 import '../../mocks.dart';
 import '../../mocks.mocks.dart';
@@ -55,11 +55,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Initial state: TV Applications (index 0)
+      // Initial state: all installed applications (index 0)
       expect(
-        find.text("TV Apps"),
+        find.text("All Apps"),
         findsOneWidget,
-        reason: "Should start on TV Apps tab",
+        reason: "Should start on All Apps tab",
       );
 
       // Focus on the list (assuming list item is focusable, or we can just send keys if focus is set)
@@ -72,23 +72,22 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
 
-      // Should now be on Non-TV Applications (index 1)
+      // The second tab is Favorites.
       expect(
-        find.text("Non-TV Apps"),
+        find.text("Favorite Apps"),
         findsOneWidget,
-        reason: "Should switch to Non-TV Apps after Right Arrow",
+        reason: "Should switch to Favorite Apps after Right Arrow",
       );
-      expect(find.text("Sideload App"), findsOneWidget);
 
       // Simulate Left Arrow
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pumpAndSettle();
 
-      // Should be back on TV Applications (index 0)
+      // Should be back on all installed applications (index 0).
       expect(
-        find.text("TV Apps"),
+        find.text("All Apps"),
         findsOneWidget,
-        reason: "Should switch back to TV Apps after Left Arrow",
+        reason: "Should switch back to All Apps after Left Arrow",
       );
       expect(find.text("TV App"), findsOneWidget);
 
@@ -96,9 +95,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pumpAndSettle();
       expect(
-        find.text("TV Apps"),
+        find.text("All Apps"),
         findsOneWidget,
-        reason: "Should stay on TV Apps when pressing Left on first tab",
+        reason: "Should stay on All Apps when pressing Left on first tab",
       );
     },
   );

@@ -26,7 +26,7 @@ import 'package:drift/drift.dart';
 import 'package:goodtv_launcher/database.dart';
 import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:flutter/foundation.dart' hide Category;
-import 'package:flutter/widgets.dart' hide Category;
+import 'package:flutter/widgets.dart';
 
 import '../models/app.dart';
 import '../models/category.dart';
@@ -708,14 +708,12 @@ class AppsService extends ChangeNotifier {
       return;
     }
 
-    int targetSectionIndex = -1;
     Category? targetCategory;
 
     // Find next valid category (skip spacers)
     if (direction == AxisDirection.down) {
       for (int i = currentSectionIndex + 1; i < _launcherSections.length; i++) {
         if (_launcherSections[i] is Category) {
-          targetSectionIndex = i;
           targetCategory = _launcherSections[i] as Category;
           break;
         }
@@ -723,7 +721,6 @@ class AppsService extends ChangeNotifier {
     } else if (direction == AxisDirection.up) {
       for (int i = currentSectionIndex - 1; i >= 0; i--) {
         if (_launcherSections[i] is Category) {
-          targetSectionIndex = i;
           targetCategory = _launcherSections[i] as Category;
           break;
         }
@@ -741,15 +738,6 @@ class AppsService extends ChangeNotifier {
     _pendingReorderFocusPackage = app.packageName;
 
     // Add to target
-    int newIndex = 0;
-    if (direction == AxisDirection.up) {
-      // If moving UP (to previous section), append to BOTTOM
-      newIndex = await _database.nextAppCategoryOrder(targetCategory.id) ?? 0;
-    } else {
-      // If moving DOWN (to next section), insert at TOP (index 0)
-      newIndex = 0;
-    }
-
     // DB Insert Logic
     // 1. Get current items in target
     List<App> targetApps = targetCategory.applications;

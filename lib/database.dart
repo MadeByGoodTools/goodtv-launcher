@@ -110,9 +110,11 @@ class FLauncherDatabase extends _$FLauncherDatabase {
     },
     onUpgrade: (migrator, from, to) async {
       if (from <= 1) {
-        await migrator.alterTable(
-          TableMigration(apps, newColumns: [apps.hidden]),
-        );
+        // Schema v1 still had class_name. Rebuilding via the current Apps
+        // table also tries to copy columns introduced much later, so perform
+        // this historical step explicitly before adding the v2 column.
+        await customStatement('ALTER TABLE apps DROP COLUMN class_name;');
+        await migrator.addColumn(apps, apps.hidden);
       }
       if (from <= 2 && from != 1) {
         await migrator.addColumn(apps, apps.hidden);
@@ -126,21 +128,31 @@ class FLauncherDatabase extends _$FLauncherDatabase {
               ..where((tbl) => tbl.name.equals("Applications")))
             .write(const CategoriesCompanion(type: Value(CategoryType.grid)));
       }
-      if (from < 6) {
-        await customStatement("ALTER TABLE apps DROP COLUMN banner;");
-        await customStatement("ALTER TABLE apps DROP COLUMN icon;");
+      if (from < 6 && to >= 6) {
+        if (await _columnExists('apps', 'banner')) {
+          await customStatement("ALTER TABLE apps DROP COLUMN banner;");
+        }
+        if (await _columnExists('apps', 'icon')) {
+          await customStatement("ALTER TABLE apps DROP COLUMN icon;");
+        }
       }
-      if (from < 7) {
-        await migrator.createTable(launcherSpacers);
-        await migrator.dropColumn(apps, "sideloaded");
+      if (from < 7 && to >= 7) {
+        if (!await _tableExists('launcher_spacers')) {
+          await migrator.createTable(launcherSpacers);
+        }
+        if (await _columnExists('apps', 'sideloaded')) {
+          await migrator.dropColumn(apps, "sideloaded");
+        }
       }
-      if (from < 8) {
-        await migrator.addColumn(apps, apps.lastLaunchedAt);
+      if (from < 8 && to >= 8) {
+        if (!await _columnExists('apps', 'last_launched_at')) {
+          await migrator.addColumn(apps, apps.lastLaunchedAt);
+        }
       }
-      if (from < 9) {
+      if (from < 9 && to >= 9) {
         await _mergeTvAndNonTvCategories();
       }
-      if (from < 10) {
+      if (from < 10 && to >= 10) {
         await _stripFavoritesFromAllApps();
       }
     },
@@ -150,6 +162,19 @@ class FLauncherDatabase extends _$FLauncherDatabase {
       wasCreated = openingDetails.wasCreated;
     },
   );
+
+  Future<bool> _tableExists(String tableName) async {
+    final result = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1",
+      variables: [Variable.withString(tableName)],
+    ).get();
+    return result.isNotEmpty;
+  }
+
+  Future<bool> _columnExists(String tableName, String columnName) async {
+    final columns = await customSelect('PRAGMA table_info($tableName)').get();
+    return columns.any((row) => row.read<String>('name') == columnName);
+  }
 
   /// Migration: merge "TV Apps" and "Non-TV Apps" into a single "All Apps" category.
   Future<void> _mergeTvAndNonTvCategories() async {

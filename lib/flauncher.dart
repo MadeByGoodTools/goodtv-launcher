@@ -415,9 +415,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                       onFocused: index < category.columnsCount
                           ? onAppFocused
                           : null,
-                      ensureVisibleOnFocus:
-                          onAppFocused == null ||
-                          index >= category.columnsCount,
+                      ensureVisibleOnFocus: index >= category.columnsCount,
                       onlyScrollWhenNearBottom: true,
                       onMove: (direction) => _onGridMove(
                         context,
