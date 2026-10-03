@@ -1,15 +1,26 @@
 import 'package:goodtv_launcher/widgets/settings/settings_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 
 import '../providers/launcher_state.dart';
 import '../providers/settings_service.dart';
+import '../models/category.dart';
 import 'daily_wifi_usage_widget.dart';
 import 'date_time_widget.dart';
 import 'network_widget.dart';
 
 class FocusAwareAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const FocusAwareAppBar({Key? key}) : super(key: key);
+  final List<Category> categories;
+  final int? selectedCategoryId;
+  final ValueChanged<int?>? onCategorySelected;
+
+  const FocusAwareAppBar({
+    Key? key,
+    this.categories = const [],
+    this.selectedCategoryId,
+    this.onCategorySelected,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -74,11 +85,18 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
           backgroundColor: Colors.transparent,
           // Left side: Settings, Network indicator, WiFi usage
           title: Row(
-            mainAxisSize: MainAxisSize.min,
             children: [
+              _FocusableIconButton(
+                icon: Icons.search_rounded,
+                tooltip: 'Search apps',
+                onPressed: () =>
+                    FLauncherChannel().launchApp('com.amazon.venezia'),
+              ),
+              const SizedBox(width: 10),
               // Settings button (moved to left side)
               _FocusableIconButton(
                 icon: Icons.settings_outlined,
+                tooltip: 'Settings',
                 focusNode: _settingsFocusNode,
                 onPressed: () => showDialog(
                   context: context,
@@ -86,6 +104,29 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
                 ),
               ),
               const SizedBox(width: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _CategoryButton(
+                        label: 'Home',
+                        selected: widget.selectedCategoryId == null,
+                        onPressed: () => widget.onCategorySelected?.call(null),
+                      ),
+                      ...widget.categories.map(
+                        (category) => _CategoryButton(
+                          label: category.name,
+                          selected: widget.selectedCategoryId == category.id,
+                          onPressed: () =>
+                              widget.onCategorySelected?.call(category.id),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
               // Network indicator (conditionally shown)
               Selector<SettingsService, bool>(
                 selector: (_, settings) =>
@@ -179,16 +220,44 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
   }
 }
 
+class _CategoryButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  const _CategoryButton({
+    required this.label,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(right: 8),
+    child: TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: selected ? Colors.white24 : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      child: Text(label, style: const TextStyle(fontSize: 18)),
+    ),
+  );
+}
+
 /// Reusable focusable icon button with consistent outline focus indicator
 class _FocusableIconButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final FocusNode? focusNode;
+  final String? tooltip;
 
   const _FocusableIconButton({
     required this.icon,
     required this.onPressed,
     this.focusNode,
+    this.tooltip,
   });
 
   @override
@@ -240,15 +309,18 @@ class _FocusableIconButtonState extends State<_FocusableIconButton> {
                     ]
                   : null,
             ),
-            child: Icon(
-              widget.icon,
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
+            child: Tooltip(
+              message: widget.tooltip ?? '',
+              child: Icon(
+                widget.icon,
+                shadows: const [
+                  Shadow(
+                    color: Colors.black54,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

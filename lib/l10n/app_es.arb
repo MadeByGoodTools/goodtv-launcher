@@ -180,7 +180,7 @@
     "updateInstallPermissionBody": "Permite que GoodTV Launcher instale apps desconocidas y vuelve a intentar la actualización.",
     "updateOpenPermissionSettingsButton": "Abrir ajustes de permisos",
     "updateErrorGeneric": "La actualización falló. Inténtalo de nuevo.",
-    "textAboutDialog": "GoodTV Launcher es un lanzador gratuito y de código abierto para Android TV, Google TV y Fire TV. Good Tools lo desarrolla a partir de Arc Launcher, LTvLauncher y FLauncher.\n\nCódigo fuente original: {repoUrl}",
+    "textAboutDialog": "GoodTV Launcher es un lanzador gratuito y de código abierto para Android TV, Google TV y Fire TV. Good Tools lo desarrolla.\n\nInformación de código abierto: {repoUrl}",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

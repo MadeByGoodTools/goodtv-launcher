@@ -119,20 +119,55 @@ bool _isVideoUri(Uri uri) {
 }
 
 class WallpaperService extends ChangeNotifier {
+  static final List<RemoteWallpaperItem> _builtInRedditLandscapes =
+      [
+            'https://i.redd.it/0bfcgnk584th1.jpeg',
+            'https://i.redd.it/12cmhm20b8th1.jpeg',
+            'https://i.redd.it/13c3gyp4y1th1.jpeg',
+            'https://i.redd.it/1wpq4u31g4th1.jpeg',
+            'https://i.redd.it/2cmj2yqpw8th1.jpeg',
+            'https://i.redd.it/2ulff82hszsh1.jpeg',
+            'https://i.redd.it/482w8lmj2tsh1.jpeg',
+            'https://i.redd.it/4g2siybw9zsh1.jpeg',
+            'https://i.redd.it/4wigtsfbrysh1.jpeg',
+            'https://i.redd.it/6vef059j0ush1.jpeg',
+            'https://i.redd.it/86pcmn1e10th1.jpeg',
+            'https://i.redd.it/8a06wkd6hath1.jpeg',
+            'https://i.redd.it/9nmtn7eimnsh1.jpeg',
+            'https://i.redd.it/ah3xzx5t2wsh1.jpeg',
+            'https://i.redd.it/bznbsixd37th1.jpeg',
+            'https://i.redd.it/c7vzvdn1p6th1.jpeg',
+            'https://i.redd.it/c9kdq7kg3ath1.jpeg',
+            'https://i.redd.it/cuja8t2krpsh1.jpeg',
+            'https://i.redd.it/ealtmde58ath1.jpeg',
+            'https://i.redd.it/eqwx9sayr8th1.jpeg',
+            'https://i.redd.it/fgdxn2yp82th1.jpeg',
+            'https://i.redd.it/gypbu8bg11th1.jpeg',
+            'https://i.redd.it/h4ittagnq9th1.jpeg',
+            'https://i.redd.it/hdbq3uxo67th1.jpeg',
+            'https://i.redd.it/i0p2j1lzcysh1.jpeg',
+          ]
+          .map(
+            (url) => RemoteWallpaperItem(
+              uri: Uri.parse(url),
+              isVideo: false,
+              title: 'Reddit landscape',
+            ),
+          )
+          .toList(growable: false);
+
   static final List<RemoteWallpaperItem> _builtInAppleAerials =
       [
-            'LA_A006_C008_2K_SDR_HEVC.mov',
-            'LW_L001_C006_2K_SDR_HEVC.mov',
-            'DB_D008_C010_2K_SDR_HEVC.mov',
-            'LA_A009_C009_2K_SDR_HEVC.mov',
-            'HK_B005_C011_2K_SDR_HEVC.mov',
-            'DB_D001_C001_2K_SDR_HEVC.mov',
+            'comp_A006_C003_1219EE_CC_v01_SDR_PS_FINAL_20180709_SDR_2K_AVC.mov',
+            'comp_CH_C002_C005_PSNK_v05_SDR_PS_FINAL_20180709_SDR_2K_AVC.mov',
+            'comp_H004_C007_PS_v02_SDR_PS_20180925_SDR_2K_AVC.mov',
+            'comp_DB_D008_C010_PSNK_v21_SDR_PS_20180914_F0F16157_SDR_2K_AVC.mov',
           ]
           .map(
             (name) => RemoteWallpaperItem(
-              uri: Uri.parse(
-                'https://sylvan.apple.com/Aerials/2x/Videos/$name',
-              ),
+              // Fire OS 8's older trust store rejects Apple's current TLS
+              // chain. Apple serves the same public H.264 files over HTTP.
+              uri: Uri.parse('http://sylvan.apple.com/Videos/$name'),
               isVideo: true,
               title: 'Apple TV Aerial',
             ),
@@ -331,13 +366,25 @@ class WallpaperService extends ChangeNotifier {
           source.path.endsWith('/entries.json')) {
         return _builtInAppleAerials;
       }
+      if (_isRedditFeed(source)) return _builtInRedditLandscapes;
       rethrow;
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
+      // Reddit frequently rate-limits TVs even when the same public feed works
+      // in a desktop browser. Keep the preset usable with a curated cache of
+      // full-resolution i.redd.it images instead of falling back to a gradient.
+      if (_isRedditFeed(source)) return _builtInRedditLandscapes;
       throw HttpException('Wallpaper feed returned ${response.statusCode}');
     }
-    return parseWallpaperFeed(response.body, source);
+    final items = parseWallpaperFeed(response.body, source);
+    if (items.isEmpty && _isRedditFeed(source)) {
+      return _builtInRedditLandscapes;
+    }
+    return items;
   }
+
+  static bool _isRedditFeed(Uri source) =>
+      source.host == 'reddit.com' || source.host.endsWith('.reddit.com');
 
   void _startFeedTimer() {
     _feedTimer?.cancel();

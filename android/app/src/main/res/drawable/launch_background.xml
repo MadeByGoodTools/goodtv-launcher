@@ -2,6 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@android:color/black" />
     <item
-        android:drawable="@mipmap/ic_launcher"
+        android:drawable="@drawable/goodtv_startup_logo"
         android:gravity="center" />
 </layer-list>

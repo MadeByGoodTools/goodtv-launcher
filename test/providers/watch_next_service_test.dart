@@ -30,4 +30,26 @@ void main() {
       contains('/Items/episode-42/Images/Primary'),
     );
   });
+
+  test('parses unplayed Jellyfin titles into Watch Now recommendations', () {
+    final items = WatchNextService.parseJellyfinRecommendationItems(
+      {
+        'Items': [
+          {
+            'Id': 'movie-7',
+            'Name': 'A Great Movie',
+            'Overview': 'Recommended from the library',
+            'BackdropImageTags': ['backdrop-tag'],
+          },
+        ],
+      },
+      serverUrl: 'http://media.local:8096',
+      token: 'secret',
+    );
+
+    expect(items, hasLength(1));
+    expect(items.single.title, 'A Great Movie');
+    expect(items.single.isRecommendation, isTrue);
+    expect(items.single.posterUri, contains('/Images/Backdrop/0'));
+  });
 }

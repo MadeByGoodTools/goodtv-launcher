@@ -33,6 +33,12 @@ import '../models/category.dart';
 
 class AppsService extends ChangeNotifier {
   static const _nativeAppsDefaultAppliedKey = 'native_apps_default_applied';
+  static const _alwaysHiddenPackageNames = <String>{
+    // Fire OS's legacy launcher card is labelled "Arc Launcher". It is a
+    // system component, not the GoodTV app, and should never appear as a tile.
+    'com.amazon.tv.arc',
+    'com.amazon.tv.launcher',
+  };
   final FLauncherChannel _fLauncherChannel;
   final FLauncherDatabase _database;
 
@@ -375,6 +381,14 @@ class AppsService extends ChangeNotifier {
     for (App application in _applications.values) {
       Map? applicationFromSystem =
           appsFromSystemByPackageName[application.packageName]?.$1;
+
+      if (_alwaysHiddenPackageNames.contains(application.packageName)) {
+        application.hidden = true;
+        await _database.updateApp(
+          application.packageName,
+          const AppsCompanion(hidden: Value(true)),
+        );
+      }
 
       if (applicationFromSystem != null) {
         if (applicationFromSystem.containsKey('action')) {

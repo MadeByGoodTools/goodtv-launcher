@@ -226,6 +226,7 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
   final ScrollController _scrollController = ScrollController();
   final List<FocusNode> _focusNodes = [];
   double? _lastScrollTarget;
+  double _horizontalPadding = _kWatchNextHorizontalPadding;
 
   @override
   void initState() {
@@ -290,7 +291,7 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
     final viewportWidth = position.viewportDimension;
     final slotWidth = _kWatchNextItemWidth + _kWatchNextItemSpacing;
 
-    final cardStart = _kWatchNextHorizontalPadding + index * slotWidth;
+    final cardStart = _horizontalPadding + index * slotWidth;
     final cardCenter = cardStart + _kWatchNextItemWidth / 2;
     final targetOffset = (cardCenter - viewportWidth / 2).clamp(
       position.minScrollExtent,
@@ -309,38 +310,50 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
     _lastScrollTarget = targetOffset;
     position.animateTo(
       targetOffset,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _kWatchNextItemHeight + 24 + _kWatchNextRowVerticalSlack,
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(
-          horizontal: _kWatchNextHorizontalPadding,
-          vertical: 12,
-        ),
-        itemExtent: _kWatchNextItemWidth + _kWatchNextItemSpacing,
-        addSemanticIndexes: false,
-        addRepaintBoundaries: true,
-        itemCount: widget.items.length,
-        itemBuilder: (context, index) {
-          final item = widget.items[index];
-          return _WatchNextCard(
-            item: item,
-            focusNode: _focusNodes[index],
-            autofocus: widget.isFirstSection && index == 0,
-            onFocusChanged: (focused) => _onFocusChanged(index, focused),
-            onNavigationKey: (key) => _handleNavigationKey(index, key),
-            handleUpNavigationToSettings: widget.handleUpNavigationToSettings,
-          );
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final contentWidth =
+            widget.items.length * _kWatchNextItemWidth +
+            (widget.items.length - 1).clamp(0, widget.items.length) *
+                _kWatchNextItemSpacing;
+        _horizontalPadding = contentWidth < constraints.maxWidth
+            ? (constraints.maxWidth - contentWidth) / 2
+            : _kWatchNextHorizontalPadding;
+        return SizedBox(
+          height: _kWatchNextItemHeight + 24 + _kWatchNextRowVerticalSlack,
+          child: ListView.builder(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding,
+              vertical: 12,
+            ),
+            itemExtent: _kWatchNextItemWidth + _kWatchNextItemSpacing,
+            addSemanticIndexes: false,
+            addRepaintBoundaries: true,
+            itemCount: widget.items.length,
+            itemBuilder: (context, index) {
+              final item = widget.items[index];
+              return _WatchNextCard(
+                item: item,
+                focusNode: _focusNodes[index],
+                autofocus: widget.isFirstSection && index == 0,
+                onFocusChanged: (focused) => _onFocusChanged(index, focused),
+                onNavigationKey: (key) => _handleNavigationKey(index, key),
+                handleUpNavigationToSettings:
+                    widget.handleUpNavigationToSettings,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -527,14 +540,15 @@ class _WatchNextCardState extends State<_WatchNextCard> {
 
   Widget _buildPoster(Uint8List? posterData, bool posterLoadFailed) {
     if (posterData != null) {
+      final dpr = MediaQuery.devicePixelRatioOf(context);
       return Image.memory(
         posterData,
         fit: BoxFit.cover,
         width: _kWatchNextItemWidth,
         height: _kWatchNextItemHeight,
-        cacheWidth: _kWatchNextItemWidth.toInt(),
-        cacheHeight: _kWatchNextItemHeight.toInt(),
-        filterQuality: FilterQuality.low,
+        cacheWidth: (_kWatchNextItemWidth * dpr).round(),
+        cacheHeight: (_kWatchNextItemHeight * dpr).round(),
+        filterQuality: FilterQuality.high,
       );
     }
 
@@ -571,7 +585,9 @@ class _WatchNextCardState extends State<_WatchNextCard> {
               ),
               const SizedBox(height: 2),
               Text(
-                localizations.watchNextSectionTitle,
+                widget.item.isRecommendation
+                    ? 'Watch Now'
+                    : localizations.watchNextSectionTitle,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -618,7 +634,9 @@ class _WatchNextCardState extends State<_WatchNextCard> {
           ),
           const SizedBox(height: 2),
           Text(
-            localizations.watchNextSectionTitle,
+            widget.item.isRecommendation
+                ? 'Watch Now'
+                : localizations.watchNextSectionTitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(

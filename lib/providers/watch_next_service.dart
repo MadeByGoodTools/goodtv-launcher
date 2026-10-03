@@ -136,6 +136,14 @@ class WatchNextService extends ChangeNotifier {
           .take(20)
           .toList(growable: false);
 
+      if (_items.length < 2 && _settingsService.jellyfinConfigured) {
+        final recommendations = await _loadJellyfinRecommendations(
+          limit: 2 - _items.length,
+          excludeIds: _items.map((item) => item.contentId).whereType<String>(),
+        );
+        _items = [..._items, ...recommendations];
+      }
+
       unawaited(_preloadInitialPosters());
     } catch (e) {
       debugPrint('WatchNext: Error loading items: $e');
@@ -208,6 +216,50 @@ class WatchNextService extends ChangeNotifier {
     }
   }
 
+  Future<List<WatchNextItem>> _loadJellyfinRecommendations({
+    required int limit,
+    required Iterable<String> excludeIds,
+  }) async {
+    final serverUrl = _settingsService.jellyfinServerUrl;
+    final token = _settingsService.jellyfinApiToken;
+    if (serverUrl == null || token == null || limit <= 0) return const [];
+
+    try {
+      final headers = {'X-Emby-Token': token, 'Accept': 'application/json'};
+      final meResponse = await http
+          .get(Uri.parse('$serverUrl/Users/Me'), headers: headers)
+          .timeout(const Duration(seconds: 5));
+      if (meResponse.statusCode != 200) return const [];
+      final userId = (jsonDecode(meResponse.body) as Map)['Id']?.toString();
+      if (userId == null || userId.isEmpty) return const [];
+
+      final uri = Uri.parse('$serverUrl/Users/$userId/Items').replace(
+        queryParameters: {
+          'Recursive': 'true',
+          'IncludeItemTypes': 'Movie,Series',
+          'Filters': 'IsUnplayed',
+          'SortBy': 'Random',
+          'Limit': '${limit + excludeIds.length + 4}',
+          'Fields': 'Overview,PrimaryImageAspectRatio',
+          'EnableImageTypes': 'Primary,Backdrop',
+        },
+      );
+      final response = await http
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 7));
+      if (response.statusCode != 200) return const [];
+      return parseJellyfinRecommendationItems(
+        jsonDecode(response.body),
+        serverUrl: serverUrl,
+        token: token,
+        excludeIds: excludeIds.toSet(),
+      ).take(limit).toList(growable: false);
+    } catch (error) {
+      debugPrint('WatchNext: Jellyfin recommendations failed: $error');
+      return const [];
+    }
+  }
+
   @visibleForTesting
   static List<WatchNextItem> parseJellyfinResumeItems(
     dynamic payload, {
@@ -227,11 +279,15 @@ class WatchNextService extends ChangeNotifier {
           final title = seriesName == null || seriesName.isEmpty
               ? name
               : '$seriesName — $name';
-          final imageUri = Uri.parse('$serverUrl/Items/$id/Images/Primary')
+          final hasBackdrop =
+              item['BackdropImageTags'] is List &&
+              (item['BackdropImageTags'] as List).isNotEmpty;
+          final imagePath = hasBackdrop ? 'Backdrop/0' : 'Primary';
+          final imageUri = Uri.parse('$serverUrl/Items/$id/Images/$imagePath')
               .replace(
                 queryParameters: {
-                  'maxWidth': '640',
-                  'quality': '85',
+                  'maxWidth': '1280',
+                  'quality': '90',
                   'api_key': token,
                 },
               );
@@ -248,6 +304,50 @@ class WatchNextService extends ChangeNotifier {
           );
         })
         .where((item) => item.contentId!.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  @visibleForTesting
+  static List<WatchNextItem> parseJellyfinRecommendationItems(
+    dynamic payload, {
+    required String serverUrl,
+    required String token,
+    Set<String> excludeIds = const {},
+  }) {
+    if (payload is! Map || payload['Items'] is! List) return const [];
+    return (payload['Items'] as List)
+        .whereType<Map>()
+        .map((item) {
+          final id = item['Id']?.toString() ?? '';
+          final hasBackdrop =
+              item['BackdropImageTags'] is List &&
+              (item['BackdropImageTags'] as List).isNotEmpty;
+          final imagePath = hasBackdrop ? 'Backdrop/0' : 'Primary';
+          final imageUri = Uri.parse('$serverUrl/Items/$id/Images/$imagePath')
+              .replace(
+                queryParameters: {
+                  'maxWidth': '1280',
+                  'quality': '90',
+                  'api_key': token,
+                },
+              );
+          return WatchNextItem(
+            id: id.hashCode,
+            title: item['Name']?.toString() ?? 'Watch now',
+            description: item['Overview']?.toString(),
+            posterUri: imageUri.toString(),
+            packageName: 'org.jellyfin.androidtv',
+            contentId: id,
+            intentUri: null,
+            aspectRatio: item['PrimaryImageAspectRatio']?.toString(),
+            isRecommendation: true,
+          );
+        })
+        .where(
+          (item) =>
+              item.contentId!.isNotEmpty &&
+              !excludeIds.contains(item.contentId),
+        )
         .toList(growable: false);
   }
 

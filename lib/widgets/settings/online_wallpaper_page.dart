@@ -118,6 +118,9 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
         url,
         _intervalMinutes,
       );
+      // Cinematic sources should remain crisp; the optional focus blur makes
+      // high-resolution photography look soft on a large television.
+      await context.read<SettingsService>().setBackgroundBlurDisabled(true);
       if (mounted) {
         ScaffoldMessenger.of(
           context,

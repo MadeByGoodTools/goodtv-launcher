@@ -39,12 +39,12 @@ class FLauncherAboutDialog extends StatelessWidget {
         child: Image.asset("assets/icon.png", height: 72),
       ),
       applicationLegalese:
-          "Developed by Good Tools\nBased on Arc Launcher, LTvLauncher, and FLauncher\nGNU GPL v3",
+          "Developed by Good Tools\nFree and open source\nGNU GPL v3",
       children: [
         SizedBox(height: 24),
         Text(
           localizations.textAboutDialog(
-            "https://github.com/meddouribadis/arclauncher",
+            "https://goodtools.ca",
           ),
         ),
       ],

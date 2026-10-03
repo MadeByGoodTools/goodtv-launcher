@@ -411,7 +411,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String textAboutDialog(String repoUrl) {
-    return 'GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools from Arc Launcher, LTvLauncher, and FLauncher.\n\nOriginal upstream source: $repoUrl';
+    return 'GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools.\n\nOpen-source information: $repoUrl';
   }
 
   @override

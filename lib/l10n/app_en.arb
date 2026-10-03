@@ -180,7 +180,7 @@
     "updateInstallPermissionBody": "Allow GoodTV Launcher to install unknown apps, then retry the update.",
     "updateOpenPermissionSettingsButton": "Open permission settings",
     "updateErrorGeneric": "Update check failed. Please try again.",
-    "textAboutDialog": "GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools from Arc Launcher, LTvLauncher, and FLauncher.\n\nOriginal upstream source: {repoUrl}",
+    "textAboutDialog": "GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools.\n\nOpen-source information: {repoUrl}",
     "@textAboutDialog": {
         "placeholders": {
             "repoUrl": {

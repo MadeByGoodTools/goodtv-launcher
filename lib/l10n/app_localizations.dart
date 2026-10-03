@@ -847,7 +847,7 @@ abstract class AppLocalizations {
   /// No description provided for @textAboutDialog.
   ///
   /// In en, this message translates to:
-  /// **'GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools from Arc Launcher, LTvLauncher, and FLauncher.\n\nOriginal upstream source: {repoUrl}'**
+  /// **'GoodTV Launcher is a free, open-source launcher for Android TV, Google TV, and Fire TV. It is developed by Good Tools.\n\nOpen-source information: {repoUrl}'**
   String textAboutDialog(String repoUrl);
 
   /// No description provided for @textEmptyCategory.

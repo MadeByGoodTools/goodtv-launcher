@@ -29,7 +29,6 @@ import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:goodtv_launcher/providers/watch_next_service.dart';
 import 'package:goodtv_launcher/widgets/app_card.dart';
 import 'package:goodtv_launcher/widgets/cached_blur_backdrop.dart';
-import 'package:goodtv_launcher/widgets/category_clean_row.dart';
 import 'package:goodtv_launcher/widgets/category_row.dart';
 import 'package:goodtv_launcher/widgets/launcher_alternative_view.dart';
 import 'package:goodtv_launcher/widgets/focus_aware_app_bar.dart';
@@ -61,6 +60,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   final GlobalKey<FocusAwareAppBarState> _appBarKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _dockKey = GlobalKey();
+  int? _selectedCategoryId;
 
   @override
   void initState() {
@@ -139,7 +139,17 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
             ),
             child: Scaffold(
               backgroundColor: Colors.transparent,
-              appBar: FocusAwareAppBar(key: _appBarKey),
+              appBar: FocusAwareAppBar(
+                key: _appBarKey,
+                categories: context.watch<AppsService>().categories,
+                selectedCategoryId: _selectedCategoryId,
+                onCategorySelected: (categoryId) {
+                  setState(() => _selectedCategoryId = categoryId);
+                  if (_scrollController.hasClients) {
+                    _scrollController.jumpTo(0);
+                  }
+                },
+              ),
               body:
                   Selector2<
                     AppsService,
@@ -197,16 +207,34 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     final favoritesCategory = appsService.categories.firstWhereOrNull(
       (c) => c.name == 'Favorites',
     );
-    final favoriteApps = favoritesCategory?.applications ?? const [];
+    final showingHome = _selectedCategoryId == null;
+    final configuredFavorites =
+        favoritesCategory?.applications
+            .where((app) => !app.hidden && !_isThisLauncher(app.packageName))
+            .toList(growable: false) ??
+        const <App>[];
+    // A fresh install may have no manually chosen favorites yet. In that case
+    // the Apple TV-style dock is immediately useful as a horizontal scroller
+    // for every visible app instead of showing an empty bar.
+    final favoriteApps = showingHome
+        ? (configuredFavorites.isNotEmpty
+              ? configuredFavorites
+              : appsService.applications
+                    .where(
+                      (app) => !app.hidden && !_isThisLauncher(app.packageName),
+                    )
+                    .toList(growable: false))
+        : const <App>[];
 
     final otherSections = appsService.launcherSections.where((section) {
       if (section is Category && section.name == 'Favorites') return false;
-      return true;
+      return _selectedCategoryId == null ||
+          (section is Category && section.id == _selectedCategoryId);
     }).toList();
 
-    final showWatchNextSection = context.select<SettingsService, bool>(
-      (s) => s.showWatchNextSection,
-    );
+    final showWatchNextSection =
+        showingHome &&
+        context.select<SettingsService, bool>((s) => s.showWatchNextSection);
     final watchNextVisible = context.select<WatchNextService, bool>(
       (s) => s.hasVisibleSection,
     );
@@ -556,11 +584,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           width: 1.5,
         ),
       ),
-      child: CategoryCleanRow(
+      child: CategoryRow(
         category: category,
         applications: apps,
         isFirstSection: handleUpNavigationToSettings,
-        scrollAlignment: 1.0,
+        showTitle: false,
         onAppFocused: _onHomeSectionFocused,
       ),
     );
@@ -589,6 +617,10 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       ),
     );
   }
+
+  bool _isThisLauncher(String packageName) =>
+      packageName == 'ca.goodtools.goodtvlauncher' ||
+      packageName == 'ca.goodtools.goodtvlauncher.debug';
 
   Widget _wallpaper(BuildContext context, WallpaperService wallpaperService) {
     final screenSize = MediaQuery.sizeOf(context);
@@ -623,10 +655,11 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       return Image(
         image: ResizeImage(
           wallpaperService.wallpaper!,
-          height: (screenSize.height * dpr).round(),
+          width: (screenSize.width * dpr).round(),
         ),
         key: ValueKey("background_${wallpaperService.wallpaperRevision}"),
         fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
         height: screenSize.height,
         width: screenSize.width,
       );

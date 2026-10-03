@@ -57,6 +57,12 @@ public class ClockScreensaverService extends DreamService {
     private ImageView remoteImageView;
     private static final String AERIAL_MANIFEST =
             "https://sylvan.apple.com/Aerials/2x/entries.json";
+    private static final String[] COMPATIBLE_AERIALS = {
+            "http://sylvan.apple.com/Videos/comp_A006_C003_1219EE_CC_v01_SDR_PS_FINAL_20180709_SDR_2K_AVC.mov",
+            "http://sylvan.apple.com/Videos/comp_CH_C002_C005_PSNK_v05_SDR_PS_FINAL_20180709_SDR_2K_AVC.mov",
+            "http://sylvan.apple.com/Videos/comp_H004_C007_PS_v02_SDR_PS_20180925_SDR_2K_AVC.mov",
+            "http://sylvan.apple.com/Videos/comp_DB_D008_C010_PSNK_v21_SDR_PS_20180914_F0F16157_SDR_2K_AVC.mov"
+    };
 
     private List<TextView> timeCharViews = new ArrayList<>();
     private List<TextView> dateCharViews = new ArrayList<>();
@@ -216,21 +222,8 @@ public class ClockScreensaverService extends DreamService {
     }
 
     private void prepareRandomAerial(SurfaceHolder holder) {
-        HttpURLConnection connection = null;
         try {
-            connection = (HttpURLConnection) new URL(AERIAL_MANIFEST).openConnection();
-            connection.setConnectTimeout(8000);
-            connection.setReadTimeout(8000);
-            connection.setRequestProperty("User-Agent", "GoodTVLauncher/1.0");
-            StringBuilder json = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) json.append(line);
-            }
-            JSONArray assets = new JSONObject(json.toString()).getJSONArray("assets");
-            JSONObject asset = assets.getJSONObject(new Random().nextInt(assets.length()));
-            String videoUrl = asset.getString("url-1080-SDR");
+            String videoUrl = COMPATIBLE_AERIALS[new Random().nextInt(COMPATIBLE_AERIALS.length)];
             new Handler(Looper.getMainLooper()).post(() -> {
                 try {
                     releaseMediaPlayer();
@@ -247,8 +240,6 @@ public class ClockScreensaverService extends DreamService {
             });
         } catch (Exception error) {
             android.util.Log.w("GoodTVScreensaver", "Unable to load aerial feed", error);
-        } finally {
-            if (connection != null) connection.disconnect();
         }
     }
 

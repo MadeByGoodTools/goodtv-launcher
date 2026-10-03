@@ -61,7 +61,8 @@
         android:banner="@drawable/banner"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="GoodTV Launcher">
+        android:label="GoodTV Launcher"
+        android:networkSecurityConfig="@xml/network_security_config">
         <!--
           Disable Impeller and fall back to the Skia renderer.
           On low-end Android TV GPUs (e.g. Fire TV Stick) the Impeller GLES

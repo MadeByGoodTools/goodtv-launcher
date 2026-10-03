@@ -130,7 +130,7 @@
     "updateInstallPermissionBody": "GoodTV Launcher'ın bilinmeyen uygulamaları yüklemesine izin verin, ardından güncellemeyi yeniden deneyin.",
     "updateOpenPermissionSettingsButton": "İzin ayarlarını aç",
     "updateErrorGeneric": "Güncelleme denetimi başarısız oldu. Lütfen tekrar deneyin.",
-    "textAboutDialog": "GoodTV Launcher; Android TV, Google TV ve Fire TV için ücretsiz, açık kaynaklı bir başlatıcıdır. Good Tools tarafından Arc Launcher, LTvLauncher ve FLauncher temel alınarak geliştirilmiştir.\n\nÖzgün kaynak kodu: {repoUrl}",
+    "textAboutDialog": "GoodTV Launcher; Android TV, Google TV ve Fire TV için ücretsiz, açık kaynaklı bir başlatıcıdır. Good Tools tarafından geliştirilmiştir.\n\nAçık kaynak bilgisi: {repoUrl}",
     "textEmptyCategory": "Bu kategori boş.",
     "time": "Saat",
     "titleStatusBarSettingsPage": "Durum çubuğunda gösterilecekleri seçin",

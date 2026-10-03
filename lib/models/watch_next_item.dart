@@ -30,6 +30,7 @@ class WatchNextItem {
   final String? intentUri;
   final int? watchNextType;
   final String? aspectRatio;
+  final bool isRecommendation;
 
   WatchNextItem({
     required this.id,
@@ -45,6 +46,7 @@ class WatchNextItem {
     this.intentUri,
     this.watchNextType,
     this.aspectRatio,
+    this.isRecommendation = false,
   });
 
   factory WatchNextItem.fromMap(Map<dynamic, dynamic> map) {
@@ -64,6 +66,7 @@ class WatchNextItem {
       intentUri: map['intentUri'],
       watchNextType: map['watchNextType'],
       aspectRatio: map['aspectRatio'],
+      isRecommendation: map['isRecommendation'] == true,
     );
   }
 
@@ -82,6 +85,7 @@ class WatchNextItem {
       'intentUri': intentUri,
       'watchNextType': watchNextType,
       'aspectRatio': aspectRatio,
+      'isRecommendation': isRecommendation,
     };
   }
 }
