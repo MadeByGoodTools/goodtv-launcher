@@ -98,6 +98,7 @@ public class MainActivity extends FlutterActivity {
                 case "launchActivityFromAction" -> result.success(launchActivityFromAction(call.arguments()));
                 case "launchApp" -> result.success(launchApp(call.arguments()));
                 case "searchAppstore" -> result.success(searchAppstore(call.arguments()));
+                case "openAptoideInstaller" -> result.success(openAptoideInstaller());
                 case "openSettings" -> result.success(openSettings());
                 case "installApk" -> result.success(installApk(call.arguments()));
                 case "requestInstallUnknownAppsPermission" -> {
@@ -494,6 +495,14 @@ public class MainActivity extends FlutterActivity {
         }
 
         return false;
+    }
+
+    private boolean openAptoideInstaller() {
+        Intent intent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://pool.apk.aptoide.com/carolyne-silva/cm-aptoidetv-pt-542-72049303-6212d8ef0991eaf05b32f8f0141dadb8.apk")
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return tryStartActivity(intent);
     }
 
     private boolean openSettings() {

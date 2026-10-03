@@ -78,6 +78,16 @@ void main() {
     expect(called, isTrue);
   });
 
+  test("openAptoideInstaller", () async {
+    final channel = MethodChannel('me.efesser.flauncher/method');
+    channel.setMockMethodCallHandler((call) async {
+      if (call.method == "openAptoideInstaller") return true;
+      fail("Unhandled method name");
+    });
+
+    expect(await FLauncherChannel().openAptoideInstaller(), isTrue);
+  });
+
   test("openAppInfo", () async {
     final channel = MethodChannel('me.efesser.flauncher/method');
     String? packageName;

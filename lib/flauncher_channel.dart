@@ -78,6 +78,9 @@ class FLauncherChannel {
   Future<bool> searchAppstore(String query) async =>
       await _methodChannel.invokeMethod('searchAppstore', query) ?? false;
 
+  Future<bool> openAptoideInstaller() async =>
+      await _methodChannel.invokeMethod('openAptoideInstaller') ?? false;
+
   Future<void> openSettings() async =>
       await _methodChannel.invokeMethod('openSettings');
 

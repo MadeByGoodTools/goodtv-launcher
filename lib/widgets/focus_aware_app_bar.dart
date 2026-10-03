@@ -233,7 +233,45 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
 
 Future<void> _showAppSearch(BuildContext context) async {
   try {
-    final opened = await FLauncherChannel().searchAppstore('');
+    final channel = FLauncherChannel();
+    final aptoideInstalled = await channel.applicationExists('cm.aptoidetv.pt');
+    if (!aptoideInstalled) {
+      if (!context.mounted) return;
+      final install = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Install an app store?'),
+          content: const Text(
+            'GoodTV uses Aptoide TV for app search. It is not installed on this TV yet.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Not now'),
+            ),
+            FilledButton.icon(
+              autofocus: true,
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              icon: const Icon(Icons.download_rounded),
+              label: const Text('Install Aptoide TV'),
+            ),
+          ],
+        ),
+      );
+      if (install == true) {
+        final opened = await channel.openAptoideInstaller();
+        if (!opened && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No browser or Downloader app was found.'),
+            ),
+          );
+        }
+      }
+      return;
+    }
+
+    final opened = await channel.searchAppstore('');
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
