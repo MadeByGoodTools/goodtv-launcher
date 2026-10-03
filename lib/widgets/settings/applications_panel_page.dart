@@ -30,15 +30,17 @@ import '../../models/category.dart';
 
 class ApplicationsPanelPage extends StatefulWidget {
   static const String routeName = "applications_panel";
+  static const String dockRouteName = "applications_panel_dock";
+  final int initialTabIndex;
 
-  const ApplicationsPanelPage({super.key});
+  const ApplicationsPanelPage({super.key, this.initialTabIndex = 0});
 
   @override
   State<ApplicationsPanelPage> createState() => _ApplicationsPanelPageState();
 }
 
 class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   String _title = "";
   bool _isSwitchingViaKeyboard = false;
 
@@ -53,6 +55,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.initialTabIndex.clamp(0, 2);
     _tabFocusNodes = List.generate(_tabs.length, (index) => FocusNode());
   }
 
@@ -68,7 +71,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
   Widget build(BuildContext context) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
     if (_title.isEmpty) {
-      _title = _tabs[0].getTitle(localizations);
+      _title = _tabs[_selectedIndex].getTitle(localizations);
     }
 
     return Column(

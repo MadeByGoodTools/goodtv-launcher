@@ -32,6 +32,7 @@ class CategoryRow extends StatelessWidget {
 
   final bool isFirstSection;
   final bool showTitle;
+  final bool evenlyDistribute;
   final VoidCallback? onAppFocused;
 
   CategoryRow({
@@ -40,6 +41,7 @@ class CategoryRow extends StatelessWidget {
     required this.applications,
     this.isFirstSection = false,
     this.showTitle = true,
+    this.evenlyDistribute = false,
     this.onAppFocused,
   }) : super(key: key);
 
@@ -57,27 +59,53 @@ class CategoryRow extends StatelessWidget {
         height:
             category.rowHeight.toDouble() +
             (showAppNames ? kAppNameLabelHeight : 0),
-        child: ListView.custom(
-          padding: const EdgeInsets.all(8),
-          scrollDirection: Axis.horizontal,
-          childrenDelegate: SliverChildBuilderDelegate(
-            childCount: applications.length,
-            findChildIndexCallback: _findChildIndex,
-            (context, index) => Padding(
-              key: Key(applications[index].packageName),
-              padding: EdgeInsets.symmetric(horizontal: horizontalSpacing),
-              child: AppCard(
-                category: category,
-                application: applications[index],
-                autofocus: index == 0,
-                handleUpNavigationToSettings: isFirstSection,
-                onFocused: onAppFocused,
-                onMove: (direction) => _onMove(context, direction, index),
-                onMoveEnd: () => _onMoveEnd(context),
+        child: evenlyDistribute && applications.length <= Category.ColumnsCount
+            ? Row(
+                children: List.generate(applications.length, (index) {
+                  return Expanded(
+                    child: Padding(
+                      key: ValueKey(applications[index].packageName),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalSpacing,
+                      ),
+                      child: AppCard(
+                        category: category,
+                        application: applications[index],
+                        autofocus: index == 0,
+                        enforceAspectRatio: false,
+                        handleUpNavigationToSettings: isFirstSection,
+                        onFocused: onAppFocused,
+                        onMove: (direction) =>
+                            _onMove(context, direction, index),
+                        onMoveEnd: () => _onMoveEnd(context),
+                      ),
+                    ),
+                  );
+                }),
+              )
+            : ListView.custom(
+                padding: const EdgeInsets.all(8),
+                scrollDirection: Axis.horizontal,
+                childrenDelegate: SliverChildBuilderDelegate(
+                  childCount: applications.length,
+                  findChildIndexCallback: _findChildIndex,
+                  (context, index) => Padding(
+                    key: Key(applications[index].packageName),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalSpacing,
+                    ),
+                    child: AppCard(
+                      category: category,
+                      application: applications[index],
+                      autofocus: index == 0,
+                      handleUpNavigationToSettings: isFirstSection,
+                      onFocused: onAppFocused,
+                      onMove: (direction) => _onMove(context, direction, index),
+                      onMoveEnd: () => _onMoveEnd(context),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       );
     }
 

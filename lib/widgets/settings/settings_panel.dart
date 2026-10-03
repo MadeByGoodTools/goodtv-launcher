@@ -123,6 +123,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
                       return _FastPageRoute(
                         builder: (_) => ApplicationsPanelPage(),
                       );
+                    case ApplicationsPanelPage.dockRouteName:
+                      return _FastPageRoute(
+                        builder: (_) =>
+                            const ApplicationsPanelPage(initialTabIndex: 1),
+                      );
                     case LauncherSectionsPanelPage.routeName:
                       return _FastPageRoute(
                         builder: (_) => LauncherSectionsPanelPage(),

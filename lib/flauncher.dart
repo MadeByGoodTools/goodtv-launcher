@@ -34,6 +34,8 @@ import 'package:goodtv_launcher/widgets/cached_blur_backdrop.dart';
 import 'package:goodtv_launcher/widgets/category_row.dart';
 import 'package:goodtv_launcher/widgets/launcher_alternative_view.dart';
 import 'package:goodtv_launcher/widgets/focus_aware_app_bar.dart';
+import 'package:goodtv_launcher/widgets/settings/applications_panel_page.dart';
+import 'package:goodtv_launcher/widgets/settings/settings_panel.dart';
 import 'package:goodtv_launcher/widgets/wallpaper_video_background.dart';
 import 'package:goodtv_launcher/widgets/watch_next_row.dart';
 import 'package:flutter/material.dart';
@@ -349,7 +351,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                   MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top -
                   kToolbarHeight -
-                  (reserveWatchNextSpace ? 410 : 150),
+                  (reserveWatchNextSpace ? 480 : 150),
             ),
           ),
           if (showWatchNextSection)
@@ -384,6 +386,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
                 ),
               ),
             ),
+          if (showingHome && favoriteApps.isEmpty)
+            SliverToBoxAdapter(child: _emptyDockPrompt(context)),
         ],
         ..._buildSectionSlivers(
           otherSections,
@@ -399,6 +403,27 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       ],
     );
   }
+
+  Widget _emptyDockPrompt(BuildContext context) => Padding(
+    padding: _kDockOuterPadding,
+    child: Center(
+      child: SizedBox(
+        width: 560,
+        height: 100,
+        child: OutlinedButton.icon(
+          autofocus: true,
+          icon: const Icon(Icons.add_circle_outline),
+          label: const Text('Add apps to Dock'),
+          onPressed: () => showDialog<void>(
+            context: context,
+            builder: (_) => const SettingsPanel(
+              initialRoute: ApplicationsPanelPage.dockRouteName,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 
   List<Widget> _buildSectionSlivers(
     List<LauncherSection> sections, {
@@ -700,6 +725,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       child: CategoryRow(
         category: category,
         applications: apps,
+        evenlyDistribute: true,
         isFirstSection: handleUpNavigationToSettings,
         showTitle: false,
         onAppFocused: _onHomeSectionFocused,

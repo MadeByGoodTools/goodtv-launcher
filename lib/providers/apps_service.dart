@@ -33,6 +33,7 @@ import '../models/category.dart';
 
 class AppsService extends ChangeNotifier {
   static const _nativeAppsDefaultAppliedKey = 'native_apps_default_applied';
+  static const _realDockMigrationKey = 'real_dock_membership_migrated';
   static const _alwaysHiddenPackageNames = <String>{
     // Fire OS's legacy launcher card is labelled "Arc Launcher". It is a
     // system component, not the GoodTV app, and should never appear as a tile.
@@ -113,6 +114,7 @@ class AppsService extends ChangeNotifier {
       // repairs older installs that removed Favorites from All Apps.
       await autoPopulateCategory(allAppsCategory);
     }
+    await _migrateLegacyVisualDock();
 
     _fLauncherChannel.addAppsChangedListener((event) async {
       String? changedPackageName;
@@ -225,6 +227,43 @@ class AppsService extends ChangeNotifier {
 
     // Pre-cache icons for visible apps
     _preCacheIcons();
+  }
+
+  Future<void> _migrateLegacyVisualDock() async {
+    final prefs = await _prefsAsync;
+    if (prefs.getBool(_realDockMigrationKey) == true) return;
+    final favorites = await getOrCreateFavoritesCategory();
+    final launcherEntries = favorites.applications
+        .where(
+          (app) =>
+              app.packageName == 'ca.goodtools.goodtvlauncher' ||
+              app.packageName == 'ca.goodtools.goodtvlauncher.debug',
+        )
+        .toList();
+    final hasRealDockApps = favorites.applications.any(
+      (app) => !launcherEntries.contains(app),
+    );
+    for (final app in launcherEntries) {
+      await removeFromCategory(app, favorites);
+    }
+    if (!hasRealDockApps) {
+      const preferredPackages = <String>[
+        'cm.aptoidetv.pt',
+        'com.esaba.downloader',
+        'org.jellyfin.androidtv',
+        'org.localsend.localsend_app',
+        'com.stremio.one',
+      ];
+      for (final packageName in preferredPackages) {
+        final app = _applications[packageName];
+        if (app != null && !app.hidden) {
+          await addToCategory(app, favorites, shouldNotifyListeners: false);
+        }
+      }
+      sortCategory(favorites);
+      notifyListeners();
+    }
+    await prefs.setBool(_realDockMigrationKey, true);
   }
 
   Future<void> _preCacheIcons() async {
