@@ -41,6 +41,7 @@ import 'package:goodtv_launcher/widgets/settings/display_presets_page.dart';
 import 'package:goodtv_launcher/widgets/settings/app_card_style_page.dart';
 import 'package:goodtv_launcher/widgets/settings/system_setup_page.dart';
 import 'package:goodtv_launcher/widgets/settings/pin_protection_page.dart';
+import 'package:goodtv_launcher/widgets/settings/accessibility_settings_page.dart';
 import 'package:goodtv_launcher/providers/pin_service.dart';
 import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -179,6 +180,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     case PinProtectionPage.routeName:
                       return _FastPageRoute(
                         builder: (_) => const PinProtectionPage(),
+                      );
+                    case AccessibilitySettingsPage.routeName:
+                      return _FastPageRoute(
+                        builder: (_) => const AccessibilitySettingsPage(),
                       );
                     case AppDetailsPage.routeName:
                       return _FastPageRoute(

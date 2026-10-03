@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -36,6 +37,7 @@ import 'package:goodtv_launcher/widgets/wallpaper_video_background.dart';
 import 'package:goodtv_launcher/widgets/watch_next_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
@@ -61,16 +63,22 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _dockKey = GlobalKey();
   int? _selectedCategoryId;
+  Timer? _idleTimer;
+  bool _idleBackgroundOnly = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    HardwareKeyboard.instance.addHandler(_handleHardwareKey);
+    _resetIdleTimer();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    HardwareKeyboard.instance.removeHandler(_handleHardwareKey);
+    _idleTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -79,107 +87,156 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       context.read<WatchNextService>().refreshPermissionAndItems();
+      _wakeFromIdle();
+    } else if (state == AppLifecycleState.paused) {
+      _idleTimer?.cancel();
     }
   }
 
+  bool _handleHardwareKey(KeyEvent event) {
+    final wasIdle = _idleBackgroundOnly;
+    _wakeFromIdle();
+    return wasIdle &&
+        event is KeyDownEvent &&
+        context.read<SettingsService>().wakeConsumesFirstPress;
+  }
+
+  void _wakeFromIdle() {
+    if (mounted && _idleBackgroundOnly) {
+      setState(() => _idleBackgroundOnly = false);
+    }
+    _resetIdleTimer();
+  }
+
+  void _resetIdleTimer() {
+    _idleTimer?.cancel();
+    if (!mounted || !context.read<SettingsService>().idleFadeEnabled) return;
+    _idleTimer = Timer(const Duration(minutes: 2), () {
+      if (mounted) setState(() => _idleBackgroundOnly = true);
+    });
+  }
+
   @override
-  Widget build(BuildContext context) => Actions(
-    actions: <Type, Action<Intent>>{
-      MoveFocusToSettingsIntent: CallbackAction<MoveFocusToSettingsIntent>(
-        onInvoke: (_) => _appBarKey.currentState?.focusSettings(),
-      ),
-    },
-    child: FocusTraversalGroup(
-      policy: RowByRowTraversalPolicy(),
-      child: Stack(
-        children: [
-          RepaintBoundary(
-            child: Consumer<WallpaperService>(
-              builder: (_, wallpaperService, __) =>
-                  _wallpaper(context, wallpaperService),
+  Widget build(BuildContext context) => Listener(
+    behavior: HitTestBehavior.translucent,
+    onPointerDown: (_) => _wakeFromIdle(),
+    child: Actions(
+      actions: <Type, Action<Intent>>{
+        MoveFocusToSettingsIntent: CallbackAction<MoveFocusToSettingsIntent>(
+          onInvoke: (_) => _appBarKey.currentState?.focusSettings(),
+        ),
+      },
+      child: FocusTraversalGroup(
+        policy: RowByRowTraversalPolicy(),
+        child: Stack(
+          children: [
+            RepaintBoundary(
+              child: Consumer<WallpaperService>(
+                builder: (_, wallpaperService, __) =>
+                    _wallpaper(context, wallpaperService),
+              ),
             ),
-          ),
-          const Positioned.fill(
-            child: IgnorePointer(child: ColoredBox(color: Color(0x66000000))),
-          ),
-          Selector3<
-            LauncherState,
-            SettingsService,
-            WallpaperService,
-            (bool, bool, bool)
-          >(
-            selector: (_, launcherState, settings, wallpaperService) => (
-              launcherState.appGridFocused,
-              settings.backgroundBlurDisabled,
-              wallpaperService.wallpaperVideoFile != null ||
-                  wallpaperService.wallpaperVideoUrl != null,
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  opacity: _idleBackgroundOnly ? 0 : 1,
+                  duration: const Duration(milliseconds: 900),
+                  child: const ColoredBox(color: Color(0x66000000)),
+                ),
+              ),
             ),
-            builder: (_, data, __) {
-              final (appGridFocused, blurDisabled, hasVideoWallpaper) = data;
-              if (hasVideoWallpaper) {
-                return const SizedBox.shrink();
-              }
-              return Positioned.fill(
-                child: IgnorePointer(
-                  child: AnimatedOpacity(
-                    opacity: appGridFocused && !blurDisabled ? 1 : 0,
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    child: const CachedBlurLayer(sigma: 10),
+            Selector3<
+              LauncherState,
+              SettingsService,
+              WallpaperService,
+              (bool, bool, bool)
+            >(
+              selector: (_, launcherState, settings, wallpaperService) => (
+                launcherState.appGridFocused,
+                settings.backgroundBlurDisabled,
+                wallpaperService.wallpaperVideoFile != null ||
+                    wallpaperService.wallpaperVideoUrl != null,
+              ),
+              builder: (_, data, __) {
+                final (appGridFocused, blurDisabled, hasVideoWallpaper) = data;
+                if (hasVideoWallpaper) {
+                  return const SizedBox.shrink();
+                }
+                return Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedOpacity(
+                      opacity:
+                          !_idleBackgroundOnly &&
+                              appGridFocused &&
+                              !blurDisabled
+                          ? 1
+                          : 0,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      child: const CachedBlurLayer(sigma: 10),
+                    ),
+                  ),
+                );
+              },
+            ),
+            AnimatedOpacity(
+              opacity: _idleBackgroundOnly ? 0 : 1,
+              duration: const Duration(milliseconds: 900),
+              curve: Curves.easeOutCubic,
+              child: IgnorePointer(
+                ignoring: _idleBackgroundOnly,
+                child: Consumer<LauncherState>(
+                  builder: (_, state, child) => Visibility(
+                    replacement: const Center(child: AlternativeLauncherView()),
+                    visible: state.launcherVisible,
+                    child: child!,
+                  ),
+                  child: Scaffold(
+                    backgroundColor: Colors.transparent,
+                    appBar: FocusAwareAppBar(
+                      key: _appBarKey,
+                      categories: context.watch<AppsService>().categories,
+                      selectedCategoryId: _selectedCategoryId,
+                      onCategorySelected: (categoryId) {
+                        setState(() => _selectedCategoryId = categoryId);
+                        if (_scrollController.hasClients) {
+                          _scrollController.jumpTo(0);
+                        }
+                      },
+                    ),
+                    body:
+                        Selector2<
+                          AppsService,
+                          SettingsService,
+                          (bool, int, bool, double, double)
+                        >(
+                          selector: (_, appsService, settingsService) => (
+                            appsService.initialized,
+                            appsService.layoutVersion,
+                            settingsService.showAppNamesBelowIcons,
+                            settingsService.appCardHorizontalSpacing,
+                            settingsService.appCardVerticalSpacing,
+                          ),
+                          builder: (context, data, _) {
+                            if (data.$1) {
+                              return _tvOSLayout(
+                                context,
+                                context.read<AppsService>(),
+                                showAppNames: data.$3,
+                                cardHorizontalSpacing: data.$4,
+                                cardVerticalSpacing: data.$5,
+                              );
+                            } else {
+                              return _emptyState(context);
+                            }
+                          },
+                        ),
                   ),
                 ),
-              );
-            },
-          ),
-          Consumer<LauncherState>(
-            builder: (_, state, child) => Visibility(
-              replacement: const Center(child: AlternativeLauncherView()),
-              visible: state.launcherVisible,
-              child: child!,
-            ),
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: FocusAwareAppBar(
-                key: _appBarKey,
-                categories: context.watch<AppsService>().categories,
-                selectedCategoryId: _selectedCategoryId,
-                onCategorySelected: (categoryId) {
-                  setState(() => _selectedCategoryId = categoryId);
-                  if (_scrollController.hasClients) {
-                    _scrollController.jumpTo(0);
-                  }
-                },
               ),
-              body:
-                  Selector2<
-                    AppsService,
-                    SettingsService,
-                    (bool, int, bool, double, double)
-                  >(
-                    selector: (_, appsService, settingsService) => (
-                      appsService.initialized,
-                      appsService.layoutVersion,
-                      settingsService.showAppNamesBelowIcons,
-                      settingsService.appCardHorizontalSpacing,
-                      settingsService.appCardVerticalSpacing,
-                    ),
-                    builder: (context, data, _) {
-                      if (data.$1) {
-                        return _tvOSLayout(
-                          context,
-                          context.read<AppsService>(),
-                          showAppNames: data.$3,
-                          cardHorizontalSpacing: data.$4,
-                          cardVerticalSpacing: data.$5,
-                        );
-                      } else {
-                        return _emptyState(context);
-                      }
-                    },
-                  ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
@@ -258,10 +315,13 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           ),
           if (showWatchNextSection)
             SliverToBoxAdapter(
-              child: WatchNextRow(
-                isFirstSection: false,
-                isAboveDock: true,
-                onItemFocused: _onHomeSectionFocused,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 18),
+                child: WatchNextRow(
+                  isFirstSection: false,
+                  isAboveDock: true,
+                  onItemFocused: _onHomeSectionFocused,
+                ),
               ),
             ),
           if (favoriteApps.isNotEmpty)

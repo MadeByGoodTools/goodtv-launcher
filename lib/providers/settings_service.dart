@@ -56,6 +56,8 @@ const String _appCardFocusZoom = "app_card_focus_zoom";
 const String _appCardSpacing = "app_card_spacing";
 const String _wallpaperFeedUrl = "wallpaper_feed_url";
 const String _wallpaperFeedIntervalMinutes = "wallpaper_feed_interval_minutes";
+const String _idleFadeEnabled = "idle_fade_enabled";
+const String _wakeConsumesFirstPress = "wake_consumes_first_press";
 const String _defaultAerialFeedUrl =
     'https://sylvan.apple.com/Aerials/2x/entries.json';
 
@@ -153,6 +155,12 @@ class SettingsService extends ChangeNotifier {
 
   bool get showWatchNextSection =>
       _sharedPreferences.getBool(_showWatchNextSection) ?? true;
+
+  bool get idleFadeEnabled =>
+      _sharedPreferences.getBool(_idleFadeEnabled) ?? true;
+
+  bool get wakeConsumesFirstPress =>
+      _sharedPreferences.getBool(_wakeConsumesFirstPress) ?? true;
 
   String? get jellyfinServerUrl {
     final value = _sharedPreferences.getString(_jellyfinServerUrl)?.trim();
@@ -386,6 +394,14 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setShowWatchNextSection(bool value) async {
     return set(_showWatchNextSection, value);
+  }
+
+  Future<void> setIdleFadeEnabled(bool value) async {
+    return set(_idleFadeEnabled, value);
+  }
+
+  Future<void> setWakeConsumesFirstPress(bool value) async {
+    return set(_wakeConsumesFirstPress, value);
   }
 
   Future<void> setJellyfinConnection(String serverUrl, String apiToken) async {

@@ -94,6 +94,7 @@ public class MainActivity extends FlutterActivity {
                 case "applicationExists" -> result.success(applicationExists(call.arguments()));
                 case "launchActivityFromAction" -> result.success(launchActivityFromAction(call.arguments()));
                 case "launchApp" -> result.success(launchApp(call.arguments()));
+                case "searchAppstore" -> result.success(searchAppstore(call.arguments()));
                 case "openSettings" -> result.success(openSettings());
                 case "installApk" -> result.success(installApk(call.arguments()));
                 case "requestInstallUnknownAppsPermission" -> {
@@ -425,6 +426,21 @@ public class MainActivity extends FlutterActivity {
         }
 
         return tryStartActivity(intent);
+    }
+
+    private boolean searchAppstore(String query) {
+        String normalized = query == null ? "" : query.trim();
+        if (normalized.isEmpty()) {
+            return launchApp("cm.aptoidetv.pt");
+        }
+        Intent searchIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("aptoidesearch://" + Uri.encode(normalized))
+        ).setPackage("cm.aptoidetv.pt").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (tryStartActivity(searchIntent)) {
+            return true;
+        }
+        return launchApp("cm.aptoidetv.pt");
     }
 
     private boolean openSettings() {

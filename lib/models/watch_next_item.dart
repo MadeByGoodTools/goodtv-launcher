@@ -32,6 +32,8 @@ class WatchNextItem {
   final String? aspectRatio;
   final bool isRecommendation;
 
+  String? get artworkUri => backdropUri ?? posterUri;
+
   WatchNextItem({
     required this.id,
     required this.title,

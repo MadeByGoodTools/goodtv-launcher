@@ -39,7 +39,8 @@ void _playFocusSound(BuildContext context) {
 const double _kWatchNextItemWidth = 360;
 const double _kWatchNextItemHeight = 200;
 const double _kWatchNextItemSpacing = 24;
-const double _kWatchNextRowVerticalSlack = 8;
+const double _kWatchNextRowVerticalPadding = 18;
+const double _kWatchNextCardRadius = 20;
 const double _kWatchNextHorizontalPadding =
     kLauncherSectionHorizontalPadding + kAppCardHorizontalPadding;
 
@@ -327,13 +328,14 @@ class _WatchNextCleanRowState extends State<_WatchNextCleanRow> {
             ? (constraints.maxWidth - contentWidth) / 2
             : _kWatchNextHorizontalPadding;
         return SizedBox(
-          height: _kWatchNextItemHeight + 24 + _kWatchNextRowVerticalSlack,
+          height: _kWatchNextItemHeight + (_kWatchNextRowVerticalPadding * 2),
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
             padding: EdgeInsets.symmetric(
               horizontal: _horizontalPadding,
-              vertical: 12,
+              vertical: _kWatchNextRowVerticalPadding,
             ),
             itemExtent: _kWatchNextItemWidth + _kWatchNextItemSpacing,
             addSemanticIndexes: false,
@@ -388,7 +390,7 @@ class _WatchNextCardState extends State<_WatchNextCard> {
   @override
   void initState() {
     super.initState();
-    context.read<WatchNextService>().ensurePosterLoaded(widget.item.posterUri);
+    context.read<WatchNextService>().ensurePosterLoaded(widget.item.artworkUri);
   }
 
   @override
@@ -397,9 +399,9 @@ class _WatchNextCardState extends State<_WatchNextCard> {
     if (oldWidget.focusNode != widget.focusNode) {
       _isHovered = widget.focusNode.hasFocus;
     }
-    if (oldWidget.item.posterUri != widget.item.posterUri) {
+    if (oldWidget.item.artworkUri != widget.item.artworkUri) {
       context.read<WatchNextService>().ensurePosterLoaded(
-        widget.item.posterUri,
+        widget.item.artworkUri,
       );
     }
   }
@@ -448,8 +450,8 @@ class _WatchNextCardState extends State<_WatchNextCard> {
     final (posterData, posterLoadFailed) = context
         .select<WatchNextService, (Uint8List?, bool)>(
           (service) => (
-            service.getCachedPoster(widget.item.posterUri),
-            service.hasPosterLoadFailed(widget.item.posterUri),
+            service.getCachedPoster(widget.item.artworkUri),
+            service.hasPosterLoadFailed(widget.item.artworkUri),
           ),
         );
     final targetScale = _clicked ? 0.97 : (_isHovered ? _focusedScale : 1.0);
@@ -494,7 +496,7 @@ class _WatchNextCardState extends State<_WatchNextCard> {
                   elevation: _isHovered ? 6 : 2,
                   clipBehavior: Clip.antiAlias,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(_kWatchNextCardRadius),
                   ),
                   child: SizedBox(
                     width: _kWatchNextItemWidth,
@@ -514,7 +516,9 @@ class _WatchNextCardState extends State<_WatchNextCard> {
                           IgnorePointer(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(
+                                  _kWatchNextCardRadius,
+                                ),
                                 border: Border.all(
                                   color: Theme.of(context).colorScheme.primary,
                                   width: 2,
@@ -544,6 +548,7 @@ class _WatchNextCardState extends State<_WatchNextCard> {
       return Image.memory(
         posterData,
         fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
         width: _kWatchNextItemWidth,
         height: _kWatchNextItemHeight,
         cacheWidth: (_kWatchNextItemWidth * dpr).round(),
@@ -554,7 +559,7 @@ class _WatchNextCardState extends State<_WatchNextCard> {
 
     return Container(
       color: Colors.grey.shade800,
-      child: widget.item.posterUri != null && !posterLoadFailed
+      child: widget.item.artworkUri != null && !posterLoadFailed
           ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
           : _buildFallbackWidget(),
     );

@@ -89,8 +89,7 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
               _FocusableIconButton(
                 icon: Icons.search_rounded,
                 tooltip: 'Search apps',
-                onPressed: () =>
-                    FLauncherChannel().launchApp('com.amazon.venezia'),
+                onPressed: () => _showAppSearch(context),
               ),
               const SizedBox(width: 10),
               // Settings button (moved to left side)
@@ -218,6 +217,42 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
       ),
     );
   }
+}
+
+Future<void> _showAppSearch(BuildContext context) async {
+  final controller = TextEditingController();
+  final query = await showDialog<String>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('Search apps'),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        textInputAction: TextInputAction.search,
+        decoration: const InputDecoration(
+          hintText: 'App name',
+          prefixIcon: Icon(Icons.search),
+        ),
+        onSubmitted: (value) => Navigator.of(dialogContext).pop(value.trim()),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton.icon(
+          autofocus: true,
+          onPressed: () =>
+              Navigator.of(dialogContext).pop(controller.text.trim()),
+          icon: const Icon(Icons.storefront_outlined),
+          label: const Text('Find & install'),
+        ),
+      ],
+    ),
+  );
+  controller.dispose();
+  if (query == null || query.isEmpty) return;
+  await FLauncherChannel().searchAppstore(query);
 }
 
 class _CategoryButton extends StatelessWidget {

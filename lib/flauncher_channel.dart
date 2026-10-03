@@ -62,6 +62,9 @@ class FLauncherChannel {
   Future<void> launchApp(String packageName) async =>
       await _methodChannel.invokeMethod('launchApp', packageName);
 
+  Future<bool> searchAppstore(String query) async =>
+      await _methodChannel.invokeMethod('searchAppstore', query) ?? false;
+
   Future<void> openSettings() async =>
       await _methodChannel.invokeMethod('openSettings');
 

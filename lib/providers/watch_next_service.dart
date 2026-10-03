@@ -354,7 +354,7 @@ class WatchNextService extends ChangeNotifier {
   Future<void> _preloadInitialPosters() async {
     final pendingUris = _items
         .take(3)
-        .map((item) => item.posterUri)
+        .map((item) => item.artworkUri)
         .whereType<String>()
         .where((uri) => !_posterCache.containsKey(uri))
         .toList(growable: false);

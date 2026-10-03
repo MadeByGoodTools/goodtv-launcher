@@ -24,6 +24,8 @@ import 'package:goodtv_launcher/widgets/settings/flauncher_about_dialog.dart';
 import 'package:goodtv_launcher/widgets/settings/interface_settings_page.dart';
 import 'package:goodtv_launcher/widgets/settings/update_dialogs.dart';
 import 'package:goodtv_launcher/widgets/settings/general_settings_page.dart';
+import 'package:goodtv_launcher/widgets/settings/accessibility_settings_page.dart';
+import 'package:goodtv_launcher/widgets/settings/system_setup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +53,13 @@ class SettingsPanelPage extends StatelessWidget {
               children: [
                 FocusableSettingsTile(
                   autofocus: true,
+                  leading: const Icon(Icons.home_outlined),
+                  title: const Text('Make GoodTV the main launcher'),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(SystemSetupPage.routeName),
+                ),
+                FocusableSettingsTile(
                   leading: const Icon(Icons.apps),
                   title: Text(
                     localizations.applications,
@@ -79,6 +88,13 @@ class SettingsPanelPage extends StatelessWidget {
                   onPressed: () => Navigator.of(
                     context,
                   ).pushNamed(GeneralSettingsPage.routeName),
+                ),
+                FocusableSettingsTile(
+                  leading: const Icon(Icons.accessibility_new),
+                  title: const Text('Accessibility & remote'),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(AccessibilitySettingsPage.routeName),
                 ),
                 const Divider(),
                 FocusableSettingsTile(
@@ -111,9 +127,7 @@ class SettingsPanelPage extends StatelessWidget {
                       builder: (context, snapshot) =>
                           snapshot.connectionState == ConnectionState.done &&
                               snapshot.hasData
-                          ? FLauncherAboutDialog(
-                              packageInfo: snapshot.data!,
-                            )
+                          ? FLauncherAboutDialog(packageInfo: snapshot.data!)
                           : Container(),
                     ),
                   ),
