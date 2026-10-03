@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/widgets/settings/back_button_action_page.dart';
+import 'package:goodtv_launcher/widgets/settings/system_setup_page.dart';
 import 'package:provider/provider.dart';
 
 class AccessibilitySettingsPage extends StatelessWidget {
@@ -69,6 +71,7 @@ class AccessibilitySettingsPage extends StatelessWidget {
                   value: settings.wakeConsumesFirstPress,
                   onChanged: settings.setWakeConsumesFirstPress,
                 ),
+                const _HomeLauncherToggle(),
                 ListTile(
                   leading: const Icon(Icons.keyboard_return),
                   title: const Text('Override Back button'),
@@ -86,4 +89,51 @@ class AccessibilitySettingsPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _HomeLauncherToggle extends StatefulWidget {
+  const _HomeLauncherToggle();
+
+  @override
+  State<_HomeLauncherToggle> createState() => _HomeLauncherToggleState();
+}
+
+class _HomeLauncherToggleState extends State<_HomeLauncherToggle> {
+  bool _isDefault = false;
+  bool _checking = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    final isDefault = await FLauncherChannel().isDefaultLauncher();
+    if (!mounted) return;
+    setState(() {
+      _isDefault = isDefault;
+      _checking = false;
+    });
+  }
+
+  Future<void> _changeDefault(bool _) async {
+    await Navigator.of(context).pushNamed(SystemSetupPage.routeName);
+    await _refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) => SwitchListTile(
+    secondary: const Icon(Icons.home_outlined),
+    title: const Text('Use GoodTV as main launcher'),
+    subtitle: Text(
+      _checking
+          ? 'Checking the current Home launcher…'
+          : _isDefault
+          ? 'Home button returns to GoodTV'
+          : 'Select GoodTV in the Fire TV Home launcher step',
+    ),
+    value: _isDefault,
+    onChanged: _checking ? null : _changeDefault,
+  );
 }

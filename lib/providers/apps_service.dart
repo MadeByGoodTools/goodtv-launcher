@@ -107,6 +107,12 @@ class AppsService extends ChangeNotifier {
     if (_database.wasCreated) {
       await _initDefaultCategories();
     }
+    final allAppsCategory = _getAppsCategory();
+    if (allAppsCategory != null) {
+      // Dock membership is independent from visibility in All Apps. This also
+      // repairs older installs that removed Favorites from All Apps.
+      await autoPopulateCategory(allAppsCategory);
+    }
 
     _fLauncherChannel.addAppsChangedListener((event) async {
       String? changedPackageName;
@@ -297,9 +303,6 @@ class AppsService extends ChangeNotifier {
             favoritesCategory,
             shouldNotifyListeners: false,
           );
-          if (allAppsCategory != null) {
-            await removeFromCategory(app, allAppsCategory);
-          }
         }
       }
     });
@@ -668,7 +671,7 @@ class AppsService extends ChangeNotifier {
     return favorites.applications.any((a) => a.packageName == app.packageName);
   }
 
-  /// Adds an app to Favorites and removes it from the Apps category
+  /// Adds an app to the home dock without removing it from All Apps.
   Future<void> addToFavorites(App app) async {
     Category favorites = await getOrCreateFavoritesCategory();
 
@@ -676,18 +679,10 @@ class AppsService extends ChangeNotifier {
       await addToCategory(app, favorites, shouldNotifyListeners: false);
     }
 
-    final appsCategory = _getAppsCategory();
-    if (appsCategory != null &&
-        appsCategory.applications.any(
-          (a) => a.packageName == app.packageName,
-        )) {
-      await removeFromCategory(app, appsCategory);
-    } else {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 
-  /// Removes an app from Favorites and puts it back in the Apps category
+  /// Removes an app from the home dock without hiding or deleting it.
   Future<void> removeFromFavorites(App app) async {
     Category? favorites = _categoriesById.values.firstWhereOrNull(
       (category) => category.name == 'Favorites',
@@ -695,14 +690,6 @@ class AppsService extends ChangeNotifier {
 
     if (favorites != null) {
       await removeFromCategory(app, favorites);
-    }
-
-    final appsCategory = _getAppsCategory();
-    if (appsCategory != null &&
-        !appsCategory.applications.any(
-          (a) => a.packageName == app.packageName,
-        )) {
-      await addToCategory(app, appsCategory);
     }
   }
 

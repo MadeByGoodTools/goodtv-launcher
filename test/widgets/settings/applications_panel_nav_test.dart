@@ -58,7 +58,7 @@ void main() {
       // Initial state: all installed applications (index 0)
       expect(
         find.text("All Apps"),
-        findsOneWidget,
+        findsNWidgets(2),
         reason: "Should start on All Apps tab",
       );
 
@@ -72,11 +72,11 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
 
-      // The second tab is Favorites.
+      // The second tab controls the Home dock.
       expect(
-        find.text("Favorite Apps"),
-        findsOneWidget,
-        reason: "Should switch to Favorite Apps after Right Arrow",
+        find.text("Home dock"),
+        findsNWidgets(2),
+        reason: "Should switch to Home dock after Right Arrow",
       );
 
       // Simulate Left Arrow
@@ -86,7 +86,7 @@ void main() {
       // Should be back on all installed applications (index 0).
       expect(
         find.text("All Apps"),
-        findsOneWidget,
+        findsNWidgets(2),
         reason: "Should switch back to All Apps after Left Arrow",
       );
       expect(find.text("TV App"), findsOneWidget);
@@ -96,7 +96,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.text("All Apps"),
-        findsOneWidget,
+        findsNWidgets(2),
         reason: "Should stay on All Apps when pressing Left on first tab",
       );
     },

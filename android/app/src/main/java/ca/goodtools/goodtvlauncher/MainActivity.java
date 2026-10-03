@@ -79,6 +79,7 @@ public class MainActivity extends FlutterActivity {
     private static final String PERMISSION_READ_TV_LISTINGS = "android.permission.READ_TV_LISTINGS";
     private static final int REQUEST_CODE_READ_TV_LISTINGS = 1001;
     private static final String COLUMN_ASPECT_RATIO = "aspect_ratio";
+    private MethodChannel methodChannel;
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -86,7 +87,8 @@ public class MainActivity extends FlutterActivity {
 
         BinaryMessenger messenger = flutterEngine.getDartExecutor().getBinaryMessenger();
 
-        new MethodChannel(messenger, METHOD_CHANNEL).setMethodCallHandler((call, result) -> {
+        methodChannel = new MethodChannel(messenger, METHOD_CHANNEL);
+        methodChannel.setMethodCallHandler((call, result) -> {
             switch (call.method) {
                 case "getApplications" -> result.success(getApplications());
                 case "getApplicationBanner" -> result.success(getApplicationBanner(call.arguments()));
@@ -200,6 +202,15 @@ public class MainActivity extends FlutterActivity {
 
         new EventChannel(messenger, NETWORK_EVENT_CHANNEL).setStreamHandler(
                 new NetworkEventStreamHandler(this));
+    }
+
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (Intent.ACTION_MAIN.equals(intent.getAction()) && methodChannel != null) {
+            methodChannel.invokeMethod("homePressed", null);
+        }
     }
 
     private List<Map<String, Serializable>> getApplications() {

@@ -30,6 +30,19 @@ class FLauncherChannel {
   );
 
   static const _watchNextMaxItems = 10;
+  static void Function()? _homePressedHandler;
+  static bool _methodHandlerInstalled = false;
+
+  void setHomePressedHandler(void Function()? handler) {
+    _homePressedHandler = handler;
+    if (_methodHandlerInstalled) return;
+    _methodHandlerInstalled = true;
+    _methodChannel.setMethodCallHandler((call) async {
+      if (call.method == 'homePressed') {
+        _homePressedHandler?.call();
+      }
+    });
+  }
 
   Future<List<Map<dynamic, dynamic>>> getApplications() async {
     List<Map<dynamic, dynamic>>? applications = await _methodChannel

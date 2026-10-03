@@ -44,7 +44,7 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
 
   final List<_TabData> _tabs = [
     _TabData(0, Icons.apps, (l) => l.allApplications),
-    _TabData(1, Icons.star, (l) => l.favoriteApps),
+    _TabData(1, Icons.view_carousel_outlined, (_) => 'Home dock'),
     _TabData(2, Icons.visibility_off_outlined, (l) => l.hiddenApplications),
   ];
 
@@ -201,9 +201,24 @@ class _ApplicationsPanelPageState extends State<ApplicationsPanelPage> {
                 )
               : null,
         ),
-        child: Icon(
-          icon,
-          color: (selected || focused) ? Colors.white : Colors.white60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: (selected || focused) ? Colors.white : Colors.white60,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: (selected || focused) ? Colors.white : Colors.white60,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -271,7 +286,7 @@ class _AllAppsTab extends StatelessWidget {
     builder: (context, applications, _) {
       if (applications.isEmpty) {
         return const _EmptyListPlaceholder(
-          "No applications found",
+          "No apps are hidden",
           autofocus: true,
         );
       }

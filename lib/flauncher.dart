@@ -23,6 +23,7 @@ import 'dart:ui' as ui;
 import 'package:collection/collection.dart';
 import 'package:goodtv_launcher/actions.dart';
 import 'package:goodtv_launcher/custom_traversal_policy.dart';
+import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/providers/apps_service.dart';
 import 'package:goodtv_launcher/providers/launcher_state.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
@@ -61,6 +62,7 @@ class FLauncher extends StatefulWidget {
 class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   final GlobalKey<FocusAwareAppBarState> _appBarKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _watchNextKey = GlobalKey();
   final GlobalKey _dockKey = GlobalKey();
   int? _selectedCategoryId;
   Timer? _idleTimer;
@@ -71,6 +73,7 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_handleHardwareKey);
+    FLauncherChannel().setHomePressedHandler(_handleHomePressed);
     _resetIdleTimer();
   }
 
@@ -78,9 +81,19 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     HardwareKeyboard.instance.removeHandler(_handleHardwareKey);
+    FLauncherChannel().setHomePressedHandler(null);
     _idleTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleHomePressed() {
+    if (!mounted) return;
+    _wakeFromIdle();
+    setState(() => _selectedCategoryId = null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _revealWatchNextRow();
+    });
   }
 
   @override
@@ -254,6 +267,19 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     _setAppGridFocused(false);
   }
 
+  void _onWatchNextFocused() {
+    _setAppGridFocused(false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revealWatchNextRow();
+    });
+    // The optional auto-hiding app bar finishes resizing after focus moves.
+    // Recheck once that animation has settled so the card cannot remain
+    // partially above the final viewport.
+    Future<void>.delayed(const Duration(milliseconds: 220), () {
+      if (mounted) _revealWatchNextRow();
+    });
+  }
+
   Widget _tvOSLayout(
     BuildContext context,
     AppsService appsService, {
@@ -315,12 +341,15 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
           ),
           if (showWatchNextSection)
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 18),
-                child: WatchNextRow(
-                  isFirstSection: false,
-                  isAboveDock: true,
-                  onItemFocused: _onHomeSectionFocused,
+              child: KeyedSubtree(
+                key: _watchNextKey,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: WatchNextRow(
+                    isFirstSection: reserveWatchNextSpace,
+                    isAboveDock: true,
+                    onItemFocused: _onWatchNextFocused,
+                  ),
                 ),
               ),
             ),
@@ -545,6 +574,31 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     await _scrollController.animateTo(
       targetOffset,
       duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  Future<void> _revealWatchNextRow() async {
+    final watchContext = _watchNextKey.currentContext;
+    final renderObject = watchContext?.findRenderObject();
+    if (!_scrollController.hasClients || renderObject == null) {
+      return;
+    }
+
+    final viewport = RenderAbstractViewport.of(renderObject);
+    final position = _scrollController.position;
+    const watchNextTopClearance = 48.0;
+    final targetOffset =
+        (viewport.getOffsetToReveal(renderObject, 0).offset -
+                watchNextTopClearance)
+            .clamp(position.minScrollExtent, position.maxScrollExtent);
+    if ((targetOffset - position.pixels).abs() < 4) {
+      return;
+    }
+
+    await _scrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 120),
       curve: Curves.easeOut,
     );
   }

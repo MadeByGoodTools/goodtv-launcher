@@ -40,7 +40,7 @@ const double _kWatchNextItemWidth = 360;
 const double _kWatchNextItemHeight = 200;
 const double _kWatchNextItemSpacing = 24;
 const double _kWatchNextRowVerticalPadding = 18;
-const double _kWatchNextCardRadius = 20;
+const double _kWatchNextCardRadius = 28;
 const double _kWatchNextHorizontalPadding =
     kLauncherSectionHorizontalPadding + kAppCardHorizontalPadding;
 
