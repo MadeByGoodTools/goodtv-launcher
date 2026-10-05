@@ -1,7 +1,7 @@
 name: goodtv_launcher
 description: Flutter-based Android TV launcher.
 
-version: 1.0.9+4118
+version: 1.0.10+4119
 
 environment:
   sdk: ">=3.11.0"

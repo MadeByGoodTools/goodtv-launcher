@@ -1,3 +1,9 @@
+# GoodTV Launcher 1.0.10
+
+* Docks fit up to five apps evenly; six or more scroll horizontally with consistent card spacing.
+* Long-press All Apps to open dock settings and add apps.
+* Long-press any app to add or remove it from a dock, with a dock picker when multiple docks exist.
+
 # Changes from the original
 
 ### Features

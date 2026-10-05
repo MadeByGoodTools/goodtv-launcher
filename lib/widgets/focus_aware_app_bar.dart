@@ -1,4 +1,6 @@
 import 'package:goodtv_launcher/widgets/settings/settings_panel.dart';
+import 'package:goodtv_launcher/widgets/settings/applications_panel_page.dart';
+import 'package:goodtv_launcher/widgets/focus_keyboard_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:goodtv_launcher/flauncher_channel.dart';
@@ -131,6 +133,15 @@ class FocusAwareAppBarState extends State<FocusAwareAppBar> {
                           selected: widget.selectedCategoryId == category.id,
                           onPressed: () =>
                               widget.onCategorySelected?.call(category.id),
+                          onLongPress: category.name == 'All Apps'
+                              ? () => showDialog<void>(
+                                  context: context,
+                                  builder: (_) => const SettingsPanel(
+                                    initialRoute:
+                                        ApplicationsPanelPage.dockRouteName,
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                     ],
@@ -301,24 +312,40 @@ class _CategoryButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
 
   const _CategoryButton({
     required this.label,
     required this.selected,
     required this.onPressed,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(right: 8),
-    child: TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: selected ? Colors.white24 : Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    child: FocusKeyboardListener(
+      onPressed: (key) {
+        if (!longPressableKeys.contains(key)) return KeyEventResult.ignored;
+        onPressed();
+        return KeyEventResult.handled;
+      },
+      onLongPress: onLongPress == null
+          ? null
+          : (_) {
+              onLongPress!();
+              return KeyEventResult.handled;
+            },
+      child: TextButton(
+        onPressed: onPressed,
+        onLongPress: onLongPress,
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: selected ? Colors.white24 : Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+        child: Text(label, style: const TextStyle(fontSize: 18)),
       ),
-      child: Text(label, style: const TextStyle(fontSize: 18)),
     ),
   );
 }

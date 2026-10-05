@@ -26,6 +26,13 @@ import '../models/app.dart';
 import '../models/category.dart';
 import '../providers/settings_service.dart';
 
+const int maxNonScrollingDockApps = 5;
+
+bool shouldEvenlyDistributeDockApps({
+  required bool evenlyDistribute,
+  required int appCount,
+}) => evenlyDistribute && appCount <= maxNonScrollingDockApps;
+
 class CategoryRow extends StatelessWidget {
   static const double _maxEvenDockTileWidth = 230;
   final Category category;
@@ -60,7 +67,11 @@ class CategoryRow extends StatelessWidget {
         height:
             category.rowHeight.toDouble() +
             (showAppNames ? kAppNameLabelHeight : 0),
-        child: evenlyDistribute && applications.length <= Category.ColumnsCount
+        child:
+            shouldEvenlyDistributeDockApps(
+              evenlyDistribute: evenlyDistribute,
+              appCount: applications.length,
+            )
             ? LayoutBuilder(
                 builder: (context, constraints) {
                   final cappedWidth =

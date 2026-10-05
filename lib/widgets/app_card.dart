@@ -23,6 +23,7 @@ import 'package:goodtv_launcher/app_image_type.dart';
 import 'package:goodtv_launcher/providers/apps_service.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/widgets/application_info_panel.dart';
+import 'package:goodtv_launcher/widgets/manage_app_docks_dialog.dart';
 import 'package:goodtv_launcher/widgets/focus_keyboard_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -685,6 +686,11 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     );
     if (result == ApplicationInfoPanelResult.reorderApp) {
       setState(() => _moving = true);
+    } else if (result == ApplicationInfoPanelResult.manageDocks && mounted) {
+      await showDialog<void>(
+        context: context,
+        builder: (_) => ManageAppDocksDialog(application: widget.application),
+      );
     }
   }
 }

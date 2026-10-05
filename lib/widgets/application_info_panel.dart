@@ -162,6 +162,8 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel> {
                   Builder(
                     builder: (context) {
                       final appsService = context.watch<AppsService>();
+                      final hasMultipleDocks =
+                          appsService.dockCategories.length > 1;
                       final isInFavorites = appsService.isAppInFavorites(
                         widget.application,
                       );
@@ -174,7 +176,9 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel> {
                             Container(width: 8),
                             Flexible(
                               child: Text(
-                                isInFavorites
+                                hasMultipleDocks
+                                    ? 'Add to other docks'
+                                    : isInFavorites
                                     ? 'Remove from dock'
                                     : 'Add to dock',
                                 style: Theme.of(context).textTheme.bodyMedium,
@@ -184,6 +188,12 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel> {
                           ],
                         ),
                         onPressed: () async {
+                          if (hasMultipleDocks) {
+                            Navigator.of(
+                              context,
+                            ).pop(ApplicationInfoPanelResult.manageDocks);
+                            return;
+                          }
                           await appsService.toggleFavorite(widget.application);
                           Navigator.of(
                             context,
@@ -416,4 +426,4 @@ class _ApplicationInfoPanelState extends State<ApplicationInfoPanel> {
   }
 }
 
-enum ApplicationInfoPanelResult { none, reorderApp }
+enum ApplicationInfoPanelResult { none, reorderApp, manageDocks }
