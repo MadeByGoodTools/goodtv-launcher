@@ -1,3 +1,7 @@
+# GoodTV Launcher 1.0.11
+
+* Enable Check for updates in locally built public releases.
+
 # GoodTV Launcher 1.0.10
 
 * Docks fit up to five apps evenly; six or more scroll horizontally with consistent card spacing.

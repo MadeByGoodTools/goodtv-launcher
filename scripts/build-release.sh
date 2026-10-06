@@ -40,4 +40,5 @@ cd "$project_dir"
   --release \
   --flavor github \
   --target-platform android-arm,android-arm64 \
+  --dart-define=ENABLE_SELF_UPDATER=true \
   --dart-define=GOODTV_FIRE_TV=true
