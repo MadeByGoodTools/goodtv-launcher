@@ -61,6 +61,10 @@ public class GoodTvHomeRedirectService extends AccessibilityService {
     }
 
     private void launchGoodTv() {
+        if (!redirectEnabled() || System.currentTimeMillis()
+                < getSharedPreferences(PREFS, MODE_PRIVATE).getLong(BYPASS_UNTIL, 0)) {
+            return;
+        }
         startActivity(new Intent(this, MainActivity.class)
                 .setAction(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_HOME)

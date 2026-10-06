@@ -508,6 +508,20 @@ public class MainActivity extends FlutterActivity {
     }
 
     private boolean openSettings() {
+        // Fire TV owns Settings inside its launcher. Allow its transition
+        // through Home without the accessibility Home override pulling us back.
+        if (Build.MANUFACTURER != null
+                && Build.MANUFACTURER.equalsIgnoreCase("Amazon")) {
+            getSharedPreferences(GoodTvHomeRedirectService.PREFS, MODE_PRIVATE)
+                    .edit()
+                    .putLong(GoodTvHomeRedirectService.BYPASS_UNTIL,
+                            System.currentTimeMillis() + 15000)
+                    .apply();
+            Intent fireSettings = new Intent(Settings.ACTION_SETTINGS)
+                    .setClassName("com.amazon.tv.launcher",
+                            "com.amazon.tv.launcher.ui.SettingsActivity");
+            if (tryStartActivity(fireSettings)) return true;
+        }
         return launchActivityFromAction(Settings.ACTION_SETTINGS);
     }
 

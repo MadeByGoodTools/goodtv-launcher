@@ -1,3 +1,7 @@
+# GoodTV Launcher 1.0.12
+
+* Open Fire TV system settings directly and protect the transition from the Home override.
+
 # GoodTV Launcher 1.0.11
 
 * Enable Check for updates in locally built public releases.
