@@ -517,6 +517,11 @@ public class MainActivity extends FlutterActivity {
                     .putLong(GoodTvHomeRedirectService.BYPASS_UNTIL,
                             System.currentTimeMillis() + 15000)
                     .apply();
+            Intent mainSettings = new Intent("amazon.intent.action.MAINSETTINGS")
+                    .addCategory("android.intent.category.MAINSETTINGS")
+                    .setClassName("com.amazon.tv.launcher",
+                            "com.amazon.tv.launcher.ui.MainSettingsActivity");
+            if (tryStartActivity(mainSettings)) return true;
             Intent fireSettings = new Intent(Settings.ACTION_SETTINGS)
                     .setClassName("com.amazon.tv.launcher",
                             "com.amazon.tv.launcher.ui.SettingsActivity");
