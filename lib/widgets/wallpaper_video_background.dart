@@ -17,17 +17,36 @@
  */
 
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class WallpaperVideoBackground extends StatefulWidget {
-  const WallpaperVideoBackground.file(this.file, {super.key}) : url = null;
+  const WallpaperVideoBackground.file(
+    this.file, {
+    super.key,
+    this.onReady,
+    this.onFailed,
+    this.onEnding,
+    this.playing = true,
+  }) : url = null;
 
-  const WallpaperVideoBackground.network(this.url, {super.key}) : file = null;
+  const WallpaperVideoBackground.network(
+    this.url, {
+    super.key,
+    this.onReady,
+    this.onFailed,
+    this.onEnding,
+    this.playing = true,
+  }) : file = null;
 
   final File? file;
   final String? url;
+  final VoidCallback? onReady;
+  final VoidCallback? onFailed;
+  final ValueChanged<Duration>? onEnding;
+  final bool playing;
 
   String get sourceKey => url ?? file!.path;
 
@@ -39,6 +58,11 @@ class WallpaperVideoBackground extends StatefulWidget {
 class _WallpaperVideoBackgroundState extends State<WallpaperVideoBackground>
     with WidgetsBindingObserver {
   VideoPlayerController? _controller;
+  bool _reportedReady = false;
+  bool _reportedFailure = false;
+  bool _appActive = true;
+  bool _reportedCompleted = false;
+  Timer? _firstFrameTimer;
 
   @override
   void initState() {
@@ -53,36 +77,93 @@ class _WallpaperVideoBackgroundState extends State<WallpaperVideoBackground>
     if (oldWidget.sourceKey != widget.sourceKey) {
       _disposeController();
       _initController();
+    } else if (oldWidget.playing != widget.playing) {
+      _syncPlayback();
     }
   }
 
-  void _initController() {
+  Future<void> _initController() async {
     final controller = widget.url != null
-        ? VideoPlayerController.networkUrl(Uri.parse(widget.url!))
-        : VideoPlayerController.file(widget.file!);
+        ? VideoPlayerController.networkUrl(
+            Uri.parse(widget.url!),
+            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+          )
+        : VideoPlayerController.file(
+            widget.file!,
+            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+          );
     _controller = controller;
-    controller
-        .initialize()
-        .then((_) {
-          if (!mounted || _controller != controller) {
-            _controller = null;
-            controller.dispose();
-            return;
-          }
-          controller.setLooping(true);
-          controller.setVolume(0);
-          controller.play();
-          setState(() {});
-        })
-        .catchError((error) {
-          debugPrint('Video wallpaper initialization failed: $error');
-          if (mounted) {
-            setState(() {});
-          }
+    _reportedReady = false;
+    _reportedFailure = false;
+    _reportedCompleted = false;
+    controller.addListener(_checkFrame);
+    try {
+      await controller.initialize();
+      if (!mounted || _controller != controller) return;
+      await controller.setLooping(widget.onEnding == null);
+      await controller.setVolume(0);
+      if (!mounted || _controller != controller) return;
+      if (_appActive && widget.playing) await controller.play();
+      if (mounted && _controller == controller) {
+        setState(() {});
+        // A paused, initialized texture renders the opening frame. Let it
+        // reach the compositor before reporting ready; playback starts only
+        // when the parent begins the crossfade.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _controller != controller) return;
+          _firstFrameTimer = Timer(const Duration(milliseconds: 150), () {
+            if (!mounted ||
+                _controller != controller ||
+                _reportedReady ||
+                controller.value.hasError)
+              return;
+            _reportedReady = true;
+            widget.onReady?.call();
+          });
         });
+      }
+    } catch (error) {
+      debugPrint('Video wallpaper initialization failed: $error');
+      if (mounted && _controller == controller) {
+        _reportFailure();
+        setState(() {});
+      }
+    }
+  }
+
+  void _reportFailure() {
+    if (_reportedFailure) return;
+    _reportedFailure = true;
+    widget.onFailed?.call();
+  }
+
+  void _checkFrame() {
+    final value = _controller?.value;
+    if (!mounted || value == null) return;
+    if (value.hasError) {
+      _reportFailure();
+    } else if (!_reportedReady &&
+        value.isInitialized &&
+        value.position > Duration.zero) {
+      _reportedReady = true;
+      widget.onReady?.call();
+    }
+    if (!_reportedCompleted &&
+        !value.hasError &&
+        value.isInitialized &&
+        value.duration > Duration.zero &&
+        value.isPlaying &&
+        widget.playing &&
+        value.duration - value.position <= const Duration(seconds: 2) &&
+        widget.onEnding != null) {
+      _reportedCompleted = true;
+      widget.onEnding!(value.duration - value.position);
+    }
   }
 
   void _disposeController() {
+    _firstFrameTimer?.cancel();
+    _controller?.removeListener(_checkFrame);
     _controller?.dispose();
     _controller = null;
   }
@@ -96,15 +177,27 @@ class _WallpaperVideoBackgroundState extends State<WallpaperVideoBackground>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appActive = state == AppLifecycleState.resumed;
     final controller = _controller;
     if (controller == null || !controller.value.isInitialized) return;
 
     if (state == AppLifecycleState.resumed) {
-      controller.play();
+      _syncPlayback();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       controller.pause();
     }
+  }
+
+  void _syncPlayback() {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    final future = _appActive && widget.playing
+        ? controller.play()
+        : controller.pause();
+    future.catchError((Object error) {
+      if (mounted && _controller == controller) _reportFailure();
+    });
   }
 
   @override

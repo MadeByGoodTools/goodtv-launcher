@@ -84,6 +84,9 @@ class FLauncherChannel {
   Future<void> openSettings() async =>
       await _methodChannel.invokeMethod('openSettings');
 
+  Future<void> setKeepAwake(bool enabled) async =>
+      await _methodChannel.invokeMethod('setKeepAwake', enabled);
+
   Future<void> openAppInfo(String packageName) async =>
       await _methodChannel.invokeMethod('openAppInfo', packageName);
 

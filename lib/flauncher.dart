@@ -17,6 +17,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -37,6 +38,7 @@ import 'package:goodtv_launcher/widgets/focus_aware_app_bar.dart';
 import 'package:goodtv_launcher/widgets/settings/applications_panel_page.dart';
 import 'package:goodtv_launcher/widgets/settings/settings_panel.dart';
 import 'package:goodtv_launcher/widgets/wallpaper_video_background.dart';
+import 'package:goodtv_launcher/widgets/wallpaper_transition.dart';
 import 'package:goodtv_launcher/widgets/watch_next_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -831,49 +833,90 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     final screenSize = MediaQuery.sizeOf(context);
     final dpr = MediaQuery.devicePixelRatioOf(context);
     final videoUrl = wallpaperService.wallpaperVideoUrl;
-    if (videoUrl != null) {
-      return SizedBox(
-        width: screenSize.width,
-        height: screenSize.height,
-        child: WallpaperVideoBackground.network(
-          videoUrl,
-          key: ValueKey(
-            "background_network_video_${wallpaperService.wallpaperRevision}",
-          ),
-        ),
-      );
-    }
     final videoFile = wallpaperService.wallpaperVideoFile;
-    if (videoFile != null) {
-      return SizedBox(
-        width: screenSize.width,
-        height: screenSize.height,
-        child: WallpaperVideoBackground.file(
-          videoFile,
-          key: ValueKey(
-            "background_video_${wallpaperService.wallpaperRevision}",
-          ),
-        ),
-      );
-    }
-    if (wallpaperService.wallpaper != null) {
-      return Image(
-        image: ResizeImage(
-          wallpaperService.wallpaper!,
-          width: (screenSize.width * dpr).round(),
-        ),
-        key: ValueKey("background_${wallpaperService.wallpaperRevision}"),
-        fit: BoxFit.cover,
-        filterQuality: FilterQuality.high,
-        height: screenSize.height,
-        width: screenSize.width,
-      );
-    } else {
-      return _CachedGradientBackground(
-        key: const Key("background"),
-        gradient: wallpaperService.gradient.gradient,
-      );
-    }
+    final image = wallpaperService.wallpaper;
+    final gradient = wallpaperService.gradient.gradient;
+    final revision = wallpaperService.wallpaperRevision;
+    final onEnding = wallpaperService.advanceVideoOnCompletion
+        ? (Duration remaining) {
+            if (wallpaperService.wallpaperRevision == revision) {
+              final delay = remaining > wallpaperCrossfadeDuration
+                  ? remaining - wallpaperCrossfadeDuration
+                  : Duration.zero;
+              wallpaperService.nextRemoteWallpaper(
+                transitionAt: DateTime.now().add(delay),
+              );
+            }
+          }
+        : null;
+    return WallpaperTransition(
+      sourceKey: (revision, videoUrl, videoFile?.path, image, gradient),
+      startAt: wallpaperService.transitionAt,
+      fallback: _CachedGradientBackground(gradient: gradient),
+      builder: (context, onReady, onFailed, playing) {
+        if (videoUrl != null) {
+          final uri = Uri.parse(videoUrl);
+          return SizedBox(
+            width: screenSize.width,
+            height: screenSize.height,
+            child: uri.scheme == 'file'
+                ? WallpaperVideoBackground.file(
+                    File.fromUri(uri),
+                    onReady: onReady,
+                    onFailed: onFailed,
+                    onEnding: onEnding,
+                    playing: playing,
+                    key: ValueKey('background_local_video_$revision'),
+                  )
+                : WallpaperVideoBackground.network(
+                    videoUrl,
+                    onReady: onReady,
+                    onFailed: onFailed,
+                    onEnding: onEnding,
+                    playing: playing,
+                    key: ValueKey("background_network_video_$revision"),
+                  ),
+          );
+        }
+        if (videoFile != null) {
+          return SizedBox(
+            width: screenSize.width,
+            height: screenSize.height,
+            child: WallpaperVideoBackground.file(
+              videoFile,
+              onReady: onReady,
+              onFailed: onFailed,
+              playing: playing,
+              key: ValueKey("background_video_$revision"),
+            ),
+          );
+        }
+        if (image != null) {
+          return Image(
+            image: ResizeImage(image, width: (screenSize.width * dpr).round()),
+            key: ValueKey("background_$revision"),
+            fit: BoxFit.cover,
+            frameBuilder: (context, child, frame, synchronouslyLoaded) {
+              if (synchronouslyLoaded || frame != null) onReady();
+              return child;
+            },
+            errorBuilder: (context, error, stack) {
+              onFailed();
+              return const SizedBox.expand();
+            },
+            filterQuality: FilterQuality.high,
+            height: screenSize.height,
+            width: screenSize.width,
+          );
+        } else {
+          onReady();
+          return _CachedGradientBackground(
+            key: const Key("background"),
+            gradient: gradient,
+          );
+        }
+      },
+    );
   }
 
   Widget _emptyState(BuildContext context, {String? message}) {

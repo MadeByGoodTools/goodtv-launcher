@@ -27,6 +27,7 @@ import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'flauncher.dart';
+import 'widgets/keep_awake.dart';
 
 class FLauncherApp extends StatelessWidget {
   static const PrioritizedIntents _backIntents = PrioritizedIntents(
@@ -144,13 +145,16 @@ class FLauncherApp extends StatelessWidget {
             tabBarTheme: TabBarThemeData(indicatorColor: accentColor),
           ),
           home: Builder(
-            builder: (context) => PopScope(
-              canPop: false,
-              child: ExcludeSemantics(child: FLauncher()),
-              onPopInvoked: (didPop) {
-                LauncherState launcherState = context.read<LauncherState>();
-                launcherState.handleBackNavigation(context);
-              },
+            builder: (context) => KeepAwake(
+              enabled: context.watch<SettingsService>().keepAwakeEnabled,
+              child: PopScope(
+                canPop: false,
+                child: ExcludeSemantics(child: FLauncher()),
+                onPopInvoked: (didPop) {
+                  LauncherState launcherState = context.read<LauncherState>();
+                  launcherState.handleBackNavigation(context);
+                },
+              ),
             ),
           ),
         );

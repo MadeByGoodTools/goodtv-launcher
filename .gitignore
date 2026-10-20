@@ -101,3 +101,6 @@ android/fastlane/README.md
 
 # Local installable verification build
 GoodTV-Launcher-debug.apk
+
+# Bundled third-party video media is shipped in APKs, not source control.
+assets/video_collections/Snoopy/*.mp4

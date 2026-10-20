@@ -92,6 +92,9 @@ public class ClockScreensaverService extends DreamService {
         setContentView(container);
 
         SharedPreferences backgroundPrefs = getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE);
+        boolean keepAwake = backgroundPrefs.getBoolean("flutter.keep_awake_enabled", false);
+        if (keepAwake) setScreenBright(true);
+        container.setKeepScreenOn(keepAwake);
         String backgroundMode = backgroundPrefs.getString(
                 "flutter.screensaver_background", "launcher");
         if ("launcher".equals(backgroundMode)) {

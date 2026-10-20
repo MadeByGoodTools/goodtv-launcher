@@ -20,8 +20,10 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:goodtv_launcher/flauncher_channel.dart';
+import 'package:goodtv_launcher/local_wallpaper_collection.dart';
 import 'package:goodtv_launcher/gradients.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,6 +40,20 @@ class RemoteWallpaperItem {
     required this.isVideo,
     this.title,
   });
+}
+
+List<RemoteWallpaperItem> shuffledWallpaperItems(
+  List<RemoteWallpaperItem> items, {
+  Uri? previous,
+  Random? random,
+}) {
+  final shuffled = List<RemoteWallpaperItem>.of(items)..shuffle(random);
+  if (shuffled.length > 1 && shuffled.first.uri == previous) {
+    final first = shuffled[0];
+    shuffled[0] = shuffled[1];
+    shuffled[1] = first;
+  }
+  return shuffled;
 }
 
 List<RemoteWallpaperItem> parseWallpaperFeed(String body, Uri source) {
@@ -188,6 +204,8 @@ class WallpaperService extends ChangeNotifier {
   int _wallpaperRevision = 0;
   List<RemoteWallpaperItem> _remoteItems = const [];
   int _remoteIndex = 0;
+  DateTime? _transitionAt;
+  DateTime? get transitionAt => _transitionAt;
   String? _lastFeedUrl;
 
   ImageProvider? _wallpaper;
@@ -202,6 +220,10 @@ class WallpaperService extends ChangeNotifier {
   }
 
   bool get remoteFeedEnabled => _settingsService.wallpaperFeedUrl != null;
+  bool get localVideoCollectionEnabled =>
+      Uri.tryParse(_settingsService.wallpaperFeedUrl ?? '')?.scheme == 'file';
+  bool get advanceVideoOnCompletion =>
+      _remoteItems.length > 1 && _remoteItems[_remoteIndex].isVideo;
 
   String? get remoteWallpaperTitle => _remoteItems.isEmpty
       ? null
@@ -305,7 +327,23 @@ class WallpaperService extends ChangeNotifier {
     _lastFeedUrl = normalizedUrl;
     _remoteItems = items;
     _remoteIndex = 0;
+    _transitionAt = null;
     await _settingsService.setWallpaperFeed(normalizedUrl, intervalMinutes);
+    _startFeedTimer();
+    _updateWallpaper(force: true);
+  }
+
+  Future<void> configureLocalVideoCollection(
+    LocalWallpaperCollection collection,
+  ) async {
+    final source = collection.directory.uri;
+    final items = await _fetchRemoteItems(source);
+    if (items.isEmpty) throw StateError('No videos in this collection');
+    _lastFeedUrl = source.toString();
+    _remoteItems = items;
+    _remoteIndex = 0;
+    _transitionAt = null;
+    await _settingsService.setWallpaperFeed(source.toString(), 15);
     _startFeedTimer();
     _updateWallpaper(force: true);
   }
@@ -322,9 +360,18 @@ class WallpaperService extends ChangeNotifier {
     _updateWallpaper(force: true);
   }
 
-  Future<void> nextRemoteWallpaper() async {
+  Future<void> nextRemoteWallpaper({DateTime? transitionAt}) async {
     if (_remoteItems.length < 2) return;
-    _remoteIndex = (_remoteIndex + 1) % _remoteItems.length;
+    final previous = _remoteItems[_remoteIndex].uri;
+    _remoteIndex++;
+    if (_remoteIndex >= _remoteItems.length) {
+      if (localVideoCollectionEnabled) {
+        _remoteItems = shuffledWallpaperItems(_remoteItems, previous: previous);
+      }
+      _remoteIndex = 0;
+    }
+    _transitionAt = transitionAt;
+    _startFeedTimer();
     _updateWallpaper(force: true);
   }
 
@@ -348,6 +395,23 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<List<RemoteWallpaperItem>> _fetchRemoteItems(Uri source) async {
+    if (source.scheme == 'file') {
+      final collection = await readWallpaperCollection(
+        await wallpaperCollectionsDirectory(),
+        Directory.fromUri(source),
+      );
+      return shuffledWallpaperItems(
+        collection.videos
+            .map(
+              (file) => RemoteWallpaperItem(
+                uri: file.uri,
+                isVideo: true,
+                title: collection.name,
+              ),
+            )
+            .toList(growable: false),
+      );
+    }
     if (_isVideoUri(source) || _isImageUri(source)) {
       return [RemoteWallpaperItem(uri: source, isVideo: _isVideoUri(source))];
     }
@@ -389,7 +453,7 @@ class WallpaperService extends ChangeNotifier {
   void _startFeedTimer() {
     _feedTimer?.cancel();
     _feedTimer = null;
-    if (_remoteItems.length > 1) {
+    if (_remoteItems.length > 1 && !_remoteItems[_remoteIndex].isVideo) {
       _feedTimer = Timer.periodic(
         Duration(minutes: _settingsService.wallpaperFeedIntervalMinutes),
         (_) => nextRemoteWallpaper(),

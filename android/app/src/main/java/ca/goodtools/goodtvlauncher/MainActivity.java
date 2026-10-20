@@ -82,6 +82,27 @@ public class MainActivity extends FlutterActivity {
     private static final String COLUMN_ASPECT_RATIO = "aspect_ratio";
     private MethodChannel methodChannel;
 
+    private void setKeepAwake(boolean enabled) {
+        if (enabled) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setKeepAwake(getSharedPreferences("FlutterSharedPreferences", MODE_PRIVATE)
+                .getBoolean("flutter.keep_awake_enabled", false));
+    }
+
+    @Override
+    protected void onPause() {
+        setKeepAwake(false);
+        super.onPause();
+    }
+
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
@@ -91,6 +112,10 @@ public class MainActivity extends FlutterActivity {
         methodChannel = new MethodChannel(messenger, METHOD_CHANNEL);
         methodChannel.setMethodCallHandler((call, result) -> {
             switch (call.method) {
+                case "setKeepAwake" -> {
+                    setKeepAwake(Boolean.TRUE.equals(call.arguments));
+                    result.success(null);
+                }
                 case "getApplications" -> result.success(getApplications());
                 case "getApplicationBanner" -> result.success(getApplicationBanner(call.arguments()));
                 case "getApplicationIcon" -> result.success(getApplicationIcon(call.arguments()));

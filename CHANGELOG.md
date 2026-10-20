@@ -1,3 +1,19 @@
+# GoodTV Launcher 1.0.15
+
+* Add Keep awake while GoodTV is open in Settings > System > Screensaver Settings.
+  This opt-in setting keeps GoodTV's backgrounds and idle screensaver playing
+  without changing device-wide sleep timers or the television's power timer.
+* Include a built-in collection of 18 Snoopy video backgrounds, usable for both
+  wallpaper and the background-only idle screensaver, with offline playback.
+* Shuffle the local video collection without repeating a clip until the set ends.
+* Crossfade switching wallpapers over 0.8 seconds, retaining the previous image
+  or video until the next one is ready. Applies to images, Reddit feeds, aerials,
+  local video collections, and the in-launcher background-only screensaver.
+* Let playlist videos play to their end, with the crossfade in the final 0.8
+  seconds. Preload the next video paused, preserving its opening frames.
+* Avoid audio-focus interruptions and keep the active video texture alive during
+  handoff. Leave the current background visible if the next one fails to load.
+
 # GoodTV Launcher 1.0.12
 
 * Open Fire TV system settings directly and protect the transition from the Home override.

@@ -1,7 +1,7 @@
 name: goodtv_launcher
 description: Flutter-based Android TV launcher.
 
-version: 1.0.12+4121
+version: 1.0.15+4124
 
 environment:
   sdk: ">=3.11.0"
@@ -59,4 +59,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/video_collections/Snoopy/
     - lib/l10n/

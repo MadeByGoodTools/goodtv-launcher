@@ -35,6 +35,20 @@ void main() async {
     await sharedPreferences.clear();
   });
 
+  test('keep awake defaults off and persists both toggle states', () async {
+    expect(settingsService.keepAwakeEnabled, isFalse);
+    var changes = 0;
+    void onChange() => changes++;
+    settingsService.addListener(onChange);
+    await settingsService.setKeepAwakeEnabled(true);
+    expect(settingsService.keepAwakeEnabled, isTrue);
+    expect(SettingsService(sharedPreferences).keepAwakeEnabled, isTrue);
+    await settingsService.setKeepAwakeEnabled(false);
+    expect(SettingsService(sharedPreferences).keepAwakeEnabled, isFalse);
+    expect(changes, 2);
+    settingsService.removeListener(onChange);
+  });
+
   test("setUse24HourTimeFormat", () async {
     final sharedPreferences = await SharedPreferences.getInstance();
     final settingsService = SettingsService(sharedPreferences);

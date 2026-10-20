@@ -1,7 +1,31 @@
+import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 
 void main() {
+  test('shuffle plays every clip once and avoids a cycle-boundary repeat', () {
+    final items = List.generate(
+      18,
+      (index) => RemoteWallpaperItem(
+        uri: Uri.file('/clips/$index.mp4'),
+        isVideo: true,
+      ),
+    );
+    for (var seed = 0; seed < 30; seed++) {
+      final cycle = shuffledWallpaperItems(
+        items,
+        previous: items.last.uri,
+        random: Random(seed),
+      );
+      expect(cycle.map((item) => item.uri).toSet(), hasLength(18));
+      expect(cycle.first.uri, isNot(items.last.uri));
+      expect(
+        cycle.map((item) => item.uri),
+        isNot(items.map((item) => item.uri)),
+      );
+    }
+    expect(items.first.uri, Uri.file('/clips/0.mp4'));
+  });
   group('parseWallpaperFeed', () {
     test('reads Overflight-style JSON and prefers 1080p video', () {
       final items = parseWallpaperFeed('''[

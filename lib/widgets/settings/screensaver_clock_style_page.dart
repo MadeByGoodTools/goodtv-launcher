@@ -21,6 +21,7 @@ import 'package:provider/provider.dart';
 
 import 'package:goodtv_launcher/l10n/app_localizations.dart';
 import '../../providers/settings_service.dart';
+import 'focusable_settings_tile.dart';
 
 class ScreensaverClockStylePage extends StatelessWidget {
   static const String routeName = "screensaver_clock_style_panel";
@@ -44,6 +45,34 @@ class ScreensaverClockStylePage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    FocusableSettingsTile(
+                      autofocus: true,
+                      title: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Keep awake while GoodTV is open'),
+                          Text(
+                            'Keep backgrounds and screensavers playing without '
+                            'Fire TV sleeping. Does not change your TV’s power timer.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: ExcludeFocus(
+                        child: IgnorePointer(
+                          child: Switch(
+                            value: settingsService.keepAwakeEnabled,
+                            onChanged: settingsService.setKeepAwakeEnabled,
+                          ),
+                        ),
+                      ),
+                      onPressed: () => settingsService.setKeepAwakeEnabled(
+                        !settingsService.keepAwakeEnabled,
+                      ),
+                    ),
                     _StyleRadioTile(
                       title: 'Use my launcher background',
                       subtitle: 'Use the selected Aerial or Reddit collection',
@@ -51,8 +80,7 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       groupValue: settingsService.screensaverBackground,
                       onChanged: (value) =>
                           settingsService.setScreensaverBackground(value!),
-                      autofocus:
-                          settingsService.screensaverBackground == 'launcher',
+                      autofocus: false,
                     ),
                     _StyleRadioTile(
                       title: 'Aerial video background',
@@ -70,8 +98,7 @@ class ScreensaverClockStylePage extends StatelessWidget {
                       groupValue: settingsService.screensaverBackground,
                       onChanged: (value) =>
                           settingsService.setScreensaverBackground(value!),
-                      autofocus:
-                          settingsService.screensaverBackground == 'black',
+                      autofocus: false,
                     ),
                     const Divider(),
                     _StyleRadioTile(

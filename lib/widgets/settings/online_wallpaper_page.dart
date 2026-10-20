@@ -4,6 +4,7 @@ import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:goodtv_launcher/providers/wallpaper_service.dart';
 import 'package:goodtv_launcher/widgets/settings/focusable_settings_tile.dart';
 import 'package:provider/provider.dart';
+import 'local_video_collections.dart';
 
 class OnlineWallpaperPage extends StatefulWidget {
   static const routeName = 'online_wallpaper';
@@ -53,6 +54,7 @@ class _OnlineWallpaperPageState extends State<OnlineWallpaperPage> {
           trailing: const Text('Use background'),
           onPressed: _saving ? null : () => _applyPreset(_appleAerialFeed),
         ),
+        const LocalVideoCollections(),
         ..._redditPresets.entries.map(
           (preset) => FocusableSettingsTile(
             leading: const Icon(Icons.reddit),
