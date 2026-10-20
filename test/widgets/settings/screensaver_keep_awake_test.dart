@@ -33,7 +33,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(settings.keepAwakeEnabled, isFalse);
-    expect(find.byType(Switch), findsOneWidget);
+    expect(find.byType(Switch), findsNWidgets(2));
     await tester.sendKeyEvent(LogicalKeyboardKey.select);
     await tester.pumpAndSettle();
     expect(settings.keepAwakeEnabled, isTrue);

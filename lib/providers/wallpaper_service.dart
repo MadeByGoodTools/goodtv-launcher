@@ -24,6 +24,7 @@ import 'dart:math';
 
 import 'package:goodtv_launcher/flauncher_channel.dart';
 import 'package:goodtv_launcher/local_wallpaper_collection.dart';
+import 'package:goodtv_launcher/snoopy_seasons.dart';
 import 'package:goodtv_launcher/gradients.dart';
 import 'package:goodtv_launcher/providers/settings_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -190,6 +191,27 @@ class WallpaperService extends ChangeNotifier {
           )
           .toList(growable: false);
   final SettingsService _settingsService;
+  final DateTime Function() _now;
+  bool get _localSnoopyCollection {
+    final source = Uri.tryParse(_settingsService.wallpaperFeedUrl ?? '');
+    final parts = source?.pathSegments
+        .where((part) => part.isNotEmpty)
+        .toList();
+    return source?.scheme == 'file' &&
+        parts != null &&
+        parts.isNotEmpty &&
+        parts.last.toLowerCase() == 'snoopy';
+  }
+
+  String? _localSeasonKey;
+  late bool _lastAutomaticSnoopySeasons;
+  int _feedRequest = 0;
+
+  String get _currentSeasonKey {
+    final date = _now();
+    return '${date.year}-${date.month}-${date.day}:${_settingsService.automaticSnoopySeasons}';
+  }
+
   final FLauncherChannel _channel = FLauncherChannel();
 
   late File _wallpaperFile;
@@ -223,7 +245,9 @@ class WallpaperService extends ChangeNotifier {
   bool get localVideoCollectionEnabled =>
       Uri.tryParse(_settingsService.wallpaperFeedUrl ?? '')?.scheme == 'file';
   bool get advanceVideoOnCompletion =>
-      _remoteItems.length > 1 && _remoteItems[_remoteIndex].isVideo;
+      _remoteItems.isNotEmpty &&
+      (_remoteItems.length > 1 || localVideoCollectionEnabled) &&
+      _remoteItems[_remoteIndex].isVideo;
 
   String? get remoteWallpaperTitle => _remoteItems.isEmpty
       ? null
@@ -239,7 +263,10 @@ class WallpaperService extends ChangeNotifier {
     orElse: () => FLauncherGradients.saintPetersburg,
   );
 
-  WallpaperService(this._settingsService) : _wallpaper = null {
+  WallpaperService(this._settingsService, {DateTime Function()? now})
+    : _now = now ?? DateTime.now,
+      _wallpaper = null {
+    _lastAutomaticSnoopySeasons = _settingsService.automaticSnoopySeasons;
     _settingsService.addListener(_onSettingsChanged);
     _init();
   }
@@ -247,6 +274,9 @@ class WallpaperService extends ChangeNotifier {
   bool _lastTimeBasedEnabled = false;
 
   void _onSettingsChanged() {
+    final automaticSeasons = _settingsService.automaticSnoopySeasons;
+    final seasonsChanged = automaticSeasons != _lastAutomaticSnoopySeasons;
+    _lastAutomaticSnoopySeasons = automaticSeasons;
     final enabled = _settingsService.timeBasedWallpaperEnabled;
     if (enabled != _lastTimeBasedEnabled) {
       _lastTimeBasedEnabled = enabled;
@@ -254,8 +284,9 @@ class WallpaperService extends ChangeNotifier {
       _updateWallpaper();
     }
     final feedUrl = _settingsService.wallpaperFeedUrl;
-    if (feedUrl != _lastFeedUrl) {
-      _loadRemoteFeed().catchError((Object error) {
+    if (feedUrl != _lastFeedUrl ||
+        (seasonsChanged && localVideoCollectionEnabled)) {
+      _loadRemoteFeed(force: seasonsChanged).catchError((Object error) {
         debugPrint('Wallpaper feed refresh failed: $error');
       });
     }
@@ -321,7 +352,9 @@ class WallpaperService extends ChangeNotifier {
         !{'http', 'https'}.contains(uri.scheme)) {
       throw const FormatException('Use a valid HTTP or HTTPS URL');
     }
+    final request = ++_feedRequest;
     final items = await _fetchRemoteItems(uri);
+    if (request != _feedRequest) return;
     if (items.isEmpty) throw StateError('No wallpapers found');
 
     _lastFeedUrl = normalizedUrl;
@@ -337,11 +370,14 @@ class WallpaperService extends ChangeNotifier {
     LocalWallpaperCollection collection,
   ) async {
     final source = collection.directory.uri;
+    final request = ++_feedRequest;
     final items = await _fetchRemoteItems(source);
+    if (request != _feedRequest) return;
     if (items.isEmpty) throw StateError('No videos in this collection');
     _lastFeedUrl = source.toString();
     _remoteItems = items;
     _remoteIndex = 0;
+    _localSeasonKey = _currentSeasonKey;
     _transitionAt = null;
     await _settingsService.setWallpaperFeed(source.toString(), 15);
     _startFeedTimer();
@@ -349,6 +385,7 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> disableRemoteFeed() async {
+    _feedRequest++;
     final wasEnabled = _settingsService.wallpaperFeedUrl != null;
     _feedTimer?.cancel();
     _feedTimer = null;
@@ -361,7 +398,32 @@ class WallpaperService extends ChangeNotifier {
   }
 
   Future<void> nextRemoteWallpaper({DateTime? transitionAt}) async {
-    if (_remoteItems.length < 2) return;
+    // Re-evaluate the local calendar at clip boundaries, including after the TV
+    // has been asleep. Never cut a playing video at midnight or rebuild Home.
+    if (_localSnoopyCollection && _localSeasonKey != _currentSeasonKey) {
+      final source = _lastFeedUrl;
+      if (source == null) return;
+      final request = _feedRequest;
+      final previous = _remoteItems.isEmpty
+          ? null
+          : _remoteItems[_remoteIndex].uri;
+      final items = await _fetchRemoteItems(Uri.parse(source));
+      if (request != _feedRequest ||
+          _lastFeedUrl != source ||
+          _settingsService.wallpaperFeedUrl != source)
+        return;
+      if (items.isEmpty) return;
+      _remoteItems = shuffledWallpaperItems(items, previous: previous);
+      _remoteIndex = 0;
+      _localSeasonKey = _currentSeasonKey;
+      _transitionAt = transitionAt;
+      _startFeedTimer();
+      _updateWallpaper(force: true);
+      return;
+    }
+    if (_remoteItems.isEmpty ||
+        (_remoteItems.length < 2 && !localVideoCollectionEnabled))
+      return;
     final previous = _remoteItems[_remoteIndex].uri;
     _remoteIndex++;
     if (_remoteIndex >= _remoteItems.length) {
@@ -378,6 +440,7 @@ class WallpaperService extends ChangeNotifier {
   Future<void> _loadRemoteFeed({bool force = false}) async {
     final feedUrl = _settingsService.wallpaperFeedUrl;
     if (!force && feedUrl == _lastFeedUrl) return;
+    final request = ++_feedRequest;
     _lastFeedUrl = feedUrl;
     _feedTimer?.cancel();
     _feedTimer = null;
@@ -389,7 +452,11 @@ class WallpaperService extends ChangeNotifier {
     }
 
     final source = Uri.parse(feedUrl);
-    _remoteItems = await _fetchRemoteItems(source);
+    final items = await _fetchRemoteItems(source);
+    if (request != _feedRequest || feedUrl != _settingsService.wallpaperFeedUrl)
+      return;
+    _remoteItems = items;
+    _localSeasonKey = _currentSeasonKey;
     _startFeedTimer();
     _updateWallpaper(force: true);
   }
@@ -400,8 +467,19 @@ class WallpaperService extends ChangeNotifier {
         await wallpaperCollectionsDirectory(),
         Directory.fromUri(source),
       );
+      final catalogue = collection.name.toLowerCase() == 'snoopy'
+          ? await loadSnoopyCatalogue()
+          : null;
+      final date = _now();
+      final automatic = _settingsService.automaticSnoopySeasons;
       return shuffledWallpaperItems(
         collection.videos
+            .where(
+              (file) =>
+                  !automatic ||
+                  catalogue == null ||
+                  catalogue.fileUnlocked(file.uri.pathSegments.last, date),
+            )
             .map(
               (file) => RemoteWallpaperItem(
                 uri: file.uri,

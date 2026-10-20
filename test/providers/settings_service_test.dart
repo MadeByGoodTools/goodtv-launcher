@@ -49,6 +49,19 @@ void main() async {
     settingsService.removeListener(onChange);
   });
 
+  test(
+    'automatic Canadian seasons and double Back default on and persist',
+    () async {
+      expect(settingsService.automaticSnoopySeasons, isTrue);
+      expect(settingsService.doubleBackScreensaver, isTrue);
+      await settingsService.setAutomaticSnoopySeasons(false);
+      await settingsService.setDoubleBackScreensaver(false);
+      final restored = SettingsService(sharedPreferences);
+      expect(restored.automaticSnoopySeasons, isFalse);
+      expect(restored.doubleBackScreensaver, isFalse);
+    },
+  );
+
   test("setUse24HourTimeFormat", () async {
     final sharedPreferences = await SharedPreferences.getInstance();
     final settingsService = SettingsService(sharedPreferences);

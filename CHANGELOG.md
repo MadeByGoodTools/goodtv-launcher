@@ -1,3 +1,19 @@
+# GoodTV Launcher 1.0.16
+
+* Expand the Snoopy library to 65 catalogued 1080p H.264 clips.
+* Enable automatic Canadian-style seasonal availability by default: everyday
+  clips remain year-round; spring is March–May, summer June–August, autumn
+  September–November, and winter November–March. November and March intentionally
+  overlap neighbouring seasons. This is a local calendar, not live weather.
+* Add calendar windows for Halloween, the December holiday season, New Year,
+  Valentine's, Canada Day, and Canadian Thanksgiving (second Monday in October).
+* Re-evaluate seasonal availability at clip boundaries, keeping the current
+  clip playing to its end and retaining the existing paused preload and
+  0.8-second crossfade. An Automatic seasons toggle can unlock all clips.
+* Add an optional double-Back shortcut on Home to enter the background-only
+  screensaver. It does not intercept Back in settings or another app, and key
+  releases no longer immediately wake a manually activated screensaver.
+
 # GoodTV Launcher 1.0.15
 
 * Add Keep awake while GoodTV is open in Settings > System > Screensaver Settings.

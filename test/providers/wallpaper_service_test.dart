@@ -126,10 +126,17 @@ void main() {
 }
 
 MockSettingsService _mockSettingsService() {
-  final settings = MockSettingsService();
+  final settings = _WallpaperSettingsMock();
   when(settings.timeBasedWallpaperEnabled).thenReturn(false);
   when(settings.wallpaperFeedUrl).thenReturn(null);
   return settings;
+}
+
+// The checked-in generated mock predates this property. These image-wallpaper
+// tests do not change seasonal mode; the rotation tests use real preferences.
+class _WallpaperSettingsMock extends MockSettingsService {
+  @override
+  bool get automaticSnoopySeasons => true;
 }
 
 class _MockPathProviderPlatform extends Mock

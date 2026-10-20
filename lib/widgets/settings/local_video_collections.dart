@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../local_wallpaper_collection.dart';
 import '../../providers/settings_service.dart';
 import '../../providers/wallpaper_service.dart';
+import '../../snoopy_seasons.dart';
 import 'focusable_settings_tile.dart';
 
 class LocalVideoCollections extends StatefulWidget {
@@ -15,6 +16,7 @@ class LocalVideoCollections extends StatefulWidget {
 
 class _LocalVideoCollectionsState extends State<LocalVideoCollections> {
   late final _collections = prepareBundledWallpaperCollections();
+  late final _catalogue = loadSnoopyCatalogue();
   bool _saving = false;
 
   Future<void> _select(LocalWallpaperCollection collection) async {
@@ -47,28 +49,86 @@ class _LocalVideoCollectionsState extends State<LocalVideoCollections> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      FutureBuilder<List<LocalWallpaperCollection>>(
-        future: _collections,
-        builder: (context, snapshot) {
-          final collections =
-              snapshot.data ?? const <LocalWallpaperCollection>[];
-          final selected = context.watch<SettingsService>().wallpaperFeedUrl;
-          return Column(
-            children: [
-              for (final collection in collections)
-                FocusableSettingsTile(
-                  leading: const Icon(Icons.video_library_outlined),
-                  title: Text(
-                    '${collection.name} · ${collection.videos.length} clips',
-                  ),
-                  trailing: selected == collection.directory.uri.toString()
-                      ? const Icon(Icons.check_circle_outline)
-                      : const Text('Use both'),
-                  onPressed: _saving ? null : () => _select(collection),
-                ),
-            ],
-          );
-        },
+  Widget build(
+    BuildContext context,
+  ) => FutureBuilder<List<LocalWallpaperCollection>>(
+    future: _collections,
+    builder: (context, snapshot) {
+      final collections = snapshot.data ?? const <LocalWallpaperCollection>[];
+      final selected = context.watch<SettingsService>().wallpaperFeedUrl;
+      return Column(
+        children: [
+          for (final collection in collections) ...[
+            FocusableSettingsTile(
+              leading: const Icon(Icons.video_library_outlined),
+              title: Text(
+                '${collection.name} · ${collection.videos.length} clips',
+              ),
+              trailing: selected == collection.directory.uri.toString()
+                  ? const Icon(Icons.check_circle_outline)
+                  : const Text('Use both'),
+              onPressed: _saving ? null : () => _select(collection),
+            ),
+            if (collection.name.toLowerCase() == 'snoopy')
+              FutureBuilder<SnoopyCatalogue>(
+                future: _catalogue,
+                builder: (context, data) {
+                  final settings = context.watch<SettingsService>();
+                  final automatic = settings.automaticSnoopySeasons;
+                  final date = DateTime.now();
+                  final catalogue = data.data;
+                  final unlocked = collection.videos
+                      .where(
+                        (file) =>
+                            !automatic ||
+                            catalogue == null ||
+                            catalogue.fileUnlocked(
+                              file.uri.pathSegments.last,
+                              date,
+                            ),
+                      )
+                      .length;
+                  final themes = catalogue
+                      ?.activeThemes(date)
+                      .where((theme) => theme != SnoopyTheme.yearRound)
+                      .map((theme) => theme.label)
+                      .join(', ');
+                  return FocusableSettingsTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Automatic seasons · Canada'),
+                        Text(
+                          automatic
+                              ? '$unlocked/${collection.videos.length} clips unlocked · Everyday${themes == null || themes.isEmpty ? '' : ' + $themes'}'
+                              : 'All ${collection.videos.length} clips available year-round',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const Text(
+                          'Uses the local date, not live weather.',
+                          style: TextStyle(fontSize: 12, color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                    trailing: ExcludeFocus(
+                      child: IgnorePointer(
+                        child: Switch(
+                          value: automatic,
+                          onChanged: settings.setAutomaticSnoopySeasons,
+                        ),
+                      ),
+                    ),
+                    onPressed: () =>
+                        settings.setAutomaticSnoopySeasons(!automatic),
+                  );
+                },
+              ),
+          ],
+        ],
       );
+    },
+  );
 }

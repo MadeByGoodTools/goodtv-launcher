@@ -48,6 +48,7 @@ import 'package:goodtv_launcher/l10n/app_localizations.dart';
 
 import 'models/app.dart';
 import 'models/category.dart';
+import 'home_back_shortcut.dart';
 
 const _kDockOuterPadding = EdgeInsets.only(
   left: kLauncherSectionHorizontalPadding,
@@ -72,6 +73,8 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
   Timer? _idleTimer;
   bool _idleBackgroundOnly = false;
   bool _wasPaused = false;
+  late final HomeBackShortcut _homeBackShortcut;
+  late final LauncherState _launcherState;
 
   @override
   void initState() {
@@ -79,6 +82,22 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_handleHardwareKey);
     FLauncherChannel().setHomePressedHandler(_handleHomePressed);
+    _launcherState = context.read<LauncherState>();
+    _homeBackShortcut = HomeBackShortcut(
+      onSingle: () {
+        if (mounted &&
+            !_wasPaused &&
+            (ModalRoute.of(context)?.isCurrent ?? false)) {
+          _launcherState.handleBackNavigation(context, bypassShortcut: true);
+        }
+      },
+      onDouble: () {
+        if (!mounted || _wasPaused) return;
+        _idleTimer?.cancel();
+        setState(() => _idleBackgroundOnly = true);
+      },
+    );
+    _launcherState.homeBackHandler = _handleHomeBack;
     _resetIdleTimer();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future<void>.delayed(const Duration(milliseconds: 100), () {
@@ -95,12 +114,15 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
     HardwareKeyboard.instance.removeHandler(_handleHardwareKey);
     FLauncherChannel().setHomePressedHandler(null);
     _idleTimer?.cancel();
+    _homeBackShortcut.cancel();
+    _launcherState.homeBackHandler = null;
     _scrollController.dispose();
     super.dispose();
   }
 
   void _handleHomePressed() {
     if (!mounted) return;
+    _homeBackShortcut.cancel();
     _wakeFromIdle();
     setState(() => _selectedCategoryId = null);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -122,16 +144,38 @@ class _FLauncherState extends State<FLauncher> with WidgetsBindingObserver {
       _wakeFromIdle();
     } else if (state == AppLifecycleState.paused) {
       _wasPaused = true;
+      _homeBackShortcut.cancel();
       _idleTimer?.cancel();
     }
   }
 
   bool _handleHardwareKey(KeyEvent event) {
+    // Releases must not immediately wake a screensaver started by KeyDown.
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) return false;
+    final back =
+        event.logicalKey == LogicalKeyboardKey.escape ||
+        event.logicalKey == LogicalKeyboardKey.goBack ||
+        event.logicalKey == LogicalKeyboardKey.gameButtonB;
+    if (back && event is KeyRepeatEvent) return true;
+    if (!back) _homeBackShortcut.cancel();
     final wasIdle = _idleBackgroundOnly;
     _wakeFromIdle();
     return wasIdle &&
         event is KeyDownEvent &&
         context.read<SettingsService>().wakeConsumesFirstPress;
+  }
+
+  bool _handleHomeBack() {
+    if (_wasPaused || !(ModalRoute.of(context)?.isCurrent ?? false))
+      return false;
+    if (_idleBackgroundOnly) {
+      _homeBackShortcut.cancel();
+      _wakeFromIdle();
+      return true;
+    }
+    if (!context.read<SettingsService>().doubleBackScreensaver) return false;
+    _homeBackShortcut.press();
+    return true;
   }
 
   void _wakeFromIdle() {

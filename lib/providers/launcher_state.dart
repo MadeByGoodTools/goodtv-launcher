@@ -29,6 +29,7 @@ class LauncherState extends ChangeNotifier {
   bool _isDefaultLauncher;
   bool _launcherVisible;
   bool _appGridFocused;
+  bool Function()? homeBackHandler;
 
   bool get isDefaultLauncher => _isDefaultLauncher;
   bool get launcherVisible => _launcherVisible;
@@ -57,7 +58,11 @@ class LauncherState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void handleBackNavigation(BuildContext context) {
+  void handleBackNavigation(
+    BuildContext context, {
+    bool bypassShortcut = false,
+  }) {
+    if (!bypassShortcut && (homeBackHandler?.call() ?? false)) return;
     AppsService appsService = context.read<AppsService>();
     LauncherState launcherState = context.read<LauncherState>();
     SettingsService settingsService = context.read<SettingsService>();

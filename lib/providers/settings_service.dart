@@ -42,6 +42,8 @@ const String _accentColor = "accent_color";
 const String _screensaverClockStyle = "screensaver_clock_style";
 const String _screensaverBackground = "screensaver_background";
 const String _keepAwakeEnabled = "keep_awake_enabled";
+const String _automaticSnoopySeasons = "automatic_snoopy_seasons";
+const String _doubleBackScreensaver = "double_back_screensaver";
 const String _dockBackdropFilterDisabled = "dock_backdrop_filter_disabled";
 const String _backgroundBlurDisabled = "background_blur_disabled";
 const String _showWatchNextSection = "show_watch_next_section";
@@ -150,6 +152,12 @@ class SettingsService extends ChangeNotifier {
 
   bool get keepAwakeEnabled =>
       _sharedPreferences.getBool(_keepAwakeEnabled) ?? false;
+
+  bool get automaticSnoopySeasons =>
+      _sharedPreferences.getBool(_automaticSnoopySeasons) ?? true;
+
+  bool get doubleBackScreensaver =>
+      _sharedPreferences.getBool(_doubleBackScreensaver) ?? true;
 
   bool get dockBackdropFilterDisabled =>
       _sharedPreferences.getBool(_dockBackdropFilterDisabled) ?? true;
@@ -390,6 +398,12 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setKeepAwakeEnabled(bool enabled) =>
       set(_keepAwakeEnabled, enabled);
+
+  Future<void> setAutomaticSnoopySeasons(bool enabled) =>
+      set(_automaticSnoopySeasons, enabled);
+
+  Future<void> setDoubleBackScreensaver(bool enabled) =>
+      set(_doubleBackScreensaver, enabled);
 
   Future<void> setDockBackdropFilterDisabled(bool value) async {
     return set(_dockBackdropFilterDisabled, value);

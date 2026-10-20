@@ -73,6 +73,32 @@ class ScreensaverClockStylePage extends StatelessWidget {
                         !settingsService.keepAwakeEnabled,
                       ),
                     ),
+                    FocusableSettingsTile(
+                      title: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Double-press Back for screensaver'),
+                          Text(
+                            'On Home, press Back twice quickly. Any button wakes.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: ExcludeFocus(
+                        child: IgnorePointer(
+                          child: Switch(
+                            value: settingsService.doubleBackScreensaver,
+                            onChanged: settingsService.setDoubleBackScreensaver,
+                          ),
+                        ),
+                      ),
+                      onPressed: () => settingsService.setDoubleBackScreensaver(
+                        !settingsService.doubleBackScreensaver,
+                      ),
+                    ),
                     _StyleRadioTile(
                       title: 'Use my launcher background',
                       subtitle: 'Use the selected Aerial or Reddit collection',

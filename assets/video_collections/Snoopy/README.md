@@ -1,6 +1,6 @@
 # Bundled video media
 
-The published APK includes 18 Snoopy video clips in this collection. The MP4
+The published APK includes 65 Snoopy video clips in this collection. The MP4
 files are kept outside source control and copied here when packaging the release.
 The launcher also builds without these files; the collection then stays hidden.
 
